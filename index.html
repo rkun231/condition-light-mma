@@ -224,6 +224,7 @@ details.fold{border-bottom:1px solid var(--line)}
 details.fold summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;min-height:48px;font-weight:700}
 details.fold summary::-webkit-details-marker{display:none}
 details.fold summary::after{content:"＋";color:var(--gold);font-weight:800}
+details.fold summary .trsum{margin-left:auto;margin-right:10px;font-weight:500;font-size:14px}
 details.fold[open] summary::after{content:"－"}
 details.fold>div{padding:0 0 14px;color:#dcd9d2}
 /* ── 루프 v2 (0.1.12): 라운드 1 검증·평가 반영 ── */
@@ -347,7 +348,7 @@ function band(p){ const a=ageOf(p);
   return {id:"m50",name:"성인 · 50세 이상",youth:false}; }
 
 /* ───────── 종목 ───────── */
-const APP_VER = "0.1.13";
+const APP_VER = "0.1.14";
 // subs 값: null = 포지션 없음 / [[묶음 이름, [포지션…]], …]
 const SPORTS = {
   "투기": { subs:{ "MMA":null }, weightClass:true }
@@ -781,7 +782,7 @@ function renderToday(){
     ${bk}${weighCard(p,L)}${ageTipToday(p)}
     <button class="btn ghost neutral" data-go="symptom">증상 체크하기</button>
     ${canRecover(p)?`<button class="btn ghost neutral" data-go="recovery">계체 후 회복 계산기${cutDday()?` · ${cutDday()}`:""}</button>`:""}
-    <details class="fold trfold" ${trOpen?"open":""}><summary><h2>오늘 훈련</h2></summary>${trainForm(L,s.lv===2)}</details>
+    <details class="fold trfold" ${trOpen?"open":""}><summary><h2>오늘 훈련</h2>${L.rest?`<span class="mut trsum">쉬는 날</span>`:(L.trainMin?`<span class="mut trsum">${esc(L.trainMin)}분${L.rpe?" × "+esc(L.rpe):""}</span>`:"")}</summary>${trainForm(L,s.lv===2)}</details>
     <h2>식단</h2>${dietCard()}`;
     bindTrain(L,d,renderToday,$("#app"));
     const tf=$(".trfold"); if(tf) tf.ontoggle=()=>{ trOpen=tf.open; };
