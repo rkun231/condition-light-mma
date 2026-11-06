@@ -226,6 +226,27 @@ details.fold summary::-webkit-details-marker{display:none}
 details.fold summary::after{content:"＋";color:var(--gold);font-weight:800}
 details.fold[open] summary::after{content:"－"}
 details.fold>div{padding:0 0 14px;color:#dcd9d2}
+/* ── 루프 v2 (0.1.12): 라운드 1 검증·평가 반영 ── */
+/* 되돌리기 바: 화면 폭 절반에 갇혀 두 줄로 꺾이던 것 → 한 줄, 가운데, 탭 바 바로 위 */
+#undo{left:0;right:0;margin:0 auto;transform:none;bottom:calc(78px + env(safe-area-inset-bottom));width:max-content;max-width:min(536px,calc(100% - 24px));white-space:nowrap}
+#undo span{min-width:0;overflow:hidden;text-overflow:ellipsis}#undo button{flex:none}
+/* 체크인 저장 버튼: 하단 탭 바로 위에 붙어 있음 (body가 스크롤 상자가 되면 sticky가 안 붙어서 body는 clip으로) */
+@supports (overflow:clip){ body{overflow-x:clip} }
+#saveck{position:sticky;z-index:4;bottom:calc(80px + env(safe-area-inset-bottom));box-shadow:0 8px 24px rgba(0,0,0,.7)}
+.optsep{margin:22px 0 -4px;border-top:1px solid var(--line)}
+/* 빨강 바탕 글씨는 검정 (흰 글씨 3.55:1 → 검정 5.3:1) */
+body.sg-r{--accInk:#111}.vi.r{color:#111}
+.btn.call119,body.offt .btn.call119{color:#111!important;font-size:22px}
+/* 처음 설정 1단계: 소개 상자와 제목 사이 간격 */
+.intro{margin:6px 0 20px}
+/* 작은 글씨 키우기 */
+nav button{font-size:14px}
+.cap{font-size:13px}.stats .cap,.wcard .cap{font-size:13px}
+label.f .dir{font-size:14px}.stepn{font-size:14px}.symbar span{font-size:14px}button.vmore{font-size:14px}
+/* 증상 화면 하단 띠 */
+.symbar{min-height:52px;line-height:1.3}
+/* 식단 막대: 0일 때도 빈 막대가 보이게 */
+.track{height:10px;background:#2c2c2c}
 </style>
 </head>
 <body>
@@ -250,27 +271,31 @@ function cleanData(d){
   const DT0=/^\d{4}-\d{2}-\d{2}$/, DT={test:k=>typeof k==="string"&&DT0.test(k)&&!isNaN(new Date(k+"T12:00:00"))&&new Date(k+"T12:00:00").toISOString().slice(0,10)===k}, numOr=(v,lo,hi)=>{ const n=+v; return v!==""&&v!=null&&isFinite(n)&&n>=lo&&n<=hi?n:null; };
   const str=v=>typeof v==="string"?v.slice(0,40):"";
   const PT=["목","어깨","팔꿈치·손목","허리","엉덩이","무릎","발목·발","허벅지","종아리","기타"];
-  const p=d.profile;
-  if(p&&typeof p==="object"){
-    p.sex=["남성","여성"].includes(p.sex)?p.sex:"";
-    p.birthYear=numOr(p.birthYear,1900,2100)??""; p.birthMonth=numOr(p.birthMonth,1,12)??"";
-    p.height=numOr(p.height,80,250)??""; p.weight=numOr(p.weight,20,250)??""; p.classLimit=numOr(p.classLimit,20,250);
-    if(!["hobby","amateur","pro"].includes(p.level)) p.level="amateur";
-    p.wcSet=Number.isInteger(p.wcSet)&&p.wcSet>=0&&p.wcSet<10?p.wcSet:0; p.weeklySessions=str(String(p.weeklySessions??"")); p.weightClass=str(p.weightClass); p.subName=str(p.subName); p.pos="";
-    if(!p.screening||typeof p.screening!=="object") p.screening={};
-    if(!p.sex||!p.birthYear||!p.height||!p.weight) d.profile=null;
+  const p0=d.profile;
+  // 프로필·기록은 앱이 쓰는 칸만 남김 (모르는 칸은 버림)
+  if(p0&&typeof p0==="object"&&!Array.isArray(p0)){
+    const sc0=p0.screening&&typeof p0.screening==="object"?p0.screening:{}, scr={};
+    for(const k of ["heart","chest","faint"]) if(["예","아니요"].includes(sc0[k])) scr[k]=sc0[k];
+    const p={cat:str(p0.cat), sub:str(p0.sub), pos:"", subName:str(p0.subName), weightClass:str(p0.weightClass), classOrg:str(p0.classOrg),
+      sex:["남성","여성"].includes(p0.sex)?p0.sex:"",
+      birthYear:numOr(p0.birthYear,1900,2100)??"", birthMonth:numOr(p0.birthMonth,1,12)??"",
+      height:numOr(p0.height,80,250)??"", weight:numOr(p0.weight,20,250)??"", classLimit:numOr(p0.classLimit,20,250),
+      level:["hobby","amateur","pro"].includes(p0.level)?p0.level:"amateur",
+      wcSet:Number.isInteger(p0.wcSet)&&p0.wcSet>=0&&p0.wcSet<10?p0.wcSet:0, weeklySessions:str(String(p0.weeklySessions??"")),
+      screening:scr, screeningFlag:p0.screeningFlag===true||Object.values(scr).includes("예")};
+    d.profile=(!p.sex||!p.birthYear||!p.height||!p.weight)?null:p;
   } else d.profile=null;
   const L={}; for(const [k,x] of Object.entries(d.logs||{})){ if(!DT.test(k)||!x||typeof x!=="object") continue;
     const int=(v,lo,hi)=>{ const n=numOr(v,lo,hi); return Number.isInteger(n)?n:null; }, sc=v=>int(v,1,5)||0;
-    L[k]={...x, sleepH:numOr(x.sleepH,0,24), sleepQ:sc(x.sleepQ), fatigue:sc(x.fatigue), soreness:sc(x.soreness), stress:sc(x.stress),
+    L[k]={sleepH:numOr(x.sleepH,0,24), sleepQ:sc(x.sleepQ), fatigue:sc(x.fatigue), soreness:sc(x.soreness), stress:sc(x.stress),
       pain:int(x.pain,0,3)||0, painPart:PT.includes(x.painPart)?x.painPart:"", weight:numOr(x.weight,20,250),
-      trainMin:numOr(x.trainMin,0,1440)||0, rest:x.rest===true||undefined, rpe:int(x.rpe,1,10)||0, sym:Array.isArray(x.sym)?x.sym.filter(v=>typeof v==="string"&&/^\w+$/.test(v)):[]}; }
+      trainMin:numOr(x.trainMin,0,1440)||0, rest:x.rest===true||undefined, rpe:int(x.rpe,1,10)||0, pitches:int(x.pitches,1,300)||undefined, sym:Array.isArray(x.sym)?x.sym.filter(v=>typeof v==="string"&&/^\w+$/.test(v)):[]}; }
   // 점수 4개가 다 있어야 체크인한 날로 봄 (일부만 있으면 점수를 비워 신호를 만들지 않음)
   for(const o of Object.values(L)) if(!(o.sleepQ&&o.fatigue&&o.soreness&&o.stress)){ o.sleepQ=0; o.fatigue=0; o.soreness=0; o.stress=0; }
   d.logs=L;
   d.lastBackup=DT.test(d.lastBackup)?d.lastBackup:null; d.created=DT.test(d.created)?d.created:today();
   const num=v=>{ const n=+v; return isFinite(n)&&n>=0?Math.min(n,1e5):0; }, obj=v=>v&&typeof v==="object"&&!Array.isArray(v);
-  const food=b=>({...(obj(b)?b:{}), n:str(b&&b.n)||"음식", k:num(b&&b.k), c:num(b&&b.c), p:num(b&&b.p), f:num(b&&b.f), na:num(b&&b.na), sv:numOr(b&&b.sv,1,5000)||100, u:b&&b.u==="ml"?"ml":"g"});
+  const food=b=>({n:str(b&&b.n)||"음식", k:num(b&&b.k), c:num(b&&b.c), p:num(b&&b.p), f:num(b&&b.f), na:num(b&&b.na), sv:numOr(b&&b.sv,1,5000)||100, u:b&&b.u==="ml"?"ml":"g"});
   if(obj(d.meals)){ const M={}; for(const [k,m] of Object.entries(d.meals)){ if(!DT.test(k)||!obj(m)) continue; M[k]={};
     for(const t of ["아침","점심","저녁","간식"]) M[k][t]=(Array.isArray(m[t])?m[t]:[]).filter(obj).map(x=>({n:str(x.n)||"음식", g:numOr(x.g,0,5000)||0, u:x.u==="ml"?"ml":"g",
       k:num(x.k), c:num(x.c), p:num(x.p), f:num(x.f), na:num(x.na), base:food(x.base||x), over:obj(x.over)?{k:num(x.over.k),c:num(x.over.c),p:num(x.over.p),f:num(x.over.f)}:null})); }
@@ -283,7 +308,8 @@ function cleanData(d){
     checks:Array.isArray(c.checks)?c.checks.filter(x=>Array.isArray(x)&&DTL.test(x[0])&&numOr(x[1],20,250)!=null).map(x=>[x[0],+x[1]]):[]}; } else delete d.cut;
   d.vnotes=(Array.isArray(d.vnotes)?d.vnotes:[]).filter(n=>obj(n)&&DT.test(n.date)).map(n=>({date:n.date, names:(Array.isArray(n.names)?n.names:[]).map(str),
     memo:String(n.memo??"").slice(0,2000), marks:(Array.isArray(n.marks)?n.marks:[]).filter(obj).map(m=>({k:m.k==="B"?"B":"A", t:num(m.t), txt:String(m.txt??"").slice(0,200)}))}));
-  return d;
+  const out={}; for(const k of ["profile","logs","lastBackup","created","meals","goal","myFoods","recent","cut","vnotes"]) if(k in d) out[k]=d[k];
+  return out;
 }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ toast("저장 공간에 쓰지 못했어요. 백업을 먼저 해 주세요."); } }
 
@@ -299,7 +325,7 @@ function band(p){ const a=ageOf(p);
   return {id:"m50",name:"성인 · 50세 이상",youth:false}; }
 
 /* ───────── 종목 ───────── */
-const APP_VER = "0.1.11";
+const APP_VER = "0.1.12";
 // subs 값: null = 포지션 없음 / [[묶음 이름, [포지션…]], …]
 const SPORTS = {
   "투기": { subs:{ "MMA":null }, weightClass:true }
@@ -410,7 +436,8 @@ let _skipPop=false;
 function toRoot(){ NAV=[]; go("today",true); }   // go → arm이 남은 보호 기록을 걷어 냄
 window.addEventListener("popstate",()=>{ if(_skipPop){ _skipPop=false; arm(); return; } if(canBack()){ goBack(); arm(); } });
 const SUB_TABS=["symptom","recovery","edit"];
-function backBtn(){ const show = !S.profile&&ob ? (ob.step>0||!!obPrev) : (NAV.length>0 && (SUB_TABS.includes(tab) || (tab==="settings"&&viaLink))); $("#back").hidden=!show; document.body.classList.toggle("hasback",show); }
+// 처음 설정 2~6단계는 아래 '이전 단계' 하나만 둠 (위 '‹ 뒤로'와 겹치지 않게). 위 버튼은 '이전 단계'가 없는 화면(체급 바꾸기, 다시 하기 1단계)에서만
+function backBtn(){ const show = !S.profile&&ob ? (!!obPrev&&(ob.only||ob.step===0)) : (NAV.length>0 && (SUB_TABS.includes(tab) || (tab==="settings"&&viaLink))); $("#back").hidden=!show; document.body.classList.toggle("hasback",show); }
 function uiBack(){ goBack(); }
 const $ = s => document.querySelector(s);
 const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -750,12 +777,13 @@ const PARTS=["목","어깨","팔꿈치·손목","허리","엉덩이","무릎","�
 function checkinForm(x){
   return `<div class="card">
   <label class="f">잠잔 시간</label>${sleepPicker(x.sleepH)}
-  <label class="f">아침 몸무게 <span class="mut">(선택 · 최근 ${curWeight()}kg)</span></label>${picker("mw",x.weight,...wRange(curWeight()),1,"kg")}
   ${scaleHtml("sleepQ",x.sleepQ,"1 아주 나쁨","5 아주 좋음","잠은 어땠나요?")}
   <p class="dirnote">아래 3개는 <b>1이 가장 좋아요</b> (상쾌·없음)</p>
   ${scaleHtml("fatigue",x.fatigue,"1 아주 상쾌","5 아주 피곤","피로는?")}
   ${scaleHtml("soreness",x.soreness,"1 전혀 없음","5 아주 심함","근육통은?")}
   ${scaleHtml("stress",x.stress,"1 전혀 없음","5 아주 심함","스트레스는?")}
+  <div class="optsep"></div>
+  <label class="f">아침 몸무게 <span class="mut">(선택 · 최근 ${curWeight()}kg)</span></label>${picker("mw",x.weight,...wRange(curWeight()),1,"kg")}
   <label class="f">아픈 곳이 있나요?</label>
   <div class="chips">${["없음","약간","중간","심함"].map((v,i)=>`<button class="chip ${x.pain===i?"on":""}" data-pain="${i}">${v}</button>`).join("")}</div>
   ${x.pain>0?`<label class="f">어디가 아픈가요?</label><div class="chips">${PARTS.map(v=>`<button class="chip ${x.painPart===v?"on":""}" data-part="${v}">${v}</button>`).join("")}</div>`:""}
@@ -1078,11 +1106,11 @@ function renderVideo(){
   </div>
   <h2>메모</h2><div class="card">
     <button class="btn sm" id="vmark">지금 시점 표시하기</button>
-    <ul class="why" id="vmarks">${VID.marks.map((m,i)=>`<li class="lo"><span style="flex:1">${m.k} · ${fmtT(m.t)} <input type="text" data-mk="${i}" value="${esc(m.txt)}" placeholder="무엇을 봤나요?" class="mk"></span><button class="x" data-mdel="${i}">✕</button></li>`).join("")}</ul>
+    <ul class="why" id="vmarks">${VID.marks.map((m,i)=>`<li class="lo"><span style="flex:1">${m.k} · ${fmtT(m.t)} <input type="text" data-mk="${i}" value="${esc(m.txt)}" placeholder="무엇을 봤나요?" class="mk"></span><button class="x" data-mdel="${i}" aria-label="${m.k} ${fmtT(m.t)} 표시 지우기">✕</button></li>`).join("")}</ul>
     <label class="f">전체 메모</label><textarea id="vmemo" rows="3" placeholder="예: 착지 때 무릎이 안쪽으로 모임">${esc(VID.memo)}</textarea>
     <button class="btn" id="vsave">메모 저장</button>
     <small class="src">영상 파일은 앱에 저장하지 않아요. 원본은 사진 앱에 그대로 있어요.</small></div>`:`<p class="mut" style="margin-top:14px">영상을 고르면 느리게 보기, 한 프레임씩 넘기기, 두 영상 나란히 비교를 할 수 있어요. 영상은 이 폰 밖으로 나가지 않아요.</p>`}
-  ${notes.length?`<h2>지난 메모</h2>${notes.map((n,ri)=>{ const i=notes.length-1-ri; return `<div class="card"><div class="mlab"><b>${esc(n.date.slice(5).replace("-","/"))} · ${esc(n.names.join(" vs "))}</b><button class="x" data-ndel="${i}">✕</button></div>
+  ${notes.length?`<h2>지난 메모</h2>${notes.map((n,ri)=>{ const i=notes.length-1-ri; return `<div class="card"><div class="mlab"><b>${esc(n.date.slice(5).replace("-","/"))} · ${esc(n.names.join(" vs "))}</b><button class="x" data-ndel="${i}" aria-label="${esc(n.date.slice(5).replace("-","/"))} 메모 지우기">✕</button></div>
     ${n.marks.length?`<ul class="why">${n.marks.map(m=>`<li class="lo">${m.k} · ${fmtT(m.t)} ${esc(m.txt)}</li>`).join("")}</ul>`:""}${n.memo?`<p style="margin:8px 0 0">${esc(n.memo)}</p>`:""}</div>`; }).join("")}`:""}`;
   document.body.classList.toggle("vfs",VID.full&&keys.some(k=>VID[k]));
   bindVideo(); fitFull();
