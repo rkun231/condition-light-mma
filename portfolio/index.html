@@ -376,11 +376,108 @@ details.qa div { padding: 12px 0 16px; }
 .card-player dt { color: var(--muted); } .card-player dd { margin: 0; font-weight: 700; }
 body.print .fab, body.print .modal { display: none !important; }
 body.print .ch { min-height: 0; }
+/* ── 루프 v2 ── */
+.skip { position: absolute; left: -9999px; top: 8px; z-index: 60; background: var(--gold); color: #111; padding: 8px 14px; border-radius: 8px; font-weight: 800; }
+.skip:focus { left: 12px; }
+.src { font-size: 13px; color: #b3ada3; }
+.tag, .eyebrow { letter-spacing: .02em; }
+.days { -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); padding-right: 40px; }
+main.play { padding-bottom: 110px; }
+.quiz button.wrong { opacity: .5; }
+.quiz button.wrong span::after { content: " ✕"; }
+.quiz button.right { box-shadow: 0 0 0 3px currentColor; }
+.quiz button.right span::after { content: " · 정답"; }
+.quiz button.pick.right span, .quiz button.pick.right span::after { color: #111; }
+.meter .tr .band { background: rgba(62,201,126,.35); }
+.vids canvas { height: min(46vh, 420px); width: auto; max-width: 100%; margin: 0 auto; }
+.retro ul { margin: 4px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.modal { background: rgba(0,0,0,.92); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); overflow: auto; place-items: start center; padding: max(12px, env(safe-area-inset-top)) 12px 24px; }
+.modal-card { max-height: none; }
+.modal .screen-area { height: min(640px, calc(100dvh - 300px)); min-height: 240px; }
+.ch .sat { align-items: center; }
+@media (max-width: 640px) {
+  .fab { width: 56px; height: 56px; padding: 0; font-size: 24px; border-radius: 50%; display: grid; place-items: center; }
+  .fab .fab-t { display: none; }
+  .brow { grid-template-columns: minmax(0, 1fr) auto; row-gap: 4px; }
+  .brow > span:first-child { grid-column: 1; } .brow .n { grid-column: 2; grid-row: 1; }
+  .brow .btrack { grid-column: 1 / -1; grid-row: 2; }
+  #e4 .table-box table, #e4 .table-box tbody, #e4 .table-box tr, #e4 .table-box td { display: block; min-width: 0; width: 100%; }
+  #e4 .table-box thead { display: none; }
+  #e4 .table-box tr { padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  #e4 .table-box td { border: 0; padding: 2px 0; }
+  #e4 .table-box td:first-child { font-weight: 800; }
+  #e4 .table-box td:last-child { font-size: 13px; }
+  .card-player .ava { width: 52px; height: 52px; font-size: 20px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } html { scroll-behavior: auto !important; } }
+/* ── 루프 v3 ── */
+.vids canvas { height: auto; aspect-ratio: 3 / 4; width: min(100%, calc(min(40vh, 320px) * 3 / 4)); }
+.vids figcaption { justify-content: center; gap: 8px; }
+summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.story > summary:focus-visible { outline-offset: -3px; }
+.hud .stat .k { font-size: 12px; }
+.story .sb .k { font-size: 13px; font-weight: 800; letter-spacing: .02em; }
+.days a { font-size: 13px; }
+.mission > .mh b { font-size: 13px; }
+.load-bars span, .load-bars b { font-size: 13px; }
+.story[data-s="5"] .sb { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.loopnote { font-size: 13px; color: #b3ada3; margin: -2px 0 6px; }
+.fab { transition: opacity .25s, transform .25s; }
+.fab.dim { opacity: .2; transform: scale(.85); }
+@media (max-width: 640px) {
+  .kv { grid-template-columns: 1fr; gap: 2px; }
+  .kv dd { margin-bottom: 10px; }
+  :is(#e2) .table-box table, :is(#e2) .table-box tbody, :is(#e2) .table-box tr, :is(#e2) .table-box td { display: block; min-width: 0; width: 100%; }
+  #e2 .table-box thead { display: none; }
+  #e2 .table-box tr { padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  #e2 .table-box td { border: 0; padding: 2px 0; }
+  #e2 .table-box td:first-child { font-weight: 800; }
+  .glasses button { width: 30px; height: 40px; }
+  .glasses { gap: 5px; }
+  .modal .screen-area { height: calc(100dvh - 210px); min-height: 300px; }
+  .modal .scen { gap: 4px; } .modal .scen button { font-size: 12px; padding: 3px 9px; }
+  .modal .device { padding: 8px 6px 4px; border-radius: 30px; } .modal .screen-area { border-radius: 22px; }
+  .modal .phone-hint { min-height: 0; font-size: 12px; }
+}
+
+/* ── v4 (3라운드 지적 반영) ── */
+.story > summary .lock, .facts .k, .tl .when, .tl .ver, .foods button small { font-size: 13px; }
+.foods button small { color: #b3ada3; }
+.load-bars { position: relative; }
+.load-bars i { background: #3a3a3a; }
+.load-bars .avgline { position: absolute; left: 0; right: 0; height: 0 !important; display: block !important; border-top: 2px dashed var(--g); pointer-events: none; }
+.load-bars .avgline span { position: absolute; right: 0; top: 4px; background: var(--card); padding: 0 4px; font-family: var(--mono); font-size: 12px; color: var(--g); }
+.load-bars .now.pending i { background: transparent; border-style: dashed; }
+.fab { opacity: .9; }
+@media (max-width: 640px) {
+  .story > summary .hint2 { display: inline; margin-left: auto; }
+  .story > summary .lock { width: auto; flex: 1; }
+  .story > summary .hint2::after { content: "▾" !important; }
+  .story[open] > summary .hint2::after { content: "▴" !important; }
+  .fab { width: 46px; height: 46px; font-size: 20px; opacity: .85; }
+  .toggles button, .seg button, .vctl button, .ghost-btn { min-height: 44px; }
+  .brand { padding: 9px 0; }
+  #e5 .qr-card { display: none; }
+}
+@media (max-width: 360px) {
+  .hud-top { gap: 8px; }
+  .hud .stat .k.long { display: none; }
+  .glasses button { width: 26px; height: 36px; } .glasses { gap: 4px; }
+}
+@media (max-height: 500px) {
+  .modal .screen-area { height: calc(100dvh - 175px); min-height: 150px; }
+  .modal .navbar { padding: 2px 6px 0; } .modal .navbar button { flex-direction: row; gap: 6px; padding: 2px 12px; } .modal .device { padding: 6px 6px 2px; } .modal-card { gap: 4px; } .modal .close { padding: 3px 12px; }
+  .modal .scen { flex-wrap: nowrap; overflow-x: auto; max-width: 100%; justify-content: flex-start; }
+  .modal .phone-hint { display: none; }
+}
+.vids canvas { width: min(100%, calc(max(200px, min(40vh, 320px)) * 3 / 4)); }
+
+
 @media print { .hud, .fab { display: none; } }
 </style>
 </head>
 <body>
-
+<a class="skip" href="#d1">본문(월요일 미션)으로 건너뛰기</a>
 <header class="hud">
   <div class="hud-top gutter">
     <a class="brand" href="#p0"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAQAElEQVR4AeydCXQjR5nHpZZl67QOy5ZPeWYyk5kkM8zkIjcJC8sjCQMsPGA5kheuhDwCAZYle7As2bxll/NtWAIsxwtHLnYJCbyXsBCWkAMm2UwmQ65hJnN7HFs+ZFvW1Tpa/DWllNtyq7u6JdvVcvt901Pqrq7+vq9/+uqr6kPCeTtOgayLRbu6Qp1G/2KDPWgEcsq6vkjEeDv9vRE0Atl8ykB3d9ioOp093eFzX7UB7Zy+abCnJxwIGGwpHAruOGMd2tm2JRaNdgWDRhvq7Ny6eQjt7Dh9uK83EgoZb2fLxgG0c/a29YP93eFw0KBhnZ0b1/WhnVdv3zA8FO0KGz9lgs1miydS8+l8oVBC2YAEO119ET92nJrNzKVy+bzBdnye9qHeANqZnc8lkllRLKJsQFwdbcN9QUGwz6fFqbkM2imXDTRja3MIsf5gh9ORyRUmZtJoR5IMNWSzxfoCXne7mC/GE+mcWCiVDLbT3+MP+FzFkhSfTkGrYlEyYpjN1hP2dgU95XIZ+qRw6osGT1k44BbiFj1KJ8GiR8kri9aBnmiXT7BizyKvnPxg0XPSDWoLQg9qCFbPBS/IxaJH7g3FMqVnciZdyYEUK6mvtPIedf9gawvnPei5YCDoSaZEIwBZ9MB96rJG6MkXSroBeoUemzXmqsfQ2qEHHtAHkEUPXKYua4oeuEIHQBY98Je6rDV64A1WgCx64Cx1WYP0wCFMAFn0wFPqsjbpgU+0AbLogZvUZc3SA7doAGTRAx+py1qmB55RA2h56MniqiQObECsq6SaTmviVVL5bCHme+odui5AFj31XEbXr/HYQ/ygDJBFD/GOytKihzhHASCLHuIalaVFD3VOLUAWPdQ19QoWPXLPLALIokfuGsWyRU+NWxYAsuipcc3SjxY9S31SBcgM9CxVXnuNdXeYpo/kd4clU6LKiF2xqQpAFj2KrpGvtGKP3BvysmDRI3eHYtmiR9EtZKVgPZFDHIGl3W53uVyhUCgajfb19Q0MDMRO/tmcgXTRXRT8XZHegYGhk+uMLNpcoXTBlSl2eHyhQCDk8XhwRBxXl6z8XLO6epUuzLq3sKOjo7u7e2hoqKenx+/346PT6XQ4HOq+M7LVbnc42trb271ebyQSwRG7urrYD8QbPZ3eDmGN0wNWAA1CjtvtNgJEw/uAJEQ7UFvWevyRQ3oGop3CWn6WlPRWLpdLjkEqlYrH46Ojo8ePHz/S1L9jx46h2fHx8fn5efkRBUGAJuBYvrKmzCc9UFLI5w0+1uozzZPIMLNW0GtEo1F87+mGXC6Hs7tv376jR49OTk7OzMwkk8l0U//ADZqdmpoCSTgQSCoWFx7fRghEp0b1kRe4pSeRzFZyILmujGVT04OQ09vbi86LGAtQDh8+fPDgQZzdUsng14k0xb7EgUDS/v37Ee0kqfqIu8fjWcoQz/TMJnNGAPKZOfaAHuTLiEA42TiL6KcgmUwGH1dekPcg2iEgyRnyeDxUE87pEfNF3QD5TE4PUg0yeM5ms4g6CD/0bK1WAf0k+k3KEPIhZEVQhn96oKQ+gExND0bmiD2wGYKQg/y4UCigzINAH/RlRBNEx87OTlPQA4V1AGRqehB1QA+WsBlnS/6NxxoeZHp6GooRTfx+XzjQnPf3MN6ZSo5bb4n5noFoJ7Yia0beg54LZSKsAJmaHpiK+bq2tjYUEHU4pAeKQSYmJrCE2O1CURLiiXSDb39abnqgKhNAZqfH5/N5TmamSFqRMtNsA/arykpvxBQU+CZHzeTt/NMDVbUB8pk5a4aF6LaCwSAKEHzFkTujwK1gKoHo5mhzFhp489wKxB6ipwZAZqcHRuJaARnU4MuNMTPW8Cw0DQL3EAOqhgPuFaMH6qkB1AL0wEKMaLCEIEvFknORz01jOKZX2xWmB+rVBag16MF1b5I7Y84wkUjAYM4FYZJqiIyNllkKK08PtFIGqDXogXn0egXyU25zZ+hJRd5t6VJ4VeiB2goAtQw9MA8XLrCEYLYXy6bIZZ2+d0WCH+2NfHYw+rG+yLsjwdd0epvSMhoh8RIFhB8ICiyyWvRAt1qAWokemIdL3FhCaHKKsjF5e1fgJ5uHU+dve3jbxns2r/vGKYO3DPd9fcPgXZvXPbJt08x52763cejVPnIZy9gRKnthurzyn80mT4bImnrLVaQHKi0CqMXooScDX+VcLgdrDYjDZrumJ3zo7NN+umX9OyMhb53bFINtjg9Gu57cfuqdpw73OiszlgaOhV1on8sI0OrSA4UXAGoxemAbBUgURXw0IOf7PfvOOu32TbENrg7G3d/THTpw9mmXhyq//cC4i7wa7XPl2bS8gry86vRAmSpArUcPbMMQDEuIgfCDwHPzUO/j2zZtcrOigwMR8TscP9+y4a3hAPmoa0kByufz6jvyQA80rADUkvTANhqB9ALkFuy/2brxc7Feh92OdgyIU7Dfd9r6S/Qn1xR69S6ME3rgGaFV6YFtro52LCG6ujCvIPzmjI2XBXzYsUH5/saYUw+CSIDIpDmOqxKB+KEHegot/AtLdgEdEWy0sUcg0PPw1o0X6o8clcMs+Yfu719ivUtW111B+y+VBIgremBJpQtryd/nwrcZ5kEwHadyPlBBLndvHj7X3+hQXN7gp/q70SHK16iUXa7q8yH1wg9v9HhcTqEl6fG62wuvPO/Afvn96u7QTkOZrwoT7YLwhmDlViyVOnQThV4xAeKQnlhfQEi06G8DpsXq8xWMCRDixFfXD9Bz2cTCFcxDetqFLY1AfNJjt9uFVn1nqiBUZ/MYE6Ab+rojDUwAqgC3xV3tmFTqYBNOBh2C1QDELT1JYz/3BGtd3P8uKT0ZLAC5BPtnBnpg13LIOld1MKjeOL3qgnnzkuzxNJ7pmZ7LVJJodcOWbuWfHrsdMzjVKRyWHOht4eAyhR94zy0wOZn2X/I+l3N6cqL+58L4p6dUKtMpRIy/8IXGWVSXK8Osea56O4pbk2x3pi7NoPmnB/YyfTlQj4gp6IGqFCCW/gv1rwwtI0DzpeqTyziQitAIRBIgnfTUbVjliZy6+yhtwIgdYy4kash70HMh9pBaOgAyCz0wTBdA5/jcgbbqlCP2bbpMyd6goNI4zYEQNc1CD8xhBchE9MAqXRn0QDtTkotmjcnjybTmjiCeXsTwuhwreVe8pm71Yg/ZkQkgF/djLuQ9xB6ypPf1sXRh3c5lDD/Q56HZRW8DwpqlQhOgsiRFu7yoMDmTRmeh952p2JHIcvdc5ChYagNkOnrwbUZXDduQPstHNFijKJGTT6wqbmp8ZbpUemJeOwLRBMghlHFQs9ADVTUAMh09MAkAYQlhoQfVcuXKOUNhOeT2iQRLCk0BEuySieiBx9QAMiM9MElXAoT6B7IG71fEvuqSl6R/HYmr1yFbKUDpTM4UPRdRG8u6AJmUHphEI1CO7T7ofRmDt0vjWOry3fj0OL2oq1qV5kDzqczK5j0KaqlnzTU7KANkXnpgHo1AjF3YETH/QiaLHZsro2L+H4+Ns7QJemjSljEaDlcsa66xSAEgU9ODM+FwVEdVjBEIHrljYgbLJkqxXH7zviNzsktaKo3T/kvxLg6VHemm1aIHCtQCZGp6YA8NP7ruI7tjcgZDNuzeLLnqwLE9adaoRgEic9B6dVhFeqDqIoDMTg/soQkQyzVU1CdyIl/49vg0KTe+vPHwiXumZtnboQBhDpp9L1JzdemBDgsAtQA9sIdGIPb+C3tBPnlk9JDR/AO7U/nSifjXx6boR5YCciBSTS9Aq04P1K4C1Br0wB46B82YQWMXImK5/JcvHELmSz4aWOYk6eOHT9x0bEzXvkjaKPS6AOKBHlhaAahl6IE99NusNwJhXwzHLnzupWM5jSf6UHOp7M/mzt574D91xh60Q6+hIgljT6I5oAe6V0RoJXow/sIXumKWzaYrByK7YHlcLOzYu/+2sckS8/T0cTF//aGRbc/sfzFrZD6JJkDsGTQ/9MBjwnBfUBDs82lxai4jihh+YqVuaXMIsf5gh9ORyRUmZtJoR5IMXh+I9QW87nYxX4wn0jmxUHOVVF0z2hfk83l8odUr19s6WyrdcHj0rL37757UGNs/Npf6yMGR4d0vfnt8usAMXM1xaciEzjWbFD9yRQ80FFqGHhhDARKNvk0BjRB5NpN7z4Fj/l3PfuCl4zcfH6+R6w6OdD/53GueP/hf8UbHbjQCsSRAvNHjRORojdhDzjrNoA0kQKSFmmVKknA19PMj4zXynfj0FNuNqjUNLv1IcyBNgDikZ7g/ILRAz0XPCo1AzQKItrxMBcxaoQsgjat3YXzSU4lAyFeMdd+IXjzkPcT7ZInzQQpmAYj2Xxh/qSRt3NKTzuaFlqGnP1p9mzjOROM5EAFxuZc0g1bpv3imZ3ImU5kH0ucmm43D2NPf4/e88hIxs9ADt9MIVA8gzunJGXgujE96Aj5XsVx9ktAs/ZccIMUEiH96EOwFmMEu/NJTksR8deapKQD1hJ3Xv7P/gdu2PnfvOWO/vaD87KXJXRcdevDVf/jxjn//xPrtmyv3vbP7rV5NlS7MFPTALh0A8UxPfDolOPS9TQHGK8obLwo9/P3t8d9d+M3Pbrrikq6tm7y9kcpzP35v24ZB9wXbAzd9ILb3f84BWKip2ALjStBD5s3xPa7pwsxCDyxlBYhzerJiEdcxYA/EcA500Zmdj/1gxy+/9arLzq3m42itngAs1Lz/1jP6uit41aumsp4mQBiCyauZiB6ozQQQ5/Tg+gl9mYskSTXfZhipKc42+5c/tQH0XHyWvlervuW1kV0/PjPWp/tNrlCJAiRPgMxFD6zQBoh/eopFic4AGbiGujHmfurusz59zRDpUOAUXTLc7wJD6weYXgIkb5kCRIk3HT0wRwOgZtLTwFVSKEoFI/bKmKskIe9B7AE92GR4DvrUYTdO//bNDb2Ttb+n496vnQ41dAkFiEQgM9IDe9UAMgs9MINGIF0J0OmneH7/ozMjISdaaFDOPM3/iffpeEMeoh3VGTmQSemB0+oCZCJ6YIaBCBTwO377ve1NoQcKQD73kWGhrjuxfZHQa6hI2jwdjoFo5f0yiWR2NpkT86+8H3TRHtofPC5nrC8ANJMpUf4GFu09F9fAFS5cJcUSVyow14zZQowTF1dZ+KRssbnowfgLXiM2sedA93zx9GiXwQEUOVbNMtTpfNNrumpW1vtI+y+pVDQvPbBOASBz0QMbaPjJM99H9smrBt94cRj7Nleu2hllbBCTQKRmh7MygW7G2EP0rwXIdPTADAoQ4xx0V7ANs8nYsely2TnaE0jkoDQCOYSyeemBLYsAMiM9sIHeRyay3YiI8NPuXGQ4GmmKIKNyu5hapjlQKpMzXd4j99WCtfzSs3jELteelHVFIK9buPG9g2TH5VhuGNSeEHI6nfQ+stm5tGiqrLnGaVWAzEsP7MH5wBLC0oVhnhi9sQAAEABJREFU7tjnqT48j12aLu0MsY32X6ViMScWjOngca3CmGupqhWATE0PDT8YaooMXdjrzmNNU5Y6i2XN1Iw2EDSDFrV+Va7eETmhB+oJpqYHBjid1WlAFnpQ//Xnh7BcPhmf0n4ukUYgTCEa0IQfeqA8F89zQQ8qilcq6NalBQoQS//lcQuxPu0cZelRGNccPpEtFKu3JansQgHK649AXNEDG4VVfxoQSlDRSw921AVQJFgNV9hxOeShXRrPIpKD0i6MXkYl6zWXvNGD+VsB1yMnVu9ZUrnLDNCD3enJYIlA3c247IWD1hMWgKAw/I4WkLTpAohDeob7AoKp6cFgGIKTAVEACGsXS76g3b8s3kPHp5lk4YHHEpo70P5LVwLEJz1ul7Pye2HSajzHLne0sdiDFmj/JUkSy/k4OML61jA0rlduvXM0J2q/05cCxJ4AcUsPrrMKkmnpwQmmADFeQ83mpMSc9jAbLeuVbK506x2jLHtRgBj7L57piSdSlXkgFrNr6sSW8+6wmmOpfKSTQCz9F2nn0afnSKG5y89+4+jsPNNtGBQglgjEOT2VCGTAj5zQA81pBGIH6M4HmN78jcbZ5dGnZ7/2oxMs9ZE+U501+1z+6UH3pTsC8UMPThiNQIyziNjl/oen59NMoQKVWQS58zs//SJLTdSh11AlraTNFPTAIn0AcUWPsfvIisXyF753HJY3RWaTxdd/+Nn4NGteRfsv9QTILPTAhzoA4ooeqN4d9mMJQTKBORUUGOVLt488s0/1J5jYGpqeLVx49TN79qXYqldqUYCgc+Wz0j8T0QP1WQHijZ6esNfrdcMACHsChMoQSbK96zP7Jqa1L1qhcj354/7Uee/ds+9wpl4FxfWYRSTr60Ugc9EDW5gA4pCerqBHeuVtCuwJEAwm8tKx7Pnve2Y0bvB3er5+54lz373n0Ijut2rSHEgRINPRA2dqA8QnPeiz6G1YeiMQzIYcGc2BoV/8bgpldnng0Wmgc+MXD7FcNK1pFuMvOm++tAszIz0wUAMgbumJJ9IOR6NvUzgRF9/y8Reu/OhzLxzU/lHB/3ty5pJr9r7phud3v2Awf6IJEAbw+ALA+1RMSg/0VwOIZ3roy1wwHjbQhcFyKg8+ltj6tt1nv+vpL/9gZNcf546cyKYyJWwdmxSffyn94GPT1958oPvSP2C09fiehiYhaQJUE37MSw+8VBcgnulJpfN2oXpbaoP0wAVEMJj6zNcOX3jV3g1X/L///Mftr3qk/3VPbHv77is/+vx37x1juc+QtKOylEcgWs3U9MAKZYA4p6dQLCGfgPaQZgGEppogqk1QgGgEMjs9MFcBIP7pgd4UIGMZNFpYYcFFDNqFkSFYC9ADH9YCZAp6oDc9GWYBCAqDIWiO9BkAtQY9MGcRQGahB4NhCLSHmAggaAvBEKxl6IE5CwCZhR4oTa+hYgiG84E1/AtNgKRSEa5GNFrJd2io+AeaDPcF3C5nTizGEyksJUnHfZtVgGCS4d/IkStn+N5CeSMo40oF5poR7eOJNMZcyJqxkgp9lpnxPjK6o0rBGQt7Ltvkf+v2wDXnB95/AQqeSzc513ep7KJrEwXI63bgnLUGPfBABSBz0QOlaQRqvP9yDodDN1w6+LNrh37xkd7/eEf356/s+sRfdN34WhR6b33H0H3XxX79scg/X9G+qRvHbUQoQA57uWXogUME09EDpZsyBGuLhXq+8JbB+64Lfeii9g0RNKsobT3+zr/aMXDPB7tueoPdZ+RlmmgWIYfqnMkqvf0JldjE2eZgf/uTSpNQqZGei7YsmKjnokrTCGRsEkjwuyL/dHnsF9f7rjjDLlRez0NbrlewO4TAu88ZvOv9jp7qPST1aiqup9dQ0SlPz1byDMVqmit5owcKC6Kh3wbEnlRWJu+hh3M4KjkE+WggB/Lt3Db08+s6334maUHX0hkL9//g6rYB3U/X0/4LA3hkqboOSitzSM9gtFNAlprT+cuS1CQUVpgeHLG9vfpeujzz+8iwFxEEnp5bdjrCxn+owNkf6PvmX9scTHGLHBRLCpDI8PoH1F8qfNLj93YIOVPRA8/SZEJvBt19y05jgQcHlUsl7/7wxfI1mmUKECKQZuWlFbilB6NjoVTSMeiX27bysYccnUYgUc+3OXT9Jf6d20gLjS8xzre7dDxm3whAPNMTn05XhvEGHLpa9EBVOgnEHoFc58SC1+qLGTiQiggdbb43bVWpIN+EkEnnzdHtyjdpljmnJ5srGAFoFemBx2kEYgTIEfZEv/I2jFqxbxMFM42MrdHwg0lzjMIY90I1JnpQT0tge1NG7DgOsmbkPei5EHtAT7Ek6QaIE3okSWLswsKffr0j6IHxzRXX1n5HN9MPJFCAdIUfU9ADl+oDaHXpgbroDrCEMNLTNhTyvfEM1F8OwaiepVlchyfVEIFIQXNpFnpgiA6AVp0eqKsXoNC1FzNOFaJxvdLWz/TbUHojkInogcdYAeKBHqhLAWJKgJwO3+XLFX6gjL29elc/yvUE+QeNQCxjeHPRA6uZAOKEHqhLTwYLQO6zh+xtTAaiZQMizWs/FwaFwRAaR/qsCZDp6IFd2v7lhx4MhiFQGsICkOvcdai5fMIIEFGgJemBaRoA8UMPdKUD+FKpxJKQunYs4xvpoU9pRvu5ZpoAqQO0CrEHBqjK0hG7YnU1gLiiB9p3+vQ9DN8WYRpmo2UDImXz+T9pv2qIBSDz0gO/1QWIN3rCAbfetykI4eZP/8BlRLJPHCEF9SUFqN4kkKnpge3KAHFIT7TLJ73yNgWWBAi2OfzL+E7x7C5tgJCx0WGjYhdmdnrgZAWA+KSnXLZJ5aq2jACV6esXYGhTRcoVUr/ep9kkDT+YNy+VKo9Ly3dpAXpgTvWUoESET3qg29RcloyHUWYEKH9I35s30DKjJO/ZLc1qvzGYArQ0/LQGPXDXIoC4pWdyJk3fpoBkAnMqUF1TxH3jmnUMVJDE4uwPn2TZkQIEneX1W4YeGLUAEM/0JFMifZsCY/iBbemHtHsZVNMria/+RmIYwKNZCpA8ApmeHhgmkypAnNOTL5ToJBA7QNknjxantV/8I/OGdjH9yEvJ/96jXe9kjaUAtRg9sLICEP/0QNG2tuqFJ8br8NgFWffc7bsqhSb9yz0zMnHTfYyNYfyFURipTLowJ2dP5EA3xtlC1KwnginoQfpsIALB5rm7nsofaU4qDXrGrr+7nGN9xzQNP5g0R9LWkvTAw0LA5ypq/aot6qlLT9ir8iSy+r7yrZgtxHwP1iBrRt6DngtlCA0/GA/riEDYUypP3vwg/m9QsruPjV1/Dzs9OBwFCOGnVemBmQL/9EBLGn700YM9bTZx74nxT/60XNT+HZ2T1WsXZak8853Hx667q5xjfZs4aYICVCoVuXqWFOo13nOhEQi+7UJ8OpXJFYpG/bvcsQdaQhoBCLtnHj4Q/5t7MfuHsi4pTsyPfeiOmW8+atP/7EpHR/U56KC/HREonc1PzmRyYhHdmS4dSGV04st3XzM5hN4l6EGPUfnFQs7pgWG0C2MfgmEvuWQeeWlk57dS/8v6oxbFsbnpLz808uZv5/aMyNthLON8U4CcDlur0iPh4gA7PTW+W5nYQw6KEQ0pGOjCyI5YliZTE393/+jVP0ze+4yUUn7FOK6xpx58If63Pzt++W1zdz6lt9vCUYig/wJDlXK5nMuJLRl7QE/c8O+FrSQ9OA0OR/WdrBjR4GMjIj47OnXLL49e/NWXP3RH/O/vn/rSrxO3PTL1b7+K33Qf1hy94CsT//Dz9EN/auQQ2Nfnq95JUpaKLUxPOpOvzAPBYF2ywvRgNqX6bbbZSksuSerSXF45t/t4+pcvJu/aPfvd3yd/8nT6V/uwRl6hkbLXW338Pp3Jtl7eI0llxB7QUyjqfy5shenBWQRAWJpIkLFRgFLpTItlzXJ6cFL0RaCVpwcqygXnRv6Rz3IkEiEhs1AoYBLIgJLYnc8xVw09ME0HQKtFT7FYpF9i/gFCvAyHw/AsZHZ2Fku9YiJ6YBorQKtFD1SE0NTH4/HgI8/S29sLhqBhoVAw8P4rc9EDM5kAapAeHIYI5p0w+4RyzZUKrFEXOnoPBoPqNVd3KwZfNPwkEgm9ypiOHhioDdCq0wMtM5nqAzTowmh+ivVcCQLP4GD1QaJkMkmhZ1TSjPTANA2AeKAHWqIvkKTqxayenh6s4U1Az7p168A3FEPSpjf7MSk9MFYNIE7ogZYQGoQQgWg3gfU8COhZv349yc+Q709OTurSyrz0wMy6AHFFDxSVCgsPoiNRJWcL61ddcJkF9NAX+U5NTSF9ZtfK1PTATGWAeKOn09vR1+11CnloDME3Hv2F2119UBVrVks6Ozs3btxINCGxB70tuzJmpweWKgDEIT0D0U7omkqlcrnqwzRgCN/7VezL2tvbh4aGYrEYuU6HiQb0XGuNHpyUWoC4ogf6IfYQehLJ7GwyNzExSZMhMNTf379hw4YV7s5wpX1gYODUU08NBALQEIIB1/j4eC630Mlipbq0QOwhBi4CiHN6xJNPmiLJSKcXnrUAPWBoy5YtGELjGgImivx+PxLtJgr6qVAo1N3djXiDA6HPwkfiPiwx4IrH44hAKDNKy9ADexcAMgU90BgChiDyXBXjZ6CD5BoYDQ8Po3drooAbhJxoNAqScCAoAMG0wvz8/Msvv4wpH3xkl1aiB1ZXATIRPVAa5wAd2djYGGZ75Rhh0wpIsViYm5sbHR2dmZnBlI+uI0Jzs1wlZbSrApC56JEbhrQaGCH/QAGJCGDS1ZXIm1IpV9osS4KtVC7mEtOTY2PjAAhjLpVdFDe1Hj0wUzAvPdCeSD6fRyhCIgKYEBiOn/ybmhjzODLetmwpNzsRf/nkOiOLsZdH3Y6s1ylKhdRUYiadyRlAB3q2JD2wS+gKeuCReELhlyWxmVEMXyWtab9mzCWezJpr6rB8bKVfta2xt4lP5OCsSbJ7C2sOxPhRaEl6Yn0BfOOTKXF6rvIkDaMvaqo5W/FJZGJjtMvXFHoQfSq/F5ZK5wvF2tcfkSNpLqEHtEG1yZk0Tli+YLAdK/bAh+rCW+wBPch/BIuepafNij1LfVKzhtCDlYIVe+AFuVj0yL2hWKb0TCSM/l6Y1XMpepauRAbWYvM91DQ5PfNpsTIPRLcxFix61B21duhByqsbIIseix70XIg9oAeu0AdQy9PTwm9BiCdS5FlSnHUDUtNzEXrQjg6ALHrgLxVZUz0X9QMrQBY91GWKhbVJD1zBBJBFDzylImuWHvhEGyCLHrhJRdYyPXCLBkAWPfCRiqxxeuAZNYAseuAgFbHogXPqAmTRA++oSA09ObEoSWWV+iqb+LxKCoXl8z34qCjKAFn0KDqLrrTooa5QAMiih3pHsWDRI3dLLUAWPXLvLC1b9NT4ZBFAFj013qn5aNFT4xB8XADIogfuUBGLHmwcwYYAAAA1SURBVEXnVAGy6FH0Dl1p0UNdUVOoAGTRU+OUmo/LSk/NsRg/Rpt3V3xPuPJKa5YRu6JufwYAAP//Ik7v9QAAAAZJREFUAwDQM9xqNvGLawAAAABJRU5ErkJggg==" alt="" width="26" height="26"><span>컨디션 신호등</span></a>
@@ -388,7 +485,7 @@ body.print .ch { min-height: 0; }
     <div class="stat hide-s" title="라이트급 한계"><span class="k">한계</span><span class="v">70.3</span></div>
     <div class="stat" title="오늘 신호"><span class="k">신호</span><span class="lamp-mini" id="hudL"><i class="r"></i><i class="y"></i><i class="g"></i></span></div>
     <span class="grow"></span>
-    <div class="stat" title="펼쳐 본 '만든 이야기'"><span class="k">만든 이야기</span><span class="v" id="hudS">0/7</span></div>
+    <div class="stat" title="펼쳐 본 '만든 이야기'"><span class="k long">만든 이야기</span><span class="v" id="hudS">0/7</span></div>
   </div>
   <nav class="days gutter" id="days" aria-label="날짜"></nav>
 </header>
@@ -400,6 +497,7 @@ body.print .ch { min-height: 0; }
       <span class="eyebrow">SK AIGEN 지원 포트폴리오 · 유경군 · 컨디션 신호등</span>
       <h1>이번 주는 당신이<br><em>계체를 앞둔 선수</em>입니다</h1>
       <p class="situ">선수가 아침마다 몸 상태를 넣으면 오늘 훈련 강도를 초록·노랑·빨강 신호와 그 이유로 보여 주는 웹앱 '컨디션 신호등'을 만들었습니다. 설명을 읽는 대신 일주일을 직접 보내 보세요. 하루를 마칠 때마다 그 기능을 <b>왜, 어떻게 만들었는지</b>가 열립니다.</p>
+      <div class="row-btns"><a class="go-btn" href="#d1" style="text-decoration:none"><span>월요일 아침으로 →</span></a><a class="ghost-btn" href="#e1" style="text-decoration:none">결과부터 보기</a><a class="ghost-btn" href="https://rkun231.github.io/condition-light-mma/" target="_blank" rel="noopener" style="text-decoration:none">실제 앱 ↗</a></div>
       <div class="split">
         <div class="card-player">
           <div class="ava">MMA</div>
@@ -414,7 +512,6 @@ body.print .ch { min-height: 0; }
           </ul>
         </div>
       </div>
-      <div class="row-btns"><a class="go-btn" href="#d1" style="text-decoration:none"><span>월요일 아침으로 →</span></a><a class="ghost-btn" href="#e1" style="text-decoration:none">결과부터 보기</a><a class="ghost-btn" href="https://rkun231.github.io/condition-light-mma/" target="_blank" rel="noopener" style="text-decoration:none">실제 앱 ↗</a></div>
       <p class="note">어느 날짜든 위쪽에서 바로 갈 수 있어요. 미션을 하지 않아도 '만든 이야기'는 눌러서 펼칠 수 있어요. 오른쪽 아래 <b>실제 앱</b> 버튼은 진짜 앱을 그날 상황으로 띄웁니다.</p>
     </div>
   </section>
@@ -429,7 +526,7 @@ body.print .ch { min-height: 0; }
         <div class="mh"><b>MISSION 1</b><span>다섯 칸을 채우고 오늘 신호 받기</span></div>
         <div class="ck">
           <div class="ctl" id="ck1"></div>
-          <div class="result" id="ck1out"><div class="placeholder">왼쪽을 채우고 '신호 받기'를 누르면<br>신호와 이유가 여기 나와요</div></div>
+          <div class="result" id="ck1out" aria-live="polite"><div class="placeholder">왼쪽을 채우고 '신호 받기'를 누르면<br>신호와 이유가 여기 나와요</div></div>
         </div>
         <div class="row-btns"><button class="go-btn" id="ck1go"><span>신호 받기</span></button><button class="ghost-btn" data-app="before">실제 앱에서 체크인 →</button></div>
       </div>
@@ -490,7 +587,7 @@ body.print .ch { min-height: 0; }
           <div><div class="k">평소 컨디션 점수</div><div class="v">14.4 / 20</div></div>
         </div>
         <div class="quiz" id="quiz"><button data-c="g"><span>초록</span></button><button data-c="y"><span>노랑</span></button><button data-c="r"><span>빨강</span></button></div>
-        <div id="quizOut"></div>
+        <div id="quizOut" aria-live="polite"></div>
         <div class="row-btns"><button class="ghost-btn" data-app="bad">실제 앱에서 이 아침 보기 →</button></div>
       </div>
       <details class="story" data-s="3"><summary><span class="lock">만든 이야기 3</span>무엇 때문에 빨간불이 켜졌는지 보여 주기<span class="hint2"></span></summary>
@@ -543,7 +640,7 @@ body.print .ch { min-height: 0; }
         <div class="sb">
           <div><span class="k">해결</span>증상은 목록에서 고르게 했습니다. 응급의료 안내 같은 공식 지침에 근거해 단계를 나눴고, 119·병원 단계를 기록하면 그날 신호가 빨간색이 됩니다.</div>
           <div><span class="k">검증</span>앱 초기 버전을 만들고 나니 오류가 생각보다 많았는데요. 그래서 제가 테스트 기준을 만들어 AI에게 자동 검증을 맡겼습니다. 한 AI는 고치고, 다른 AI는 문제를 찾고, 또 다른 AI는 점수를 매기게 해서 세 번에 걸쳐 고쳤습니다. 고친 부분들을 확인할 수 있게 체크리스트를 만들라고 요청했고, 그 체크리스트를 바탕으로 제 눈으로 다시 확인해 재검증했습니다.</div>
-          <div class="full"><span class="k">검증할 때마다 오른 점수</span><div class="bars" id="loopBars"></div><span class="src">1차: 증상 저장 뒤 화면 이동, 폰 뒤로 가기 버튼 오류 등 · 2차: 영상 크게 보기에서 검은 화면이 뜨는 문제, 회복 계산에 계체 전 몸무게가 들어가던 문제 등 · 3차: 90점, 남은 문제까지 마저 고침</span></div>
+          <div class="full"><span class="k">검증할 때마다 오른 점수</span><div class="bars" id="loopBars"></div></div>
         </div>
       </details>
     </div>
@@ -554,7 +651,7 @@ body.print .ch { min-height: 0; }
     <div class="ch-in">
       <div class="dayline"><span class="d">D-1 · 토</span><span class="t">08:00 · 계체</span></div>
       <h2>계체 통과. 이제 내일 저녁까지 채우기</h2>
-      <div class="split">
+      <div class="split sat">
         <div class="stack" style="align-items:center">
           <div class="scale" id="scale"><span class="lim">공식 계체 · 라이트급 70.3kg</span><span class="num" id="scaleNum">0.0</span><span class="lim" id="scaleMsg">저울에 올라가세요</span></div>
           <button class="go-btn" id="weighGo"><span>저울에 올라가기</span></button>
@@ -596,15 +693,15 @@ body.print .ch { min-height: 0; }
       <p class="situ">왼쪽은 지난주, 오른쪽은 어제 찍은 하이킥입니다. 두 영상은 시작 시점이 달라서 그냥 틀면 비교가 안 됩니다. 아래 막대로 오른쪽 영상을 밀어 <b>발이 가장 높은 순간</b>을 맞춰 보세요.</p>
       <div class="mission" id="m7">
         <div class="mh"><b>MISSION 7</b><span>두 영상의 발차기 최고점을 같은 순간으로 맞추기</span></div>
-        <div class="vids"><figure><canvas id="cvA" width="300" height="400"></canvas><figcaption><span>지난주</span><span id="fA">0프레임</span></figcaption></figure><figure><canvas id="cvB" width="300" height="400"></canvas><figcaption><span>어제</span><span id="fB">0프레임</span></figcaption></figure></div>
-        <div class="vctl" id="vctl"><button data-v="-1">◀ 1프레임</button><button data-v="play">▶ 재생</button><button data-v="1">1프레임 ▶</button><span class="note">속도</span><button data-r="0.25">0.25</button><button data-r="0.5">0.5</button><button data-r="1" aria-pressed="true">1</button></div>
+        <div class="vids"><figure><canvas id="cvA" width="300" height="400"></canvas><figcaption><span>지난주 · <span id="fA">0프레임</span></span></figcaption></figure><figure><canvas id="cvB" width="300" height="400"></canvas><figcaption><span>어제 · <span id="fB">0프레임</span></span></figcaption></figure></div>
+        <div class="vctl" id="vctl"><button type="button" data-v="-1" aria-label="한 프레임 뒤로">◀ 1프레임</button><button type="button" data-v="play">▶ 재생</button><button type="button" data-v="1" aria-label="한 프레임 앞으로">1프레임 ▶</button><span class="note">속도</span><button type="button" data-r="0.25" aria-pressed="false">0.25배</button><button type="button" data-r="0.5" aria-pressed="false">0.5배</button><button type="button" data-r="1" aria-pressed="true">1배</button></div>
         <div class="sync"><span>오른쪽 밀기</span><input type="range" id="sync" min="-30" max="30" step="1" value="0"><output id="syncO">0프레임</output></div>
-        <div id="vidOut" class="note"></div>
+        <div id="vidOut" class="note" aria-live="polite"></div>
       </div>
       <details class="story" data-s="7"><summary><span class="lock">만든 이야기 7</span>풋살 팀에서 못 했던 '영상으로 짚어 주기'<span class="hint2"></span></summary>
         <div class="sb">
           <div><span class="k">과제정의</span>풋살 팀 코치를 할 때 경기 영상을 되짚어 가며 설명해 주고 싶었는데 마땅한 방법이 없었습니다. 그래서 느리게, 한 프레임씩, 두 영상을 나란히 같은 순간으로 맞추는 기능을 넣었습니다(v0.4.0).</div>
-          <div><span class="k">직접 써 보며</span>써 보니 1·5·10초씩 건너뛰기가 필요했고, 화면을 꽉 채우는 '크게 보기'와 소리 켜기를 넣었습니다. 크게 보기에서 설정을 펼치면 검은 화면이 되던 문제는 점검 2라운드에서 찾아 고쳤습니다.</div>
+          <div><span class="k">직접 써 보며</span>써 보니 1·5·10초씩 건너뛰기가 필요했고, 화면을 꽉 채우는 '크게 보기'와 소리 켜기를 넣었습니다. 크게 보기에서 설정을 펼치면 검은 화면이 되던 문제는 2차 자동 검증에서 찾아 고쳤습니다.</div>
           <div><span class="k">보류</span>AI 자세 분석은 뺐습니다. 격투기는 상대와 상황에 따라 움직임이 달라서 '정답 자세'가 없다고 봤기 때문인데요. 골프처럼 정해진 동작을 반복하는 종목에는 나중에 넣어 볼 생각입니다.</div>
         </div>
       </details>
@@ -651,7 +748,7 @@ body.print .ch { min-height: 0; }
       <h2>11월 1일 첫 버전부터<br>11월 5일 MMA 분리까지</h2>
       <div class="stats">
         <div><span class="big-num">19<small>번</small></span><span class="cap">고칠 때마다 남긴 커밋 (여러 종목 18 + MMA 1)</span></div>
-        <div><span class="big-num">78→90</span><span class="cap">세 역할 점검 3라운드</span></div>
+        <div><span class="big-num">78→90</span><span class="cap">자동 검증 3차례 평가 점수</span></div>
         <div><span class="big-num">1,015<small>개</small></span><span class="cap">식약처 DB에서 고른 음식</span></div>
         <div><span class="big-num">1<small>명</small></span><span class="cap">매일 쓰는 사용자 (만든 본인)</span></div>
       </div>
@@ -675,12 +772,12 @@ body.print .ch { min-height: 0; }
     </div>
   </section>
 
-  <section class="ch epi" id="e5" data-day="회고" data-label="NEXT">
+  <section class="ch epi" id="e5" data-day="회고·Q&amp;A" data-label="NEXT">
     <div class="ch-in">
       <span class="tag">회고</span>
       <h2>배운 것, 놓친 것, 이어갈 것</h2>
       <div class="retro">
-        <div class="r-g"><b>배운 것</b><span>설문으로 현장에 물어보니 몰랐던 것들이 보였습니다. 선수마다 평소 체중에서 빼는 폭이 꽤 달랐고, 감량법을 배운 곳도 제각각이었습니다. 반면 계체 후 경기 전까지 다시 채우는 방법(전해질 음료 → 탄수화물)은 대부분 비슷했습니다. 감량·회복 중에 어지럼이나 경기력 저하 같은 문제를 겪은 경우가 생각보다 많았고, 기록은 주로 휴대폰 메모로 하고 있었습니다. 격투기 관련 앱을 쓰는 분은 없었지만, 의학 논문과 전문가 자문을 바탕으로 한 앱이라면 쓰겠다는 답이 많았습니다. 필요한 기능을 고르게 하니 한 분은 7개를 모두, 나머지 분들도 3~4개씩 골라 생각보다 이런 앱이 필요하다는 걸 느꼈고, 자동화했으면 하는 일을 적어 준 분도 있었습니다.</span></div>
+        <div class="r-g"><b>배운 것</b><span>설문으로 현장에 물어보니 몰랐던 것들이 보였습니다.</span><ul><li>선수마다 평소 체중에서 빼는 폭이 꽤 달랐고, 감량법을 배운 곳도 제각각이었습니다.</li><li>반면 계체 후 경기 전까지 다시 채우는 방법(전해질 음료 → 탄수화물)은 대부분 비슷했습니다.</li><li>감량·회복 중에 어지럼이나 경기력 저하 같은 문제를 겪은 경우가 생각보다 많았고, 기록은 주로 휴대폰 메모로 하고 있었습니다.</li><li>격투기 관련 앱을 쓰는 분은 없었지만, 의학 논문과 전문가 자문을 바탕으로 한 앱이라면 쓰겠다는 답이 많았습니다.</li><li>필요한 기능을 고르게 하니 한 분은 7개를 모두, 나머지 분들도 3~4개씩 골라 생각보다 이런 앱이 필요하다는 걸 느꼈고, 자동화했으면 하는 일을 적어 준 분도 있었습니다.</li></ul></div>
         <div class="r-y"><b>놓친 것</b><span>매일 쓰는 실제 사용자는 아직 저 하나뿐입니다. 설문 응답도 아직 3명이라 경향이라고 말할 수 없습니다. 갤럭시에서 영상이 끊기는지는 확인하지 못했고, 의료진의 검토도 받지 않았습니다.</span></div>
         <div class="r-gold"><b>이어갈 것</b><span>11월 12일 설문이 마감되면 결과를 반영해 MMA 앱을 고치고, 아이디를 남겨 주신 분들께 직접 써 보시고 후기를 부탁드릴 계획입니다. 감량 '계획'처럼 혼자 정하면 위험할 수 있는 부분은 전문가와 함께 기준을 세운 뒤에 만들겠습니다. MMA 앱을 완성한 뒤에는 다른 종목과 합칠지, 종목별로 따로 만들지를 그동안 모은 의견을 보고 정하려고 합니다.</span></div>
       </div>
@@ -704,7 +801,7 @@ body.print .ch { min-height: 0; }
   </section>
 </main>
 
-<button class="fab" type="button" id="fab">📱 실제 앱</button>
+<button class="fab" type="button" id="fab" aria-label="실제 앱 열기">📱<span class="fab-t"> 실제 앱</span></button>
 <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-label="실제 앱 체험">
   <div class="modal-card"><button class="close" type="button" id="mclose">닫기 ✕</button><div id="phoneHost"></div></div>
 </div>
@@ -743,18 +840,19 @@ body.print .ch { min-height: 0; }
   host.innerHTML = `<div class="scen">${Object.entries(SCENES).map(([k, s]) => `<button type="button" data-s="${k}">${s[0]}</button>`).join("")}</div>
     <div class="device"><div class="screen-area" data-r="screen"></div>
     <div class="navbar"><button type="button" data-a="back"><span class="glyph">◀</span>뒤로</button><button type="button" data-a="reset"><span class="glyph">↺</span>처음부터</button></div></div>
-    <p class="phone-hint">실제 앱 파일 그대로예요. 누른 내용은 이 브라우저에만 남아요.</p>`;
+    <p class="phone-hint">실제 앱 파일 그대로예요. 앱 안 날짜는 오늘 날짜로 보여요. 누른 내용은 이 브라우저에만 남아요.</p>`;
   let frame = null, cur = "before";
   function load(kind) {
     cur = kind;
     try { localStorage.setItem(DEMO_KEY, JSON.stringify(demoState(kind))); } catch (e) {}
     host.querySelectorAll("[data-s]").forEach(b => b.setAttribute("aria-pressed", b.dataset.s === kind ? "true" : "false"));
     const tab = SCENES[kind][1];
-    const html = appHtml().replace("<head>", '<head><base href="https://rkun231.github.io/condition-light/" target="_blank">')
+    const html = appHtml().replace("<head>", '<head><base href="https://rkun231.github.io/condition-light-mma/" target="_blank">')
       .replace('const KEY = "condition-mma-v1";', `const KEY = "${DEMO_KEY}";`).replace("function arm(){", "function arm(){ return; ")
       .replace("</body>", `<script>try{ ${tab !== "today" ? `NAV=["today"]; go("${tab}");` : ""} }catch(e){}<\/script></body>`);
     if (frame) frame.remove();
     frame = document.createElement("iframe"); frame.title = "컨디션 신호등 MMA 체험 화면"; frame.srcdoc = html;
+    frame.addEventListener("load", function () { try { this.contentDocument.addEventListener("keydown", e => { if (e.key === "Escape") close(); }); } catch (_) {} });
     host.querySelector('[data-r="screen"]').appendChild(frame);
   }
   host.addEventListener("click", e => {
@@ -764,9 +862,13 @@ body.print .ch { min-height: 0; }
     if (a.dataset.a === "back") { try { frame.contentWindow.uiBack(); } catch (_) {} }
   });
   const modal = document.getElementById("modal");
-  window.openApp = kind => { modal.hidden = false; load(kind || window.__dayScene || "before"); document.getElementById("mclose").focus(); };
-  const close = () => { modal.hidden = true; if (frame) { frame.remove(); frame = null; } };
-  document.getElementById("fab").addEventListener("click", () => window.openApp());
+  let lastFocus = null;
+  const bg = () => [document.querySelector("main"), document.querySelector(".hud"), document.getElementById("fab"), document.querySelector(".skip")];
+  window.openApp = kind => { lastFocus = document.activeElement; bg().forEach(el => el && (el.inert = true)); modal.hidden = false; modal.scrollTop = 0; load(kind || window.__dayScene || "before"); document.getElementById("mclose").focus(); };
+  function close() { bg().forEach(el => el && (el.inert = false)); modal.hidden = true; if (frame) { frame.remove(); frame = null; } if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+  const fab = document.getElementById("fab"); let ft = null;
+  fab.addEventListener("click", () => window.openApp());
+  addEventListener("scroll", () => { fab.classList.add("dim"); clearTimeout(ft); ft = setTimeout(() => fab.classList.remove("dim"), 900); }, { passive: true });
   document.getElementById("mclose").addEventListener("click", close);
   modal.addEventListener("click", e => { if (e.target === modal) close(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !modal.hidden) close(); });
@@ -779,7 +881,7 @@ body.print .ch { min-height: 0; }
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const r1 = x => Math.round(x * 10) / 10;
   const fmtSleep = h => { const H = Math.floor(h), M = Math.round((h - H) * 60); return M ? `${H}시간 ${M}분` : `${H}시간`; };
-  const PRINT = /[?&]print/.test(location.search);
+  const PRINT = new URLSearchParams(location.search).get("print") === "1";
   if (PRINT) document.body.classList.add("print");
 
   /* ── 진행 상태: 미션 완료·이야기 열람 ── */
@@ -801,7 +903,7 @@ body.print .ch { min-height: 0; }
     const c = chapters[i]; $("hudW").textContent = c.dataset.w || "—"; window.__dayScene = c.dataset.scene || "before";
     const sig = { d1: dayResult.d1, d2: 0, d3: dayResult.d3, d4: 0, d5: dayResult.d5, d6: 0, d7: 0 }[c.id]; setHudSignal(sig);
     const a = dayLinks[i], t = $("days");
-    if (a.offsetLeft < t.scrollLeft || a.offsetLeft + a.offsetWidth > t.scrollLeft + t.clientWidth) t.scrollTo({ left: a.offsetLeft - 40, behavior: "smooth" });
+    t.scrollTo({ left: a.offsetLeft - (t.clientWidth - a.offsetWidth) / 2, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }
   const dayResult = { d1: null, d3: null, d5: null };
   if ("IntersectionObserver" in window) { const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) markDay(chapters.indexOf(e.target)); }), { rootMargin: "-40% 0px -59% 0px" }); chapters.forEach(c => io.observe(c)); }
@@ -840,25 +942,29 @@ body.print .ch { min-height: 0; }
   function load2() {
     const m = +$("tMin").value, r = +$("tRpe").value; $("tMinO").textContent = m + "분"; $("tRpeO").textContent = r + " / 10";
     const week = 90 * 6 + m * r, avg = PAST.reduce((a, b) => a + b, 0) / 4;
-    const proj = week + 90 * 6 * 3, ratio = proj / avg;
+    const proj = week + 90 * 6 * 3, ratio = Math.round(proj / avg * 100) / 100;
     const max = Math.max(...PAST, proj) * 1.1;
     $("loadBars").innerHTML = PAST.map((v, i) => `<div><b>${v}</b><i style="height:${v / max * 130}px"></i><span>${4 - i}주 전</span></div>`).join("") +
-      `<div class="now ${ratio > 1.5 ? "bad" : ratio > 1.3 ? "warn" : ""}"><b>${proj}</b><i style="height:${proj / max * 130}px"></i><span>이번 주*</span></div>`;
+      `<div class="now ${ratio > 1.5 ? "bad" : ratio > 1.3 ? "warn" : ""} ${done.has(2) ? "" : "pending"}"><b>${proj}</b><i style="height:${proj / max * 130}px"></i><span>이번 주*</span></div>` +
+      `<div class="avgline" style="bottom:${avg / max * 130 + 25}px"><span>평소 ${Math.round(avg)}</span></div>`;
     $("loadOut").innerHTML = `오늘 훈련량 <b>${m * r}</b> · 이번 주 예상 <b>${proj}</b> = 평소 주평균(${Math.round(avg)})의 <b class="${ratio > 1.5 ? "no" : ratio > 1.3 ? "mid" : "yes"}">${ratio.toFixed(2)}배</b>. ${ratio > 1.5 ? "앱은 '급하게 늘었어요'로 빨강 이유를 붙여요." : ratio > 1.3 ? "앱은 '늘었어요'로 노랑 이유를 붙여요." : "평소 범위예요."}<br><span class="src">* 남은 사흘은 월요일과 같은 90분 × 6으로 가정. 기록 21일 이상일 때만 계산하는 참고 지표예요.</span>`;
   }
   ["tMin", "tRpe"].forEach(id => $(id).addEventListener("input", load2)); load2();
-  $("t2go").addEventListener("click", () => { complete(2); $("t2go").firstElementChild.textContent = "기록했어요 ✓"; });
+  $("t2go").addEventListener("click", () => { complete(2); load2(); $("t2go").firstElementChild.textContent = "기록했어요 ✓"; });
 
   /* MISSION 3: 신호 맞히기 */
   $("quiz").addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
-    $("quiz").querySelectorAll("button").forEach(x => x.classList.toggle("pick", x === b));
+    $("quiz").querySelectorAll("button").forEach(x => { x.classList.toggle("pick", x === b); x.classList.toggle("wrong", x === b && x.dataset.c !== "r"); x.classList.toggle("right", x.dataset.c === "r"); });
     const s = signal({ sQ: 2, fa: 2, so: 2, st: 2, pa: 2, H: 5, W: -2.4, base: 14.4, sd: 2 }); dayResult.d3 = s.lv; setHudSignal(s.lv);
     const right = b.dataset.c === "r";
-    $("quizOut").innerHTML = `<p style="font-weight:800;margin-bottom:8px">${right ? "맞혔어요." : "앱은 빨강을 보여 줘요."} 하나라도 빨강 기준에 걸리면 빨강이고, 이유는 걸린 만큼 모두 붙어요.</p>` + sigHtml(s);
+    $("quizOut").innerHTML = `<p style="font-weight:800;margin-bottom:8px">${right ? "맞혔어요 — 앱도 빨강을 보여 줘요." : "아쉬워요 — 앱은 빨강을 보여 줘요."} 하나라도 빨강 기준에 걸리면 빨강이고, 이유는 걸린 만큼 모두 붙어요.</p>` + sigHtml(s);
     complete(3);
   });
 
+  const hasJong = w => { const c = w.charCodeAt(w.length - 1); return c >= 0xac00 && c <= 0xd7a3 && (c - 0xac00) % 28 !== 0; };
+  const josa = (w, a, b) => w + (hasJong(w) ? a : b);
+  const orList = ws => ws.length === 2 ? josa(ws[0], "이나", "나") + " " + ws[1] : ws[0];
   /* MISSION 4: 식단 (식약처 DB 값, 100g당 → 1회 분량) */
   const FOODS = [["쌀밥", 166, 37.3, 3.4, 210, "한 공기 210g"], ["닭가슴살(삶은것)", 127, 0, 28.1, 100, "100g"], ["달걀(삶은것)", 145, 1.4, 13.5, 100, "2개 100g"], ["고구마(찐것)", 163, 39.4, 1.1, 150, "1개 150g"], ["바나나", 77, 20, 1.1, 100, "1개 100g"], ["된장찌개", 46, 4.4, 3.4, 200, "1그릇 200g"], ["연어(구운것)", 210, 0, 22.1, 100, "100g"], ["라면", 82, 13.7, 1.7, 550, "1그릇 550g"], ["돼지 삼겹살(생것)", 372, 0, 13.9, 100, "100g"]];
   const pick = new Set();
@@ -869,8 +975,16 @@ body.print .ch { min-height: 0; }
     const mk = (lab, v, max, band, unit) => `<div class="meter"><div class="mt"><span>${lab}</span><b>${Math.round(v)}${unit}</b></div><div class="tr">${band ? `<span class="band" style="left:${band[0] / max * 100}%;width:${(band[1] - band[0]) / max * 100}%"></span>` : ""}<i style="width:${Math.min(100, v / max * 100)}%"></i></div></div>`;
     $("meters").innerHTML = mk("열량 (초록 칸이 목표)", k, 1400, KCAL, "kcal") + mk("단백질 (초록 칸이 20g 이상)", p, 80, [20, 80], "g") + mk("탄수화물", c, 160, null, "g");
     const kOk = k >= KCAL[0] && k <= KCAL[1], pOk = p >= 20;
+    const tips = [];
+    const kc = i => FOODS[i][1] * FOODS[i][4] / 100, not = ids => ids.filter(i => !pick.has(i)).map(i => FOODS[i][0].replace(/\(.*\)/, "").trim());
+    const add = c => { const w = orList(c); return ` ${josa(w, "을", "를")} 더해 보세요.`; };
+    if (k < KCAL[0]) { const c = not([3, 2, 4, 0]).slice(0, 2); tips.push(`열량이 ${Math.round(KCAL[0] - k)}kcal 더 필요해요.${c.length ? add(c) : ""}`); }
+    if (k > KCAL[1]) { const ok = [...pick].filter(i => k - kc(i) >= KCAL[0]).sort((a, b) => kc(a) - kc(b)); const out = ok.length ? ok[0] : [...pick].sort((a, b) => kc(b) - kc(a))[0];
+      const w = FOODS[out][0].replace(/\(.*\)/, "").trim(); tips.push(`열량이 ${Math.round(k - KCAL[1])}kcal 넘쳐요. ${josa(w, "을", "를")} 빼 보세요.`); }
+    if (!pOk) { const c = not([1, 2, 6]).slice(0, 2); tips.push(`단백질이 ${r1(20 - p)}g 더 필요해요.${c.length ? add(c) : ""}`); }
     $("verdict").innerHTML = !pick.size ? `<span class="muted">음식을 눌러 담아 보세요.</span>` :
-      `${kOk ? '<span class="yes">열량 알맞음</span>' : k < KCAL[0] ? '<span class="mid">열량 적음</span>' : '<span class="no">열량 많음</span>'} · ${pOk ? '<span class="yes">단백질 충분</span>' : '<span class="mid">단백질 부족</span>'}`;
+      `${kOk ? '<span class="yes">열량 알맞음</span>' : k < KCAL[0] ? '<span class="mid">열량 적음</span>' : '<span class="no">열량 많음</span>'} · ${pOk ? '<span class="yes">단백질 충분</span>' : '<span class="mid">단백질 부족</span>'}` +
+      (tips.length ? `<p class="note" style="font-weight:500;margin-top:6px">${tips.join(" ")}</p>` : `<p class="note" style="font-weight:500;margin-top:6px">좋아요. 목표 안에 들어왔어요.</p>`);
     $("foodSrc").textContent = "이 장면의 점심 목표(600~900kcal)는 예시예요. 앱은 키·몸무게·주간 훈련·감량 목표로 하루 목표를 계산하고, 점심은 그 30% ±30%로 봐요. 주식 끼니 단백질 20g 이상.";
     $("foods").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", pick.has(+b.dataset.i) ? "true" : "false"));
     if (kOk && pOk) complete(4);
@@ -885,13 +999,13 @@ body.print .ch { min-height: 0; }
   $("syms").innerHTML = SYMS.map(([id, lv, t]) => `<label><input type="checkbox" value="${id}"><span>${esc(t)}</span></label>`).join("");
   $("syms").addEventListener("change", () => {
     const on = [...$("syms").querySelectorAll("input:checked")].map(i => SYMS.find(s => s[0] === i.value));
-    if (!on.length) { $("symOut").innerHTML = '<div class="placeholder">증상을 하나 이상 골라 보세요</div>'; return; }
+    if (!on.length) { $("symOut").innerHTML = '<div class="placeholder">증상을 하나 이상 골라 보세요</div>'; dayResult.d5 = null; setHudSignal(null); return; }
     const lv = Math.max(...on.map(s => s[1])); dayResult.d5 = lv >= 1 ? 2 : 0; setHudSignal(dayResult.d5);
     $("symOut").innerHTML = `<div class="triage l${lv}"><b>${LV[lv][0]}</b><span>${LV[lv][1]}</span><span class="src">고른 증상 중 가장 급한 단계로 안내해요. ${lv >= 1 ? "이 단계를 기록하면 오늘 신호가 빨강이 돼요." : ""} 진단이 아니에요.</span></div>`;
     complete(5);
   });
-  const LOOP = [["1차 검증", 78], ["2차 검증", 84], ["3차 검증", 90]];
-  $("loopBars").innerHTML = LOOP.map(([l, s], i) => `<div class="brow"><span>${l}</span><div class="btrack"><i class="${i === 2 ? "hl" : ""}" style="width:${s}%"></i></div><span class="n">${s}점</span></div>`).join("");
+  const LOOP = [["1차 검증", 78, "증상 저장 뒤 화면 이동, 폰 뒤로 가기 버튼 오류 등"], ["2차 검증", 84, "영상 크게 보기의 검은 화면, 회복 계산에 계체 전 몸무게가 들어가던 문제 등"], ["3차 검증", 90, "90점 통과, 남은 문제까지 마저 고침"]];
+  $("loopBars").innerHTML = LOOP.map(([l, s, t], i) => `<div class="brow"><span>${l}</span><div class="btrack"><i class="${i === 2 ? "hl" : ""}" style="width:${s}%"></i></div><span class="n">${s}점</span></div><p class="loopnote">${t}</p>`).join("");
 
   /* MISSION 6: 계체 + 수분 잔 */
   $("weighGo").addEventListener("click", () => {
@@ -913,7 +1027,7 @@ body.print .ch { min-height: 0; }
   glass();
   ["rU", "rW", "rG"].forEach(id => $(id).addEventListener("input", rec));
   function rec() {
-    const usual = +$("rU").value, weigh = Math.min(+$("rW").value, usual), gap = +$("rG").value;
+    const usual = +$("rU").value; $("rW").max = usual; const weigh = Math.min(+$("rW").value, usual), gap = +$("rG").value; if (+$("rW").value > usual) $("rW").value = usual;
     $("oU").textContent = usual.toFixed(1) + "kg"; $("oWk").textContent = weigh.toFixed(1) + "kg"; $("oG").textContent = gap + "시간";
     const lost = usual - weigh, pct = lost / usual * 100, fl = [lost * 1.25, lost * 1.5], cph = Math.min(60, Math.round(weigh));
     const big = pct >= 5, carb = big ? [8, 12] : [4, 7], carbTot = carb.map(x => Math.round(x * weigh)), carbFit = Math.max(0, Math.floor(gap - 2)) * 60, warn = [];
@@ -921,7 +1035,8 @@ body.print .ch { min-height: 0; }
     if (gap >= 12 && pct > 8) warn.push(`전날 계체여도 감량은 최대 8%까지가 권장돼요. 지금 ${pct.toFixed(1)}%예요. (GSSI)`);
     if (fl[0] > Math.max(0, gap) * 1.5) warn.push("경기 전까지 시간이 짧아 잃은 수분을 다 채우기 어려워요. 무리해서 한 번에 많이 마시지 마세요.");
     if (carbFit < carbTot[0]) warn.push(`경기 전까지 시간당 60g씩 먹어도 탄수화물 목표(${carbTot[0]}g)를 다 채우기 어려워요.`);
-    $("recOut").innerHTML = `<div class="stats"><div><span class="big-num">${r1(lost)}<small>kg</small></span><span class="cap">감량 ${pct.toFixed(1)}%</span></div><div><span class="big-num">${r1(weigh * 1.1)}<small>kg</small></span><span class="cap">회복 목표 (+10%)</span></div></div>
+    if (lost < 0.05) { $("recOut").innerHTML = `<ul class="why"><li class="l0" style="color:var(--ink)">감량이 없어요. 계체 체중이 평소 체중보다 낮을 때 회복 계산이 나와요.</li></ul>`; return; }
+    $("recOut").innerHTML = `<div class="stats"><div><span class="big-num">${r1(lost)}<small>kg</small></span><span class="cap">감량 ${pct.toFixed(1)}%</span></div><div><span class="big-num">${r1(weigh * 1.1)}<small>kg</small></span><span class="cap">계체 뒤 최대 회복 범위 (계체 체중 +10%)</span></div></div>
       ${warn.map(w => `<ul class="why"><li class="l2">${esc(w)}</li></ul>`).join("")}
       <ul class="why"><li class="l1"><b>직후 ~1시간</b> · 경구수액 600~900mL, 나트륨 1L당 50~90mmol</li><li class="l1"><b>1~2시간</b> · 시간당 1~1.5L씩, 총 ${r1(fl[0])}~${r1(fl[1])}L (잃은 무게의 125~150%)</li>
       <li class="l1"><b>2시간 뒤부터</b> · 탄수화물 시간당 약 ${cph}g (1g/kg, 최대 60g)</li><li class="l1"><b>경기 전까지 합</b> · 탄수화물 ${carbTot[0]}~${carbTot[1]}g (${carb[0]}~${carb[1]}g/kg · ${big ? "감량 폭이 큰 편" : "작은 편"})</li></ul>
@@ -963,7 +1078,7 @@ body.print .ch { min-height: 0; }
     const b = e.target.closest("button"); if (!b) return;
     if (b.dataset.r) { rate = +b.dataset.r; $("vctl").querySelectorAll("[data-r]").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false")); return; }
     if (b.dataset.v === "play") { playing = !playing; b.textContent = playing ? "❚❚ 멈춤" : "▶ 재생"; last = 0; if (playing) requestAnimationFrame(tick); return; }
-    playing = false; $("vctl").querySelector('[data-v="play"]').textContent = "▶ 재생"; fa = (fa + +b.dataset.v + N) % N; vid();
+    playing = false; const pb = $("vctl").querySelector('[data-v="play"]'); pb.textContent = "▶ 재생"; fa = (fa + +b.dataset.v + N) % N; vid();
   });
   $("sync").addEventListener("input", () => { offset = +$("sync").value; vid(); });
   fa = PEAK_A; vid();
@@ -1020,7 +1135,7 @@ body.print .ch { min-height: 0; }
     ["11월 2일", "3차 · 증상 체크, 투구 수, 계체 후 회복, 35세 이상", "v0.3.0", "build", "감량 '계획'은 보류하고 계체 '후' 회복만."],
     ["11월 2일", "4차 · 영상 비교", "v0.4.0", "build", "느리게, 한 프레임씩, 두 영상 같은 순간으로."],
     ["11월 3일", "발견 · 아이폰으로 써 본 피드백", "v0.4.1", "find", "'직접 입력' 위치 재조정, 커서가 숫자를 가림, 날짜가 멋대로 골라짐, 영상 ±1·5·10초 이동 버튼 추가."],
-    ["11월 3일", "세 역할 점검 3라운드", "v0.4.3~0.4.5", "build", "78 → 84 → 90점."],
+    ["11월 3일", "자동 검증 3차례", "v0.4.3~0.4.5", "build", "AI가 고치고·찾고·채점. 78 → 84 → 90점."],
     ["11월 3~4일", "설정 정리, 평가 AI 안 일부 반영", "v0.4.6~0.4.9", "build", "뒤로 버튼은 하위 화면에만, 증상 체크·회복 계산기 버튼은 흰색으로."],
     ["11월 4일", "현장 설문 설계", "", "field", "입장에 따라 질문이 갈라지는 구글 폼. 로그인 없이."],
     ["11월 4~5일", "코치·관장, 선수, 기자에게 DM", "", "field", "설문을 돌리던 중 '잠들기 어려움' 추가."],
@@ -1056,7 +1171,7 @@ body.print .ch { min-height: 0; }
     $("t2go").click(); $("quiz").querySelector('[data-c="r"]').click();
     [0, 1, 2].forEach(i => pick.add(i)); food();
     $("syms").querySelector('input[value="sf3"]').checked = true; $("syms").dispatchEvent(new Event("change"));
-    filled = 5; glass(); $("scaleNum").textContent = "70.2"; $("scale").classList.add("pass"); $("scaleMsg").textContent = "통과 · 한계보다 0.1kg 아래";
+    filled = 5; glass(); $("weighGo").disabled = true; $("scaleNum").textContent = "70.2"; $("scale").classList.add("pass"); $("scaleMsg").textContent = "통과 · 한계보다 0.1kg 아래";
     offset = 10; $("sync").value = 10; fa = PEAK_A; vid();
     document.querySelectorAll(".story").forEach(s => { s.open = true; s.classList.remove("new"); });
     document.querySelectorAll("details.qa").forEach(d => d.open = true);
