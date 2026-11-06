@@ -72,6 +72,7 @@ ul.why li.hi{color:var(--ink)}ul.why li.lo{color:#cfccc4}
 .cap{font:700 11px var(--cond);letter-spacing:.16em;color:var(--mut);text-transform:uppercase}.stats .cap{font:600 12px/1.35 Pretendard,sans-serif;letter-spacing:0;text-transform:none}
 .banner a{display:inline-block;padding:12px 4px;margin:-12px -4px}.banner{border-radius:0;padding:12px 14px;margin:0 0 12px;font-size:15px;border-left:4px solid var(--gold)}
 .banner.warn{background:var(--yS);border-color:var(--y)}.banner.bad{background:var(--rS);border-color:var(--r)}.banner.info{background:var(--card)}
+nav[hidden]{display:none!important}
 nav{position:fixed;z-index:5;left:0;right:0;bottom:0;background:#080808;border-top:1px solid #222;display:flex;padding:10px max(6px,calc(50% - 280px)) env(safe-area-inset-bottom)}
 nav button{flex:1;border:0;background:none;color:#5d5b56;font:inherit;font-size:12px;font-weight:600;padding:2px 0 12px}
 nav button svg{display:block;margin:0 auto 5px;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -173,6 +174,7 @@ body.vfs .vctl .vrow{margin:6px 0}
 @media (orientation:landscape){ body.vfs .vctl{left:auto;width:min(340px,42vw);top:0;border-top:0;border-left:2px solid var(--acc);max-height:none} body.vfs .vgrid{right:min(340px,42vw);bottom:0} }
 
 /* ── 루프 v2: 평가·검증 반영 ── */
+#undo{position:fixed;z-index:31;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:14px;background:var(--card2);color:var(--ink);border-left:4px solid var(--gold);padding:6px 6px 6px 16px;box-shadow:0 10px 30px rgba(0,0,0,.5);font-size:15px;max-width:calc(100% - 24px)}#undo[hidden]{display:none}#undo button{min-height:44px;padding:0 14px;background:none;border:0;color:var(--gold);font:700 15px Pretendard,sans-serif;text-decoration:underline;cursor:pointer}
 #toast{position:fixed;z-index:30;left:50%;bottom:auto;top:calc(14px + env(safe-area-inset-top));transform:translateX(-50%);max-width:320px;width:max-content;background:var(--card2);color:var(--ink);border-left:4px solid var(--acc);padding:12px 16px;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.5);pointer-events:none}
 #toast[hidden]{display:none}
 .btn.danger{background:#262626;color:var(--ink);box-shadow:inset 0 0 0 2px #4a4a4a}
@@ -182,7 +184,7 @@ body.offt nav button.on svg{stroke:var(--ink)}body.offt .unitbox,body.offt .pick
 .btn.back-l{flex-direction:row-reverse;justify-content:flex-end;gap:8px;width:auto;display:inline-flex;box-shadow:none!important;color:var(--mut)!important;background:none!important;font:600 15px Pretendard,sans-serif;transform:none;padding:12px 4px;margin-top:8px}.btn.back-l::after{content:"‹"}
 .chip{min-height:44px}
 .x{width:44px;height:44px}
-.ends{font-size:14px;color:#8f8c84}input::placeholder{font:500 15px Pretendard,sans-serif;color:#8a877f;font-style:normal}h2[id],#exj{scroll-margin-top:calc(84px + env(safe-area-inset-top))}body[class^="sg-"] .card .chip.on{background:var(--ink)!important;color:#111!important}body[class^="sg-"] .scale button.on{background:var(--ink)!important;color:#111!important}.ends.goodL span:first-child,.ends.goodR span:last-child{color:var(--ink);font-weight:600}
+.ends{font-size:14px;color:#8f8c84}.ferr{display:block;color:var(--y);font-size:14px;font-weight:600;margin-top:6px}input[aria-invalid="true"]{border-bottom-color:var(--y)!important}input::placeholder{font:500 15px Pretendard,sans-serif;color:#8a877f;font-style:normal}h2[id],#exj{scroll-margin-top:calc(84px + env(safe-area-inset-top))}body[class^="sg-"] .card .chip.on{background:var(--ink)!important;color:#111!important}body[class^="sg-"] .scale button.on{background:var(--ink)!important;color:#111!important}.ends.goodL span:first-child,.ends.goodR span:last-child{color:var(--ink);font-weight:600}
 .dirnote{margin:20px 0 -4px;color:#cfccc4;font-size:15px;border-left:3px solid var(--gold);padding-left:10px}label.f .dir{font-weight:500;font-size:13px;color:#9a978f;margin-left:6px}
 nav button{color:#8a877f}
 .vchg{padding:8px 12px}
@@ -230,6 +232,7 @@ details.fold>div{padding:0 0 14px;color:#dcd9d2}
 <button id="back" hidden aria-label="뒤로">‹ <span>뒤로</span></button>
 <main id="app"></main>
 <div id="toast" hidden role="status" aria-live="polite"></div>
+<div id="undo" hidden role="status"><span></span><button type="button">되돌리기</button></div>
 <nav id="nav" hidden></nav>
 <div id="modal"></div>
 <script>
@@ -261,7 +264,7 @@ function cleanData(d){
     const int=(v,lo,hi)=>{ const n=numOr(v,lo,hi); return Number.isInteger(n)?n:null; }, sc=v=>int(v,1,5)||0;
     L[k]={...x, sleepH:numOr(x.sleepH,0,24), sleepQ:sc(x.sleepQ), fatigue:sc(x.fatigue), soreness:sc(x.soreness), stress:sc(x.stress),
       pain:int(x.pain,0,3)||0, painPart:PT.includes(x.painPart)?x.painPart:"", weight:numOr(x.weight,20,250),
-      trainMin:numOr(x.trainMin,0,1440)||0, rpe:int(x.rpe,1,10)||0, sym:Array.isArray(x.sym)?x.sym.filter(v=>typeof v==="string"&&/^\w+$/.test(v)):[]}; }
+      trainMin:numOr(x.trainMin,0,1440)||0, rest:x.rest===true||undefined, rpe:int(x.rpe,1,10)||0, sym:Array.isArray(x.sym)?x.sym.filter(v=>typeof v==="string"&&/^\w+$/.test(v)):[]}; }
   // 점수 4개가 다 있어야 체크인한 날로 봄 (일부만 있으면 점수를 비워 신호를 만들지 않음)
   for(const o of Object.values(L)) if(!(o.sleepQ&&o.fatigue&&o.soreness&&o.stress)){ o.sleepQ=0; o.fatigue=0; o.soreness=0; o.stress=0; }
   d.logs=L;
@@ -296,7 +299,7 @@ function band(p){ const a=ageOf(p);
   return {id:"m50",name:"성인 · 50세 이상",youth:false}; }
 
 /* ───────── 종목 ───────── */
-const APP_VER = "0.1.10";
+const APP_VER = "0.1.11";
 // subs 값: null = 포지션 없음 / [[묶음 이름, [포지션…]], …]
 const SPORTS = {
   "투기": { subs:{ "MMA":null }, weightClass:true }
@@ -383,17 +386,17 @@ const LEVELS = { hobby:"취미 (대회 안 나감)", amateur:"아마추어 대�
 let tab = "today", ob = null;
 // 뒤로 가기: 바로 전 화면으로 (안드로이드 뒤로 버튼도 같이 동작)
 let NAV=[], obPrev=null, viaLink=false;   // viaLink: 오늘 화면 안 링크로 설정에 온 경우 ‹ 뒤로를 보임
-function go(t,back){ const tt=$("#toast"); if(tt&&!tt.hidden&&t!==tab){ tt.hidden=true; tt.textContent=""; clearTimeout(toast._t); }
+function go(t,back){ if(t!==tab){ const u=$("#undo"); if(u) u.hidden=true; } const tt=$("#toast"); if(tt&&!tt.hidden&&t!==tab){ tt.hidden=true; tt.textContent=""; clearTimeout(toast._t); }
   if(t!=="symptom") symSel=null; if(t!=="video"&&VID.full) setFull(false);
   if(tab==="edit"&&t!=="edit") draft=null;                       // 고치기 화면을 떠나면 저장 안 한 값은 버림
   // E) 버린 '체크인 고치기' 화면으로는 돌아가지 않고 오늘 화면으로
   if(!back && t!==tab){ const from = tab==="edit" ? "today" : tab; if(from!==t && NAV[NAV.length-1]!==from) NAV.push(from); }
   tab=t; render(); window.scrollTo(0,0); arm(); }
-const canBack=()=>!!$("#modal").innerHTML || !!VID.full || (!S.profile&&ob ? (ob.step>0||!!obPrev) : NAV.length>0);
+const canBack=()=>!!$("#modal").innerHTML || !!VID.full || (!S.profile&&ob ? ((ob.step>0&&!ob.only)||!!obPrev) : NAV.length>0);
 function goBack(){
   if($("#modal").innerHTML){ $("#modal").innerHTML=""; _sheetBusy=false; const r=_mBack; _mBack=null; if(r&&r.isConnected) r.focus({preventScroll:true}); return; }
   if(VID.full){ setFull(false); renderVideo(); return; }
-  if(!S.profile&&ob){ if(ob.step>0){ ob.step--; renderOnboard(); window.scrollTo(0,0); }
+  if(!S.profile&&ob){ if(ob.step>0&&!ob.only){ ob.step--; renderOnboard(); window.scrollTo(0,0); }
     else if(obPrev){ S.profile=obPrev; obPrev=null; ob=null; render(); } return; }
   if(tab==="edit") draft=null;
   if(NAV.length) go(NAV.pop(),true);
@@ -495,7 +498,8 @@ function bindSleep(onv){
 function renderOnboard(){
   ob = ob || { step:0, p:{ birthYear:"", birthMonth:"", sex:"", height:"", weight:"", weeklySessions:"", level:"", cat:"투기", sub:"MMA", pos:"", weightClass:"", classLimit:"", screening:{} } };
   const p=ob.p, N=6, st=ob.step;
-  const bar=`<div class="steps" role="progressbar" aria-valuemin="1" aria-valuemax="${N}" aria-valuenow="${st+1}" aria-label="처음 설정 ${st+1}/${N}단계">${Array.from({length:N},(_,i)=>`<i class="${i<=st?"on":""}"></i>`).join("")}</div><div class="stepn">${st+1} / ${N}</div>`;
+  let bar=`<div class="steps" role="progressbar" aria-valuemin="1" aria-valuemax="${N}" aria-valuenow="${st+1}" aria-label="처음 설정 ${st+1}/${N}단계">${Array.from({length:N},(_,i)=>`<i class="${i<=st?"on":""}"></i>`).join("")}</div><div class="stepn">${st+1} / ${N}</div>`;
+  if(ob.only) bar=`<div class="stepn" style="text-align:left">체급만 바꿔요 · 뒤로 가면 그대로 둬요</div>`;
   const years=[]; const y=new Date().getFullYear(); for(let i=y-6;i>=y-90;i--) years.push(i);
   let h="", ok=false;
   if(st===0){
@@ -504,11 +508,12 @@ function renderOnboard(){
     <label class="f">태어난 해와 달</label>
     <div class="row"><select id="by"><option value="">년</option>${years.map(v=>`<option ${+p.birthYear===v?"selected":""}>${v}</option>`).join("")}</select>
     <select id="bm"><option value="">월</option>${Array.from({length:12},(_,i)=>`<option ${+p.birthMonth===i+1?"selected":""}>${i+1}</option>`).join("")}</select></div>
-    <label class="f">성별</label><div class="chips">${["남성","여성"].map(v=>`<button class="chip ${p.sex===v?"on":""}" data-sex="${v}">${v}</button>`).join("")}</div>`;
+    <label class="f">성별</label><div class="chips">${["남성","여성"].map(v=>`<button class="chip ${p.sex===v?"on":""}" data-sex="${v}">${v}</button>`).join("")}</div>
+    ${!obPrev?`<div class="obimp"><button class="btn sm ghost neutral" id="obimp">폰을 바꿨나요? 백업 파일로 기록 가져오기</button><input type="file" id="obimpf" accept=".json,application/json" hidden></div>`:""}`;
     ok=p.birthYear&&p.birthMonth&&p.sex;
   } else if(st===1){
     h=`<h1>몸과 훈련</h1>
-    <div class="row"><div><label class="f">키 (cm)</label><input id="ht" type="number" inputmode="decimal" value="${esc(p.height)}" placeholder="175"></div>
+    <div class="row"><div><label class="f">키 (cm)</label><input id="ht" type="number" inputmode="decimal" value="${esc(p.height)}" placeholder="예: 175"></div>
     </div><label class="f">몸무게 (kg)</label>${picker("wt",p.weight,45,130,1,"kg")}
     <label class="f">평소 일주일에 몇 번 훈련하나요?</label>
     <div class="chips">${["0~1","2~3","4~5","6 이상"].map(v=>`<button class="chip ${p.weeklySessions===v?"on":""}" data-ws="${v}">${v==="6 이상"?"6회 이상":v+"회"}</button>`).join("")}</div>`;
@@ -536,7 +541,7 @@ function renderOnboard(){
       ${sets&&!wl?`<div class="mut">${esc(sets[si].org)}은 ${esc(p.sex)} 체급이 없어요. 아래에 직접 써 주세요.</div>`:""}
       ${wl?`${sets.length===1?`<div class="mut">${esc(sets[0].org)}</div>`:""}<div class="chips" style="margin-top:8px">${wl.map(([n,k],i)=>`<button class="chip ${p.weightClass===n&&String(p.classLimit)===String(k??"")?"on":""}" data-wc="${i}">${esc(n)}${k!=null&&!/kg/.test(n)?` · ${k}kg`:""}</button>`).join("")}</div>`:""}
       ${!sets?`<div class="mut">${p.sub==="기타 투기"?"위 예시 중 삼보·가라데·극진가라데는 체급표가 나와요. ":""}체급표가 없는 종목은 아래에 직접 써 주세요.</div>`:""}
-      ${!p.weightClass?`<div class="mut" style="margin-top:8px">체급을 고르면 오늘 화면에 계체 카드가 생겨요. 나중에 설정 → 처음 설정 다시 하기에서 골라도 돼요.</div>`:""}
+      ${!p.weightClass?`<div class="mut" style="margin-top:8px">체급을 고르면 오늘 화면에 계체 카드가 생겨요. 나중에 설정 → 체급 바꾸기에서 골라도 돼요.</div>`:""}
       ${(()=>{ const chipOn=wl&&wl.some(([n,k])=>p.weightClass===n&&String(p.classLimit)===String(k??"")); const inner=`<div class="row"><div><label class="f">체급 이름</label><input id="wc" type="text" value="${esc(p.weightClass)}" placeholder="예: 라이트급"></div>
       <div><label class="f">한계 kg</label><input id="wl" type="number" inputmode="decimal" step="0.1" value="${esc(p.classLimit)}" placeholder="비우면 무제한"></div></div>`;
         return wl ? `<details class="fold" ${(p.weightClass||(p.classLimit!==""&&p.classLimit!=null))&&!chipOn?"open":""}><summary>목록에 없거나 대회 규정이 달라요 (직접 쓰기)</summary><div>${inner}</div></details>${b4youth(p)?`<div class="mut" style="margin-top:6px">표는 성인 기준이에요.</div>`:""}` : inner; })()}`:""}`;
@@ -558,7 +563,7 @@ function renderOnboard(){
     <p class="mut">이 앱은 의학적 진단을 하지 않아요. 기록을 바탕으로 참고할 신호를 보여 줘요.</p>`;
     ok=true;
   }
-  $("#app").innerHTML=bar+h+`<button class="btn" id="next" ${ok?"":"disabled"}>${nextLabel(p,st,ok)}</button>${st>0?`<button class="btn sm ghost neutral back-l" id="prev">이전 단계</button>`:""}`;
+  $("#app").innerHTML=bar+h+`<button class="btn" id="next" ${ok?"":"disabled"}>${nextLabel(p,st,ok)}</button>${st>0&&!ob.only?`<button class="btn sm ghost neutral back-l" id="prev">이전 단계</button>`:""}`;
   bindOnboard(); backBtn(); arm();
 }
 function obMissing(p,st){
@@ -569,7 +574,7 @@ function obMissing(p,st){
   if(st===4){ const n=["heart","chest","faint"].filter(k=>!p.screening[k]).length; return n?[`건강 질문 ${n}개`]:[]; }
   return [];
 }
-function nextLabel(p,st,ok){ if(ok) return st<5?"다음":"시작하기"; const m=obMissing(p,st); return m.length?`골라 주세요 · ${m.join(", ")}`:"다음"; }
+function nextLabel(p,st,ok){ if(ok) return ob&&ob.only?"저장":st<5?"다음":"시작하기"; const m=obMissing(p,st); return m.length?`채워 주세요 · ${m.join(", ")}`:"다음"; }
 function finalProfile(p){
   const prof={...p, birthYear:+p.birthYear, birthMonth:+p.birthMonth, height:+p.height, weight:+p.weight, classLimit:(+p.classLimit>=20&&+p.classLimit<=250)?+p.classLimit:null};
   prof.screeningFlag=Object.values(p.screening).includes("예");
@@ -598,8 +603,10 @@ function bindOnboard(){
   on("[data-scr]",b=>p.screening[b.dataset.scr]=b.dataset.v);
   inp("ht","height"); inp("wt","weight"); inp("wc","weightClass"); inp("wl","classLimit"); inp("subname","subName");
   $("#next").onclick=()=>{ if(ob.step===3&&p.classLimit!==""&&p.classLimit!=null&&!(+p.classLimit>=20&&+p.classLimit<=250)){ const fd=$("details.fold"); if(fd) fd.open=true; const wlI=$("#wl"); if(wlI) wlI.focus(); toast("한계 kg를 확인해 주세요 (20~250kg, 비우면 무제한)."); return; }
+    if(ob.only){ S.profile=finalProfile(p); ob=null; obPrev=null; save(); tab="settings"; render(); window.scrollTo(0,0); toast("체급을 바꿨어요."); return; }
     if(ob.step<5){ob.step++;re();window.scrollTo(0,0);} else { S.profile=finalProfile(p); ob=null; obPrev=null; save(); NAV=[]; tab="today"; render(); window.scrollTo(0,0); arm(); } };
   const pv=$("#prev"); if(pv) pv.onclick=()=>{ob.step--;re();};
+  const oi=$("#obimp"); if(oi){ oi.onclick=()=>$("#obimpf").click(); $("#obimpf").onchange=handleImport; }
   arm();
   function okStep(){ return ob.step!==1 || (+p.height>=80&&+p.height<=250&&+p.weight>=20&&+p.weight<=250&&p.weeklySessions); }
 }
@@ -699,7 +706,11 @@ function renderToday(){
   const d=today(), L=S.logs[d], p=S.profile, b=band(p);
   let top=`<div class="kick">${kicker(p)}</div>`;
   const daysSinceBackup = S.lastBackup ? Math.floor((new Date(d)-new Date(S.lastBackup))/864e5) : Math.floor((new Date(d)-new Date(S.created))/864e5);
-  if(daysSinceBackup>=14) top+=`<div class="banner warn">백업한 지 ${daysSinceBackup}일 지났어요. <a href="#" data-go="settings" data-anchor="exj">설정에서 기록 내보내기</a></div>`;
+  const bk = daysSinceBackup>=14 ? `<div class="banner warn">백업한 지 ${daysSinceBackup}일 지났어요. <a href="#" data-go="settings" data-anchor="exj">설정에서 기록 내보내기</a></div>` : "";
+  const checked=!!(L&&L.sleepQ);
+  if(!checked) top+=bk;     // 체크인 뒤에는 신호 카드 아래로 내림
+  // 어제 체크인은 했는데 훈련을 안 적었으면 지금 적을 수 있게
+  const yd=addDays(d,-1), Y=S.logs[yd], yAsk = Y&&Y.sleepQ&&!Y.trainMin&&!Y.rest;
   if(p.screeningFlag) top+=`<div class="banner bad">건강 확인에 '예'가 있었어요. 고강도 운동 전에 진료를 받아 보세요.</div>`;
   if(!L||!L.sleepQ){
     draft = draft || { sleepH:"", sleepQ:0, fatigue:0, soreness:0, stress:0, pain:0, painPart:"", weight:"" };
@@ -716,13 +727,15 @@ function renderToday(){
     ${s.baseline<7?`<small class="src">평소 기준을 만드는 중이에요 (${s.baseline}/7일). 기록이 쌓이면 내 평소와 비교해요.</small>`:""}
     <small class="src">참고 신호예요. 진단이 아니에요. <a href="#" data-go="settings" data-anchor="crit">판단 기준 보기</a></small>
     <button class="btn back-l" id="editck">체크인 고치기</button></div>
-    ${weighCard(p,L)}${ageTipToday(p)}
+    ${yAsk?`<div class="banner info">어제 훈련을 안 적었어요. <a href="#" id="yfill">지금 적기</a> · <a href="#" id="yrest">어제는 쉬었어요</a></div>`:""}
+    ${bk}${weighCard(p,L)}${ageTipToday(p)}
     <button class="btn ghost neutral" data-go="symptom">증상 체크하기</button>
     ${canRecover(p)?`<button class="btn ghost neutral" data-go="recovery">계체 후 회복 계산기${cutDday()?` · ${cutDday()}`:""}</button>`:""}
     <h2>오늘 훈련</h2>${trainForm(L,s.lv===2)}
     <h2>식단</h2>${dietCard()}`;
-    bindTrain(L);
+    bindTrain(L,d,renderToday,$("#app"));
     $("#editck").onclick=()=>{ draft={...L}; go("edit"); };
+    const yf=$("#yfill"); if(yf){ yf.onclick=e=>{ e.preventDefault(); openDay(yd,renderToday); }; $("#yrest").onclick=e=>{ e.preventDefault(); S.logs[yd].rest=true; save(); renderToday(); toast("어제는 쉰 날로 적었어요."); }; }
   }
 }
 function renderTodayEdit(L){ paintSig(); $("#app").innerHTML=`<div class="kick">MORNING CHECK-IN</div><h1>체크인 고치기</h1>${checkinForm(draft,true)}`; bindCheckin(true,L); }
@@ -748,7 +761,7 @@ function checkinForm(x){
   ${x.pain>0?`<label class="f">어디가 아픈가요?</label><div class="chips">${PARTS.map(v=>`<button class="chip ${x.painPart===v?"on":""}" data-part="${v}">${v}</button>`).join("")}</div>`:""}
   </div>${saveCkBtn(x)}`;
 }
-function ckMissing(x){ return [[hasSleep(x.sleepH),"잠잔 시간"],[x.sleepQ,"잠"],[x.fatigue,"피로"],[x.soreness,"근육통"],[x.stress,"스트레스"]].filter(a=>!a[0]).map(a=>a[1]); }
+function ckMissing(x){ return [[hasSleep(x.sleepH),"잠잔 시간"],[x.sleepQ,"잠의 질"],[x.fatigue,"피로"],[x.soreness,"근육통"],[x.stress,"스트레스"]].filter(a=>!a[0]).map(a=>a[1]); }
 function saveCkBtn(x){ const m=ckMissing(x); return `<button class="btn" id="saveck" ${m.length?"disabled":""}>${m.length?`${m.length}개 남았어요 · ${m.join(", ")}`:"저장하고 신호 보기"}</button>`; }
 function updSaveCk(){ const b=$("#saveck"); if(!b) return; const m=ckMissing(draft); b.disabled=!!m.length; b.textContent=m.length?`${m.length}개 남았어요 · ${m.join(", ")}`:"저장하고 신호 보기";
 }
@@ -762,21 +775,21 @@ function bindCheckin(edit,L){
   bindSleep(v=>{ draft.sleepH=v; updSaveCk(); });
   $("#mw").oninput=e=>{ draft.weight=e.target.value; };
   $("#saveck").onclick=()=>{
-    const wv=+draft.weight; if(draft.weight!==""&&draft.weight!=null&&!(wv>=20&&wv<=250)){ toast("몸무게를 확인해 주세요 (20~250kg)."); return; }
-    if(!(+draft.sleepH>=0&&+draft.sleepH<=24)){ toast("잠잔 시간을 확인해 주세요 (0~24시간)."); return; }
+    const wv=+draft.weight; if(draft.weight!==""&&draft.weight!=null&&!(wv>=20&&wv<=250)){ const el=$("#mw"); if(el){ const bx=$("#mw_box"); if(bx) bx.classList.remove("hid"); fieldErr(el,"20~250kg 사이로 적어 주세요."); } toast("몸무게를 확인해 주세요 (20~250kg)."); return; }
+    if(!(+draft.sleepH>=0&&+draft.sleepH<=24)){ const el=$("#sh_h"); if(el) fieldErr(el,"0~24시간 사이로 적어 주세요."); toast("잠잔 시간을 확인해 주세요 (0~24시간)."); return; }
     const d=today(); const prev=S.logs[d]||{};
     S.logs[d]={...prev, sleepH:+draft.sleepH, sleepQ:draft.sleepQ, fatigue:draft.fatigue, soreness:draft.soreness, stress:draft.stress, pain:draft.pain, painPart:draft.painPart, weight:draft.weight?+draft.weight:null};
     draft=null; save(); if(tab==="edit"){ tab="today"; goBack(); if(tab!=="today") go("today",true); } else renderToday();
     window.scrollTo(0,0); const sh=$(".sigh"); if(sh) sh.focus({preventScroll:true});
   };
 }
-function trainForm(L,red){
+function trainForm(L,red,d=today()){ L=L||{};
   return `<div class="card"><p class="mut">${red?"오늘은 쉬는 날이에요. 회복 운동만 했다면 시간과 힘든 정도를 적어 주세요.":"훈련이 끝나면 적어 주세요. 쉬는 날이면 비워 두면 돼요."}</p>
   <label class="f">훈련 시간 (분)</label><input id="tm" type="number" inputmode="numeric" min="0" max="1440" value="${L.trainMin||""}" placeholder="예: 60">
   <label class="f">얼마나 힘들었나요? (1~10)</label>
   <div class="scale" style="grid-template-columns:repeat(5,1fr)">${Array.from({length:10},(_,i)=>`<button data-rpe="${i+1}" class="${L.rpe===i+1?"on":""}" aria-label="힘든 정도 ${i+1}점 (1 아주 쉬움 ~ 10 최대로 힘듦)">${i+1}</button>`).join("")}</div>
   <div class="ends"><span>1 아주 쉬움</span><span>10 최대로 힘듦</span></div>
-  <small class="src tl" ${L.trainMin&&L.rpe?"":"hidden"}>${L.trainMin&&L.rpe?`오늘 훈련량 ${tload(L)} (시간 × 힘든 정도)`:""}</small>${pitchForm(L)}</div>`;
+  <small class="src tl" ${L.trainMin&&L.rpe?"":"hidden"}>${L.trainMin&&L.rpe?loadTxt(d,L):""}</small>${pitchForm(L)}</div>`;
 }
 function pitchForm(L){
   const p=S.profile; if(!isPitcher(p)) return "";
@@ -789,16 +802,26 @@ function pitchForm(L){
    ${next!=null?`<div class="banner info" style="margin-top:10px">오늘 ${n}개 → <b>${next?`${next}일 쉬고 ${md(addDays(today(),next+1))}부터`:"다음날 바로"}</b> 던질 수 있어요.</div>`:""}
    <small class="src">만 ${R.age}세 하루 최대 ${R.max}개. 출처: MLB·USA Baseball 'Pitch Smart'</small>`}`;
 }
-function bindTrain(L){
-  const d=today();
-  const done=()=>{ const L=S.logs[d]; save(); renderToday(); toast(L.trainMin&&L.rpe?`훈련 기록했어요 · 훈련량 ${tload(L)}`:"저장했어요"); };
-  document.querySelectorAll("[data-rpe]").forEach(b=>b.onclick=()=>{ S.logs[d].rpe=+b.dataset.rpe; done(); });
+// root 안의 훈련 칸만 묶음 (오늘 화면, 기록의 지난 날 시트에서 같이 씀)
+function bindTrain(L,d=today(),after=renderToday,root=document,onTime=null){
+  const q=x=>root.querySelector(x), lg=()=>(S.logs[d]=S.logs[d]||{});
+  const msg=L=>L.trainMin&&L.rpe?`훈련 기록했어요 · 훈련량 ${tload(L)}`:L.trainMin?"시간을 저장했어요. 힘든 정도도 눌러 주세요.":"저장했어요";
+  const done=()=>{ save(); after(); toast(msg(lg())); };
+  root.querySelectorAll("[data-rpe]").forEach(b=>b.onclick=()=>{ const n=+b.dataset.rpe, x=lg(); x.rpe = x.rpe===n ? 0 : n; done(); });   // 같은 숫자를 다시 누르면 선택 풀기
   // 시간 칸에서는 다시 그리지 않음: 칸을 벗어나며 바로 '힘든 정도'를 누를 때 그 누름이 사라지지 않게
-  $("#tm").onchange=e=>{ const v=e.target.value; if(v!==""&&!(+v>=0&&+v<=1440)){ toast("훈련 시간을 확인해 주세요 (0~1440분)."); e.target.value=S.logs[d].trainMin||""; return; } S.logs[d].trainMin=v?+v:0; save();
-    { const L=S.logs[d], sm=e.target.closest(".card").querySelector("small.tl"); if(sm){ const ok=L.trainMin&&L.rpe; sm.hidden=!ok; sm.textContent=ok?`오늘 훈련량 ${tload(L)} (시간 × 힘든 정도)`:""; } }
-    const L=S.logs[d]; toast(L.trainMin&&L.rpe?`훈련 기록했어요 · 훈련량 ${tload(L)}`:L.trainMin?"시간을 저장했어요. 힘든 정도도 눌러 주세요.":"저장했어요"); };
-  const pc=$("#pc"); if(pc) pc.onchange=e=>{ S.logs[d].pitches=e.target.value?+e.target.value:0; save(); renderToday(); toast(`투구 수 ${S.logs[d].pitches}개 저장했어요`); };
+  q("#tm").onchange=e=>{ const v=e.target.value, x=lg(); if(v!==""&&!(+v>=0&&+v<=1440)){ fieldErr(e.target,"0~1440분 사이로 적어 주세요."); e.target.value=x.trainMin||""; return; } fieldErr(e.target,null); x.trainMin=v?+v:0; delete x.rest; save();
+    const sm=e.target.closest(".card").querySelector("small.tl"); if(sm){ const ok=x.trainMin&&x.rpe; sm.hidden=!ok; sm.innerHTML=ok?loadTxt(d,x):""; }
+    if(onTime) onTime(); toast(msg(x)); };
+  const pc=q("#pc"); if(pc) pc.onchange=e=>{ lg().pitches=e.target.value?+e.target.value:0; save(); after(); toast(`투구 수 ${lg().pitches}개 저장했어요`); };
 }
+// 훈련량을 내 평소(지난 28일 중 훈련한 날 평균)와 비교해서 보여 줌
+function loadTxt(d,L){ let s=0,n=0; for(let i=1;i<=28;i++){ const x=S.logs[addDays(d,-i)]; if(x&&tload(x)){ s+=tload(x); n++; } }
+  const t=tload(L); return `${d===today()?"오늘":"이날"} 훈련량 <b>${t}</b> (시간 × 힘든 정도) · ${n>=3?`평소 훈련한 날 평균 ${r0(s/n)}의 ${r1(t/(s/n))}배`:"훈련 기록이 3일 이상 쌓이면 평소와 비교해요"}`; }
+// 입력칸 바로 아래에 오류 문구 (null이면 지움)
+function fieldErr(el,text){ const box=el.closest(".unitbox,.pick2")||el, nx=box.nextElementSibling;
+  if(nx&&nx.classList.contains("ferr")) nx.remove(); el.removeAttribute("aria-invalid");
+  if(!text) return; el.setAttribute("aria-invalid","true"); box.insertAdjacentHTML("afterend",`<small class="ferr" role="alert">${esc(text)}</small>`);
+  el.scrollIntoView({block:"center"}); el.focus({preventScroll:true}); }
 
 /* ───────── 3차: 증상 체크 (목록형, 진단 아님) ───────── */
 // lv 2 = 119, 1 = 오늘 병원, 0 = 쉬면서 관찰
@@ -857,19 +880,21 @@ function renderSymptom(){
   const lv=symLevel([...symSel]), R=lv>=0?SYM_LV[lv]:null;
   const srcs=[...new Set(list.map(x=>x[4]).filter(Boolean))];
   $("#app").innerHTML=`<div class="kick">SYMPTOM CHECK</div><h1>증상 체크</h1>
-  <p class="mut">지금 해당하는 걸 모두 눌러 주세요. 가장 급한 단계로 안내해요. <b>진단이 아니에요.</b> 판단이 어렵거나 불안하면 119에 전화해 상담하세요.</p>
+  <p class="mut">지금 해당하는 걸 모두 눌러 주세요. 누르면 바로 오늘 기록에 남고, 가장 급한 단계로 안내해요. <b>진단이 아니에요.</b> 판단이 어렵거나 불안하면 119에 전화해 상담하세요.</p>
   ${R?`<div class="card sym" style="--c:${R.c}"><div class="t">${R.k} · ${R.k==="119"?"EMERGENCY":R.k==="병원"?"SEE A DOCTOR":"WATCH"}</div><p class="big">${R.head}</p><div class="msg">${R.body}</div>
     ${lv===2?`<a class="btn call119" href="tel:119" style="text-decoration:none">119 전화하기</a>`:""}</div>`:""}
   ${areas.map(a=>`<h2>${a}</h2><div class="card" style="padding:4px 12px">${list.filter(x=>x[0]===a).map(x=>`<button class="symr ${symSel.has(x[1])?"on":""}" data-sym="${x[1]}">
     <span class="sbox"></span><span style="flex:1">${x[3]}</span>${symSel.has(x[1])?`<em class="slv" style="--c:${SYM_LV[x[2]].c}">${SYM_LV[x[2]].k}</em>`:""}</button>`).join("")}</div>`).join("")}
-  <button class="btn" id="symsave">오늘 기록에 남기기</button>
+  <button class="btn" id="symsave">다 골랐어요 · 오늘 신호 보기</button>
   ${symSel.size?`<button class="btn ghost" id="symclr">모두 지우기</button>`:""}
   <small class="src">근거: ${srcs.map(k=>SYM_SRC[k]).join(" / ")}</small>
   ${R?`<div style="height:64px"></div><button class="symbar" id="symbar" style="--c:${R.c}">지금 단계: <b>${R.k}</b> · ${symSel.size}개 선택 <span>↑ 안내 보기</span></button>`:""}`;
   const sbar=$("#symbar"); if(sbar) sbar.onclick=()=>window.scrollTo({top:0,behavior:"smooth"});
-  document.querySelectorAll("[data-sym]").forEach(b=>b.onclick=()=>{ const id=b.dataset.sym; symSel.has(id)?symSel.delete(id):symSel.add(id); renderSymptom(); });
+  // 누르는 즉시 오늘 기록에 저장 (화면을 떠나도 사라지지 않게)
+  const keep=()=>{ const d=today(); S.logs[d]=S.logs[d]||{}; S.logs[d].sym=[...symSel]; save(); };
+  document.querySelectorAll("[data-sym]").forEach(b=>b.onclick=()=>{ const id=b.dataset.sym; symSel.has(id)?symSel.delete(id):symSel.add(id); keep(); renderSymptom(); });
   $("#symsave").onclick=()=>{ const d=today(); S.logs[d]=S.logs[d]||{}; S.logs[d].sym=[...symSel]; save(); symSel=null; if(NAV.length) goBack(); else go("today"); requestAnimationFrame(()=>{ window.scrollTo(0,0); const sh=$(".sigh"); if(sh) sh.focus({preventScroll:true}); }); const sg=S.logs[d].sleepQ?signal(d):null; toast(sg?`증상을 기록했어요 · 오늘 신호 ${sg.name}`:"증상을 기록했어요. 체크인을 하면 신호에 반영돼요."); };
-  const c=$("#symclr"); if(c) c.onclick=()=>{ symSel.clear(); renderSymptom(); };
+  const c=$("#symclr"); if(c) c.onclick=()=>{ const was=[...symSel]; symSel.clear(); keep(); renderSymptom(); undoBar("증상 선택을 모두 지웠어요",()=>{ symSel=new Set(was); keep(); renderSymptom(); }); };
 }
 
 /* ───────── 3차: 투수 투구 수 (MLB·USA Baseball Pitch Smart, 만 7~22세) ───────── */
@@ -955,10 +980,12 @@ function drawRecovery(){
   <h2>회복 확인</h2><div class="card">
   <p class="mut">중간중간 몸무게를 재서 넣으면 회복 목표(${r1(P.target)}kg) 대비 얼마나 올라왔는지 보여 줘요.</p>
   ${last?`<div class="mlab"><span>지금 ${last[1]}kg · ${sgn(gain)}kg</span><span>${Math.round(prog)}%</span></div><div class="track"><i style="width:${prog}%;background:var(--acc)"></i></div>
-   `:""}${c.checks.length?`<ul class="why">${c.checks.map(([t,kg])=>{ const h=hoursBetween(c.weighAt,t); return `<li class="lo">${h>=0?`계체 뒤 ${r1(h)}시간 · ${kg}kg (${sgn(kg-c.weighKg)})`:`계체 전 · ${kg}kg (회복 계산에서 빠져요)`}</li>`; }).join("")}</ul>`:""}
+   `:""}${c.checks.length?`<ul class="why">${c.checks.map(([t,kg],i)=>{ const h=hoursBetween(c.weighAt,t); return `<li class="lo"><span style="flex:1">${h>=0?`계체 뒤 ${r1(h)}시간 · ${kg}kg (${sgn(kg-c.weighKg)})`:`계체 전 · ${kg}kg (회복 계산에서 빠져요)`}</span><button class="x" data-cdel="${i}" aria-label="이 기록 지우기">✕</button></li>`; }).join("")}</ul>`:""}
   <label class="f">지금 몸무게</label>${picker("rnow","",...wRange(last?last[1]:c.weighKg),1,"kg")}
   <button class="btn sm" id="radd">기록</button></div>`;
-  $("#radd").onclick=()=>{ const v=parseFloat($("#rnow").value); if(!(v>=20&&v<=250)){ toast("몸무게를 확인해 주세요 (20~250kg)."); return; } c.checks.push([nowLocal(),v]); save(); drawRecovery(); };
+  box.querySelectorAll("[data-cdel]").forEach(b=>b.onclick=()=>{ const i=+b.dataset.cdel, [it]=c.checks.splice(i,1); save(); drawRecovery();
+    undoBar(`지웠어요 · ${it[1]}kg 기록`,()=>{ c.checks.splice(i,0,it); save(); drawRecovery(); }); });
+  $("#radd").onclick=()=>{ const v=parseFloat($("#rnow").value); if(!(v>=20&&v<=250)){ const bx=$("#rnow_box"); if(bx) bx.classList.remove("hid"); fieldErr($("#rnow"),"20~250kg 사이로 적어 주세요."); return; } c.checks.push([nowLocal(),v]); save(); drawRecovery(); };
 }
 
 /* ───────── 3차: 나이대별 확인 (35세 이상, 하루 한 줄) ───────── */
@@ -978,26 +1005,43 @@ function ageTipToday(p){ const L=ageTips(p); if(!L) return "";
   return `<div class="banner info"><div class="cap" style="color:var(--gold)">나이대 체크 · ${b.id==="m50"?"50세 이상":"35~49세"}</div>${t}<small class="src">${AGE_SRC[s]} · <a href="#" data-go="settings">전체 보기</a></small></div>`; }
 
 /* ───────── 기록 ───────── */
+// 그날 신호 이유 + 훈련 적기/고치기 (기록 탭, 오늘 화면 '어제 훈련' 배너에서 엶)
+function openDay(k,after){
+  const L=S.logs[k]||{}, s=L.sleepQ?signal(k):null;
+  const why=s?`<h2 style="margin-top:4px">${s.name} · ${SIG_UI[s.lv][1]}</h2><p class="mut">${s.msg}</p>
+    <ul class="why">${s.why.map(([n,t])=>`<li class="${n?"hi":"lo"}"><span>${n?`<span class="sr-only">${n===2?"멈춤 이유: ":"주의 이유: "}</span>`:""}${k===today()?t:t.replace(/ ?<a [^>]*data-go="symptom"[^>]*>.*?<\/a>/,"")}</span></li>`).join("")}</ul>`
+    :`<h2 style="margin-top:4px">${L.sleepQ===undefined&&!S.logs[k]?"기록 없음":"체크인 없음"}</h2><p class="mut">${k===today()?"오늘 체크인은 오늘 화면에서 할 수 있어요.":"지난 날 체크인은 넣을 수 없어요(그날 아침 몸 상태가 기준이라서). 훈련은 지금 적을 수 있어요."}</p>`;
+  sheet(`<div class="kick">${k.slice(5).replace("-","/")}</div>${why}
+    <h2>이날 훈련</h2>${trainForm(L,false,k)}<button class="btn ghost neutral" id="cl">닫기</button>`);
+  const root=$("#mbg"); bindTrain(L,k,()=>{ after(); openDay(k,after); },root,after); $("#cl").onclick=closeSheet;
+}
 function renderHistory(){
   const d=today(), rows=[], loads=[];
   for(let i=27;i>=0;i--){ const k=addDays(d,-i); loads.push(S.logs[k]?tload(S.logs[k]):0); }
-  for(let i=0;i<14;i++){ const k=addDays(d,-i), L=S.logs[k]; if(!L) continue; const s=L.sleepQ?signal(k):null;
-    rows.push(`<${s?`button class="hist" data-hday="${k}" aria-label="${k} ${s.name} 신호 이유 보기"`:`div class="hist"`}><span class="hd" style="background:var(--${s?s.color:"line"})"></span><span style="flex:1;display:block"><b>${k.slice(5).replace("-","/")}</b>
-    <span class="mut"> · 컨디션 ${L.sleepQ?wsum(L)+"/20":"-"} · 잠 ${L.sleepH!=null?fmtSleep(L.sleepH):"-"}${L.weight?" · "+esc(L.weight)+"kg":""}${L.trainMin?" · 훈련 "+esc(L.trainMin)+"분"+(L.rpe?" × 힘든 정도 "+esc(L.rpe):""):""}${L.pain?" · 통증 "+["","약간","중간","심함"][L.pain]+(L.painPart?"("+esc(L.painPart)+")":""):""}</span></span></${s?"button":"div"}>`); }
+  for(let i=0;i<14;i++){ const k=addDays(d,-i), L=S.logs[k]; if(!L){ if(k===d) continue; if(k>=S.created) rows.push(`<button class="hist miss" data-hday="${k}" aria-label="${k} 기록 없음, 훈련 적기"><span class="hd" style="background:var(--line)"></span><span style="flex:1;display:block"><b>${k.slice(5).replace("-","/")}</b><span class="mut"> · 기록 없음 · 훈련만 적을 수 있어요</span></span></button>`); continue; } const s=L.sleepQ?signal(k):null;
+    rows.push(`<button class="hist" data-hday="${k}" aria-label="${k} ${s?s.name+" 신호 이유와 ":""}훈련 보기"><span class="hd" style="background:var(--${s?s.color:"line"})"></span><span style="flex:1;display:block"><b>${k.slice(5).replace("-","/")}</b>
+    <span class="mut"> · 컨디션 ${L.sleepQ?wsum(L)+"/20":"-"} · 잠 ${L.sleepH!=null?fmtSleep(L.sleepH):"-"}${L.weight?" · "+esc(L.weight)+"kg":""}${L.rest?" · 쉬는 날":""}${L.trainMin?" · 훈련 "+esc(L.trainMin)+"분"+(L.rpe?" × 힘든 정도 "+esc(L.rpe):""):""}${L.pain?" · 통증 "+["","약간","중간","심함"][L.pain]+(L.painPart?"("+esc(L.painPart)+")":""):""}</span></span></button>`); }
   const mx=Math.max(1,...loads);
   const bars=loads.map((v,i)=>`<rect x="${i*(100/28)+0.4}" y="${60-v/mx*56}" width="${100/28-0.8}" height="${v/mx*56}" rx="0.6" fill="var(--gold)" opacity="${i>=21?1:.45}"/>`).join("");
   $("#app").innerHTML=`<div class="kick">HISTORY</div><h1>기록</h1>
-  <div class="card"><b>최근 4주 훈련량</b>${loads.some(v=>v)?`<svg class="spark" viewBox="0 0 100 60" preserveAspectRatio="none" role="img" aria-label="최근 4주 하루 훈련량 막대">${bars}</svg><small class="src">진한 막대가 최근 7일이에요.</small>`:`<p class="mut" style="margin:10px 0 0">아직 막대가 없어요. 오늘 화면에서 훈련 시간과 힘든 정도를 적으면 하루 훈련량 막대가 생겨요.</p>`}</div>
-  <div class="card">${rows.length?`<small class="src" style="display:block;margin:0 0 4px">컨디션 점수는 20점 만점, 높을수록 좋아요. 줄을 누르면 그날 신호 이유가 나와요.</small>`+rows.join(""):`<p class="mut">아직 기록이 없어요.</p>`}</div>`;
-  document.querySelectorAll("[data-hday]").forEach(b=>b.onclick=()=>{ const k=b.dataset.hday, s=signal(k); if(!s) return;
-    sheet(`<div class="kick">${k.slice(5).replace("-","/")}</div><h2 style="margin-top:4px">${s.name} · ${SIG_UI[s.lv][1]}</h2><p class="mut">${s.msg}</p>
-    <ul class="why">${s.why.map(([n,t])=>`<li class="${n?"hi":"lo"}"><span>${n?`<span class="sr-only">${n===2?"멈춤 이유: ":"주의 이유: "}</span>`:""}${k===today()?t:t.replace(/ ?<a [^>]*data-go="symptom"[^>]*>.*?<\/a>/,"")}</span></li>`).join("")}</ul><button class="btn ghost neutral" id="cl">닫기</button>`); $("#cl").onclick=closeSheet; });
+  <div class="card"><b>최근 4주 훈련량</b>${loads.some(v=>v)?`<svg class="spark" viewBox="0 0 100 60" preserveAspectRatio="none" role="img" aria-label="최근 4주 하루 훈련량 막대">${bars}</svg><small class="src"><span style="display:flex;justify-content:space-between"><span>← 4주 전</span><span>오늘 →</span></span>진한 막대가 최근 7일이에요. 빈 칸은 훈련 기록이 없는 날이에요.</small>`:`<p class="mut" style="margin:10px 0 0">아직 막대가 없어요. 오늘 화면에서 훈련 시간과 힘든 정도를 적으면 하루 훈련량 막대가 생겨요.</p>`}</div>
+  <div class="card">${rows.length?`<small class="src" style="display:block;margin:0 0 4px">컨디션 점수는 20점 만점, 높을수록 좋아요. 줄을 누르면 그날 신호 이유가 나오고, 훈련을 적거나 고칠 수 있어요.</small>`+rows.join(""):`<p class="mut">아직 기록이 없어요.</p>`}</div>`;
+  document.querySelectorAll("[data-hday]").forEach(b=>b.onclick=()=>openDay(b.dataset.hday,renderHistory));
 }
 
 /* ───────── 준비 중 탭 ───────── */
 /* ───────── 4차: 영상 (느리게 · 한 프레임씩 · 두 영상 나란히) ─────────
    영상 파일은 저장하지 않음(사진 앱에 원본). 앱에는 메모와 표시한 시점만 저장. */
-const VID = { A:null, B:null, mode:"one", target:"A", rate:1, fps:30, linked:false, offset:0, marks:[], memo:"", full:false, sound:false };
+// 영상 프레임 수 자동 재기: 재생될 때 화면에 나온 프레임 사이 간격으로 계산 (지원 브라우저만)
+// 영상 프레임 수 자동 재기: 재생 중 1초 동안 디코드된 프레임 수로 계산 (화면 주사율 60Hz에 묶이지 않게)
+function measureFps(v,k){ if(!v.getVideoPlaybackQuality||!VID[k]||VID[k].fpsDone) return;
+  const go=()=>{ if(VID[k].fpsDone) return; const q0=v.getVideoPlaybackQuality().totalVideoFrames, t0=v.currentTime;
+    setTimeout(()=>{ if(!v.isConnected||v.paused||VID[k].fpsDone) return; const dt=v.currentTime-t0, n=v.getVideoPlaybackQuality().totalVideoFrames-q0; if(dt<0.5) return;
+      const raw=n/dt, STD=[24,25,30,48,50,60,90,100,120,240], nr=STD.reduce((a,b)=>Math.abs(b-raw)<Math.abs(a-raw)?b:a), f=Math.abs(nr-raw)/nr<0.12?nr:Math.round(raw); /* 흔한 값(30·60·120·240)에 맞춤 */ if(f>=10&&f<=480){ VID[k].fpsDone=true; VID.measured=f; if(VID.fpsAuto) VID.fps=f; fpsUI(); } },1200); };
+  v.addEventListener("playing",go); }
+function fpsNote(){ return VID.fpsAuto ? (VID.measured?`자동: 이 영상은 초당 약 ${VID.measured}프레임이에요. 1프레임 버튼이 여기에 맞춰 움직여요.`:"자동: 영상을 한 번 재생하면 초당 프레임을 재서 맞춰요. 재기 전에는 30으로 움직여요.") : "직접 고른 값이에요. 슬로모션은 120이나 240을 고르세요."; }
+function fpsUI(){ document.querySelectorAll("[data-fps]").forEach(x=>x.classList.toggle("on", x.dataset.fps==="auto"?VID.fpsAuto:(!VID.fpsAuto&&+x.dataset.fps===VID.fps))); const n=$("#fpsnote"); if(n) n.textContent=fpsNote(); }
+const VID = { A:null, B:null, mode:"one", target:"A", rate:1, fps:30, fpsAuto:true, measured:0, linked:false, offset:0, marks:[], memo:"", full:false, sound:false };
 function setFull(on){ VID.full=on; document.body.classList.toggle("vfs",on);
   // 안드로이드 크롬은 주소창까지 숨김. 아이폰은 앱 안에서 화면을 꽉 채우는 방식만 됨
   try{ if(on&&document.documentElement.requestFullscreen&&!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
@@ -1027,8 +1071,8 @@ function renderVideo(){
     <small class="src">영상 아래 막대는 시간 막대예요. 손가락으로 끌면 그 시점으로 바로 이동해요.</small>
     <button class="vmore" id="vmore">${VID.more?"속도·프레임 접기 ▴":"속도·프레임 설정 ▾"}</button>
     <div class="vrow vopt"><span class="cap">속도</span><div class="chips">${[0.25,0.5,1].map(r=>`<button class="chip ${VID.rate===r?"on":""}" data-rate="${r}">${r}×</button>`).join("")}</div></div>
-    <div class="vrow vopt"><span class="cap">프레임</span><div class="chips">${[30,60,120,240].map(f=>`<button class="chip ${VID.fps===f?"on":""}" data-fps="${f}">${f}</button>`).join("")}</div></div>
-    <small class="src">프레임 칸은 찍은 영상의 초당 프레임이에요. 슬로모션은 120이나 240을 고르세요.</small>
+    <div class="vrow vopt"><span class="cap">프레임</span><div class="chips"><button class="chip ${VID.fpsAuto?"on":""}" data-fps="auto">자동</button>${[30,60,120,240].map(f=>`<button class="chip ${!VID.fpsAuto&&VID.fps===f?"on":""}" data-fps="${f}">${f}</button>`).join("")}</div></div>
+    <small class="src" id="fpsnote">${fpsNote()}</small>
     ${two?`<button class="btn ghost sm" id="vsync">${VID.linked?`맞춤 풀기 (B가 A보다 ${VID.offset>=0?"+":""}${VID.offset.toFixed(2)}초)`:"지금 위치로 두 영상 맞추기"}</button>
       <small class="src">두 영상을 같은 순간(예: 발이 땅에 닿는 순간)에 멈춰 두고 누르면, 그다음부터 '둘 다'로 같이 움직여요.</small>`:""}
   </div>
@@ -1047,13 +1091,15 @@ function vTargets(){ return (VID.target==="AB"?["A","B"]:[VID.target]).map(vEl).
 function bindVideo(){
   document.querySelectorAll("[data-vm]").forEach(b=>b.onclick=()=>{ VID.mode=b.dataset.vm; if(VID.mode==="one") VID.linked=false; renderVideo(); });
   document.querySelectorAll("[data-vf]").forEach(inp=>inp.onchange=()=>{ const f=inp.files[0]; if(!f) return; const k=inp.dataset.vf;
+    VID.measured=0; if(VID.fpsAuto) VID.fps=30;     // 새 영상이면 이전 측정값을 버림
     if(VID[k]) URL.revokeObjectURL(VID[k].url); VID[k]={url:URL.createObjectURL(f), name:f.name.replace(/\.[^.]+$/,"")}; VID.linked=false; renderVideo(); });
   document.querySelectorAll("[data-vtg]").forEach(b=>b.onclick=()=>{ VID.target=b.dataset.vtg; renderVideo(); });
   document.querySelectorAll("[data-rate]").forEach(b=>b.onclick=()=>{ VID.rate=+b.dataset.rate; ["A","B"].map(vEl).filter(Boolean).forEach(v=>v.playbackRate=VID.rate); document.querySelectorAll("[data-rate]").forEach(x=>x.classList.toggle("on",+x.dataset.rate===VID.rate)); });
-  document.querySelectorAll("[data-fps]").forEach(b=>b.onclick=()=>{ VID.fps=+b.dataset.fps; document.querySelectorAll("[data-fps]").forEach(x=>x.classList.toggle("on",+x.dataset.fps===VID.fps)); });
+  document.querySelectorAll("[data-fps]").forEach(b=>b.onclick=()=>{ const a=b.dataset.fps==="auto"; VID.fpsAuto=a; VID.fps=a?(VID.measured||30):+b.dataset.fps; fpsUI(); });
   ["A","B"].forEach(k=>{ const v=vEl(k); if(!v) return; const sc=$("#sc"+k), vt=$("#vt"+k);
     v.playbackRate=VID.rate;
     v.addEventListener("loadedmetadata",()=>{ v.currentTime=VID[k].t||0.001; },{once:true});
+    measureFps(v,k);
     let dragging=false;
     const upd=()=>{ if(!dragging&&isFinite(v.duration)&&v.duration){ sc.value=Math.round(v.currentTime/v.duration*1000); } vt.textContent=fmtT(v.currentTime); };
     v.addEventListener("timeupdate",upd); v.addEventListener("seeked",upd); v.addEventListener("durationchange",upd);
@@ -1088,7 +1134,8 @@ function bindVideo(){
   const sv=$("#vsave"); if(sv) sv.onclick=()=>{ if(!VID.memo.trim()&&!VID.marks.length){ toast("메모나 표시한 시점이 없어요."); return; }
     S.vnotes=S.vnotes||[]; S.vnotes.push({date:today(), names:["A","B"].filter(k=>VID[k]&&(k==="A"||VID.mode==="two")).map(k=>VID[k].name), marks:VID.marks.map(m=>({...m,t:Math.round(m.t*100)/100})), memo:VID.memo.trim()});
     VID.marks=[]; VID.memo=""; save(); toast("메모를 저장했어요."); renderVideo(); };
-  document.querySelectorAll("[data-ndel]").forEach(b=>b.onclick=()=>ask("이 메모를 지울까요?","지우기",()=>{ S.vnotes.splice(+b.dataset.ndel,1); save(); renderVideo(); }));
+  document.querySelectorAll("[data-ndel]").forEach(b=>b.onclick=()=>{ const i=+b.dataset.ndel, [it]=S.vnotes.splice(i,1); save(); renderVideo();
+    undoBar("메모를 지웠어요",()=>{ S.vnotes.splice(i,0,it); save(); renderVideo(); }); });
 }
 
 /* ───────── 설정·백업 ───────── */
@@ -1096,11 +1143,13 @@ function renderSettings(){
   const p=S.profile, b=band(p);
   $("#app").innerHTML=`<div class="kick">SETTINGS</div><h1>설정</h1>
   <div class="card"><b>${b.name}</b> · 만 ${ageOf(p)}세 · ${esc(p.sex)} · ${esc(p.height)}cm · ${esc(p.weight)}kg<div class="mut">${esc(p.subName||p.sub)}${p.pos?" · "+esc(p.pos):""}${p.weightClass?" · "+esc(p.weightClass)+(p.classLimit?` (${esc(p.classLimit)}kg)`:""):""} · ${esc(LEVELS[p.level]||"")}</div>
+  <button class="btn ghost neutral" id="rewc">체급 바꾸기</button>
   <button class="btn ghost neutral" id="reprof">처음 설정 다시 하기 (기록은 그대로)</button></div>
   <h2>백업 · 데이터</h2><div class="card"><p class="mut">기록은 이 휴대폰에만 있어요. 폰을 바꾸거나 사파리 데이터를 지우면 사라질 수 있으니 가끔 내보내 두세요.${S.lastBackup?` 마지막 백업: ${esc(S.lastBackup)}`:""}</p>
   <button class="btn" id="exj">기록 내보내기 (복원용 파일)</button>
   <button class="btn ghost neutral" id="exc">엑셀용 파일(CSV) 내보내기</button>
   <button class="btn ghost neutral" id="imp">기록 가져오기</button><input type="file" id="impf" accept=".json,application/json" hidden>
+  <details class="fold"><summary>백업 파일은 어디에? 새 폰으로 옮기기</summary><div>아이폰은 저장할 곳을 고르는 창이 떠요. '파일' 앱이나 iCloud Drive에 두거나, 카톡 '나와의 채팅'으로 보내 두면 안전해요. 안드로이드는 '다운로드' 폴더에 저장돼요.<br>새 폰에서는 앱을 연 뒤 처음 화면의 '백업 파일로 기록 가져오기'(또는 설정 → 기록 가져오기)를 누르고 <b>컨디션신호등MMA_백업_날짜.json</b> 파일을 고르세요. 엑셀용(CSV) 파일로는 되살릴 수 없어요.</div></details>
   <div class="wipe-row"><button class="btn danger" id="wipe">이 폰의 모든 기록 지우기</button></div></div>
   ${ageTips(p)?`<h2>나이대별 확인 (${band(p).id==="m50"?"50세 이상":"35~49세"})</h2><div class="card" style="font-size:15px"><ul class="why">${ageTips(p).map(([t,k])=>`<li class="lo"><span>${t}<small class="src">${AGE_SRC[k]}</small></span></li>`).join("")}</ul></div>`:""}
   <h2 id="crit" tabindex="-1">판단 기준과 출처</h2><div class="card fold-card" style="font-size:15px"><p class="mut" style="margin-top:0">누르면 펼쳐져요.</p>
@@ -1117,15 +1166,25 @@ function renderSettings(){
   <details class="fold"><summary>식단 목표</summary><div><p>하루 열량은 기초대사량(Mifflin-St Jeor 공식) × 주간 훈련 횟수 활동계수에서 시작해요. 단백질은 체중 1kg당 1.6g(감량 2.0g, 증량 1.8g, 청소년 1.5g), 탄수화물은 그날 훈련 시간에 따라 1kg당 3~8g이에요. 감량은 주 1%, 증량은 주 0.5%를 넘지 않게 막아요.<small class="src">Thomas 등 (2016) Med Sci Sports Exerc 48(3); Jäger 등 (2017) JISSN 14:20; Helms 등 (2014) JISSN 11:20; Mifflin 등 (1990) Am J Clin Nutr 51(2)</small></p><p>음식 영양값은 식품의약품안전처 식품영양성분 통합DB(공공데이터포털, 2026-09-29 기준)에서 가져왔어요.</p></div></details>
   <p class="mut">이 앱은 의학적 진단·치료를 하지 않아요. 몸에 이상이 있으면 의료진과 상담하세요.</p></div>
   <p class="mut" style="text-align:center">컨디션 신호등 MMA v${APP_VER}</p>`;
+  $("#rewc").onclick=()=>{ ob={step:3,only:true,p:{...S.profile, birthYear:String(S.profile.birthYear), birthMonth:String(S.profile.birthMonth), classLimit:S.profile.classLimit??"", subName:S.profile.subName||"", screening:{...S.profile.screening}}}; obPrev=S.profile; S.profile=null; render(); };
   $("#reprof").onclick=()=>{ ob={step:0,p:{...S.profile, birthYear:String(S.profile.birthYear), birthMonth:String(S.profile.birthMonth), classLimit:S.profile.classLimit??"", subName:S.profile.subName||"", screening:{...S.profile.screening}}}; obPrev=S.profile; S.profile=null; render(); };
-  $("#exj").onclick=()=>{ download(`컨디션신호등MMA_백업_${today()}.json`, JSON.stringify({app:"condition-note",version:1,exported:new Date().toISOString(),data:S},null,1), "application/json"); S.lastBackup=today(); save(); renderSettings(); toast("백업 파일을 저장했어요."); };
+  // 폰에서는 공유 시트로 저장 위치를 고르게 하고, 실제로 저장했을 때만 '백업함'으로 기록
+  $("#exj").onclick=()=>{ const name=`컨디션신호등MMA_백업_${today()}.json`, text=JSON.stringify({app:"condition-note",version:1,exported:new Date().toISOString(),data:S},null,1);
+    const done=()=>{ S.lastBackup=today(); save(); renderSettings(); toast("백업 파일을 저장했어요."); };
+    let file=null; try{ file=new File([text],name,{type:"application/json"}); }catch(_){}
+    if(file&&matchMedia("(pointer:coarse)").matches&&navigator.canShare&&navigator.canShare({files:[file]})){
+      navigator.share({files:[file],title:name}).then(done).catch(err=>{ if(err&&err.name==="AbortError") toast("저장을 취소했어요. 백업은 아직 안 됐어요."); else { download(name,text,"application/json"); done(); setTimeout(()=>toast("공유가 안 돼서 파일로 내려받았어요. 파일 앱의 다운로드에서 확인해 주세요."),50); } });
+    } else { download(name,text,"application/json"); done(); } };
   $("#exc").onclick=()=>{ download(`컨디션신호등MMA_기록_${today()}.csv`, toCSV(), "text/csv"); toast("CSV 파일을 저장했어요."); };
   $("#imp").onclick=()=>$("#impf").click();
-  $("#impf").onchange=async e=>{ const f=e.target.files[0]; if(!f) return; try{ const j=JSON.parse(await f.text()); if(j.app!=="condition-note"||!j.data||!j.data.logs) throw 0;
-      ask(`백업 파일의 기록 ${Object.keys(j.data.logs).length}일치로 바꿀까요? 지금 이 폰의 기록은 덮어써져요.`,"가져오기",()=>{ const wasMMA=!!(j.data.profile&&j.data.profile.sub==="MMA"); let nd; try{ nd=cleanData(fixMMA(j.data)); }catch(_){ toast("이 앱의 백업 파일이 아니에요."); return; } S=nd; save(); NAV=[]; draft=null; symSel=null; toRoot(); toast(!S.profile?"기록은 가져왔어요. 프로필 값이 맞지 않아 처음 설정을 다시 해 주세요.":!wasMMA?"MMA로 맞췄어요. 설정에서 체급을 골라 주세요.":"가져왔어요."); });
-    }catch(_){ toast("이 앱의 백업 파일이 아니에요."); } e.target.value=""; };
+  $("#impf").onchange=handleImport;
   $("#wipe").onclick=()=>ask("이 폰의 모든 기록과 설정을 지울까요? 되돌릴 수 없어요. 먼저 내보내기를 권해요.","모두 지우기",()=>{ S=blank(); save(); NAV=[]; tab="today"; draft=null; symSel=null; obPrev=null; ob=null; if(VID){ VID.marks=[]; VID.memo=""; } render(); });
 }
+const BADFILE="이 앱의 백업 파일이 아니에요. '컨디션신호등MMA_백업_날짜.json' 파일을 골라 주세요. 엑셀용(CSV) 파일로는 복원할 수 없어요.";
+// 백업 파일 가져오기 (설정, 처음 설정 1단계 두 곳에서 씀)
+async function handleImport(e){ const f=e.target.files[0]; if(!f) return; try{ const j=JSON.parse(await f.text()); if(j.app!=="condition-note"||!j.data||!j.data.logs) throw 0;
+      ask(`백업 파일의 기록 ${Object.keys(j.data.logs).length}일치로 바꿀까요? 지금 이 폰의 기록은 덮어써져요.`,"가져오기",()=>{ const wasMMA=!!(j.data.profile&&j.data.profile.sub==="MMA"); let nd; try{ nd=cleanData(fixMMA(j.data)); }catch(_){ toast(BADFILE); return; } S=nd; save(); ob=null; obPrev=null; NAV=[]; draft=null; symSel=null; toRoot(); toast(!S.profile?"기록은 가져왔어요. 프로필 값이 맞지 않아 처음 설정을 다시 해 주세요.":!wasMMA?"MMA로 맞췄어요. 설정에서 체급을 골라 주세요.":"가져왔어요."); });
+    }catch(_){ toast(BADFILE); } e.target.value=""; }
 function toCSV(){
   const h=["날짜","잔시간","잠(5 좋음)","피로(1 상쾌)","근육통(1 없음)","스트레스(1 없음)","컨디션점수","통증","통증부위","몸무게","훈련분","힘든정도","훈련량","증상","신호"];
   const rows=Object.keys(S.logs).sort().map(k=>{ const L=S.logs[k], s=L.sleepQ?signal(k):null;
@@ -1138,14 +1197,18 @@ function download(name, text, type){
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000);
 }
 let _mBack=null;   // 확인창·시트를 열기 전 초점 (닫으면 돌려줌)
-function ask(text, okLabel, fn){
+function ask(text, okLabel, fn){ { const u=$("#undo"); if(u) u.hidden=true; }
   if(!$("#modal").innerHTML) _mBack=document.activeElement;
   $("#modal").innerHTML=`<div class="modal"><div class="card"><p>${esc(text)}</p><button class="btn danger" id="mok">${okLabel}</button><button class="btn ghost neutral" id="mno">취소</button></div></div>`;
   $("#modal").firstElementChild.setAttribute("role","dialog"); $("#modal").firstElementChild.setAttribute("aria-modal","true");
   const back=document.activeElement, close=()=>{ $("#modal").innerHTML=""; if(back&&back.isConnected) back.focus(); };
   $("#mok").onclick=()=>{ $("#modal").innerHTML=""; _mBack=null; fn(); }; $("#mno").onclick=close; $("#mno").focus();
 }
-function toast(t){ const el=$("#toast"); el.hidden=false; el.textContent=""; requestAnimationFrame(()=>{ el.textContent=t; }); clearTimeout(toast._t); toast._t=setTimeout(()=>{ el.hidden=true; el.textContent=""; },3000); }
+// 지운 뒤 잠깐 '되돌리기'를 보여 줌 (삭제는 확인창 대신 이 방식으로 통일)
+function undoBar(msg,fn){ const el=$("#undo"); el.querySelector("span").textContent=msg; el.hidden=false; clearTimeout(undoBar._t);
+  el.querySelector("button").onclick=()=>{ el.hidden=true; clearTimeout(undoBar._t); fn(); toast("되돌렸어요."); };
+  undoBar._t=setTimeout(()=>{ el.hidden=true; },6000); }
+function toast(t){ const el=$("#toast"); el.hidden=false; el.textContent=""; requestAnimationFrame(()=>{ el.textContent=t; }); clearTimeout(toast._t); toast._t=setTimeout(()=>{ el.hidden=true; el.textContent=""; },Math.max(3000,t.length*90)); }
 
 /* ───────── 2차: 식단 + 목표 ─────────
    하루 목표 = 기초대사량(Mifflin-St Jeor) × 활동계수 ± 목표 조정
@@ -1272,11 +1335,12 @@ function renderFood(){
   $("#goalbtn").onclick=goalSheet;
   $("#whyplan").onclick=e=>{ e.preventDefault(); whyPlan(T); };
   document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>foodSheet(b.dataset.add));
-  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); const [k,i]=b.dataset.del.split("|"); m[k].splice(+i,1); save(); renderFood(); });
+  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); const [k,i]=b.dataset.del.split("|"); const [it]=m[k].splice(+i,1); save(); renderFood();
+    undoBar(`지웠어요 · ${shown(it.n)}`,()=>{ m[k].splice(+i,0,it); save(); renderFood(); }); });
   document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{ const [k,i]=b.dataset.edit.split("|"); portionSheet(k,null,+i); });
 }
 let _sheetBusy=false;
-function sheet(html){ if(_sheetBusy) return; const first=!$("#modal").innerHTML; if(first) _mBack=document.activeElement; _sheetBusy=true; arm(); try{ $("#modal").innerHTML=`<div class="modal" id="mbg"><div class="card sheet">${html}</div></div>`; } finally{ _sheetBusy=false; } $("#mbg").onclick=e=>{ if(e.target.id==="mbg") closeSheet(); };
+function sheet(html){ if(_sheetBusy) return; { const u=$("#undo"); if(u) u.hidden=true; } const first=!$("#modal").innerHTML; if(first) _mBack=document.activeElement; _sheetBusy=true; arm(); try{ $("#modal").innerHTML=`<div class="modal" id="mbg"><div class="card sheet">${html}</div></div>`; } finally{ _sheetBusy=false; } $("#mbg").onclick=e=>{ if(e.target.id==="mbg") closeSheet(); };
   $("#mbg").setAttribute("role","dialog"); $("#mbg").setAttribute("aria-modal","true");
   // 처음 열 때 시트 자체에 초점 (입력칸에 주면 폰 키보드가 튀어나와서)
   if(first){ const f=$("#mbg .sheet"); f.tabIndex=-1; f.style.outline="none"; setTimeout(()=>{ if(f.isConnected&&!f.contains(document.activeElement)) f.focus({preventScroll:true}); },0); } }
@@ -1291,6 +1355,8 @@ function whyPlan(T){
 }
 function goalSheet(){
   const g={...goalOf()}, youth=band(S.profile).youth;
+  const prev=T=>`<div class="card" style="background:var(--chip);border:0;margin-top:12px"><b>하루 ${T.kcal.toLocaleString()}kcal</b><div class="mut">단백질 ${T.p}g · 탄수화물 ${T.c}g · 지방 ${T.f}g</div>${T.notes.map(x=>`<div class="mut">${x}</div>`).join("")}</div>
+    ${T.warn.map(x=>`<div class="banner warn">${x}</div>`).join("")}`;
   const draw=()=>{
     const T=plan(g);
     sheet(`<h2 style="margin-top:0">목표</h2>
@@ -1299,14 +1365,14 @@ function goalSheet(){
     ${g.type!=="maintain"?`<div class="row"><div><label class="f">목표 체중 (kg)</label><input id="gk" type="number" inputmode="decimal" step="0.1" value="${g.targetKg||""}" placeholder="${r1(curWeight())}"></div>
     <div><label class="f">언제까지 (선택)</label><input id="gd" type="date" value="${g.date||""}" min="${addDays(today(),7)}"></div></div>
     <p class="mut">지금 ${r1(curWeight())}kg. 기한을 비워 두면 ${g.type==="lose"?"주 0.5%":"주 0.25%"} 속도로 계산해요.</p>`:""}
-    <div class="card" style="background:var(--chip);border:0;margin-top:12px"><b>하루 ${T.kcal.toLocaleString()}kcal</b><div class="mut">단백질 ${T.p}g · 탄수화물 ${T.c}g · 지방 ${T.f}g</div>${T.notes.map(x=>`<div class="mut">${x}</div>`).join("")}</div>
-    ${T.warn.map(x=>`<div class="banner warn">${x}</div>`).join("")}
+    <div id="gprev">${prev(T)}</div>
     <button class="btn" id="gsave">저장</button><button class="btn ghost neutral" id="cl">취소</button>`);
     document.querySelectorAll("[data-gt]").forEach(b=>b.onclick=()=>{ g.type=b.dataset.gt; draw(); });
     const gk=$("#gk"), gd=$("#gd");
-    if(gk) gk.onchange=()=>{ g.targetKg=gk.value?+gk.value:null; draw(); };
-    if(gd) gd.onchange=()=>{ g.date=gd.value||null; draw(); };
-    $("#gsave").onclick=()=>{ S.goal=g.type==="maintain"?{type:"maintain"}:g; save(); closeSheet(); renderFood(); };
+    // 칸을 바꿔도 시트를 다시 그리지 않고 아래 계산만 바꿈 (칸을 벗어나며 누른 '저장'이 사라지지 않게)
+    const upd=()=>{ if(gk) g.targetKg=gk.value?+gk.value:null; if(gd) g.date=gd.value||null; const pv=$("#gprev"); if(pv) pv.innerHTML=prev(plan(g)); };
+    if(gk) gk.oninput=upd; if(gd) gd.onchange=upd;
+    $("#gsave").onclick=()=>{ upd(); S.goal=g.type==="maintain"?{type:"maintain"}:g; save(); closeSheet(); renderFood(); };
     $("#cl").onclick=closeSheet;
   };
   draw();
@@ -1345,11 +1411,13 @@ function portionSheet(meal, f, editIdx){
     <div class="chips" style="margin-top:8px">${[0.5,1,1.5,2].map(x=>`<button class="chip" data-sv="${x}">${x===1?"1인분":x+"인분"} (${r0(base.sv*x)}${base.u})</button>`).join("")}</div>
     <label class="f">영양값 <span class="mut">(포장지 숫자와 다르면 고쳐 주세요)</span></label>
     <div class="grid4">${[["k","열량 kcal"],["c","탄수화물 g"],["p","단백질 g"],["f","지방 g"]].map(([k,l])=>`<div><div class="mut">${l}</div><input type="number" inputmode="decimal" data-ov="${k}" value="${r1(v[k])}"></div>`).join("")}</div>
-    ${over?`<p class="mut">직접 고친 숫자를 쓰고 있어요. <a href="#" id="reset">DB 값으로 되돌리기</a></p>`:""}
+    <p class="mut" id="rsw" ${over?"":"hidden"}>직접 고친 숫자를 쓰고 있어요. <a href="#" id="reset">DB 값으로 되돌리기</a></p>
     <button class="btn" id="psave">${old?"고치기":"추가"}</button><button class="btn ghost neutral" id="cl">취소</button>`);
-    $("#pg").onchange=e=>{ g=+e.target.value||0; over=null; draw(); };
+    // 입력 중에는 시트를 다시 그리지 않음 (칸을 벗어나며 누른 '추가'가 사라지지 않게)
+    const fillOv=()=>{ const v=calc(); document.querySelectorAll("[data-ov]").forEach(i=>i.value=r1(v[i.dataset.ov])); $("#rsw").hidden=!over; };
+    $("#pg").oninput=e=>{ g=+e.target.value||0; over=null; fillOv(); };
     document.querySelectorAll("[data-sv]").forEach(b=>b.onclick=()=>{ g=r0(base.sv*+b.dataset.sv); over=null; draw(); });
-    document.querySelectorAll("[data-ov]").forEach(i=>i.onchange=()=>{ over=over||{...calc()}; over[i.dataset.ov]=+i.value||0; draw(); });
+    document.querySelectorAll("[data-ov]").forEach(i=>i.oninput=()=>{ over=over||{...calc()}; over[i.dataset.ov]=+i.value||0; $("#rsw").hidden=false; });
     const rs=$("#reset"); if(rs) rs.onclick=e=>{ e.preventDefault(); over=null; draw(); };
     $("#psave").onclick=()=>{ const v=calc(); const item={n:base.n,g,u:base.u,k:v.k,c:v.c,p:v.p,f:v.f,na:base.na*g/100,base,over};
       if(old) m[meal][editIdx]=item; else m[meal].push(item);

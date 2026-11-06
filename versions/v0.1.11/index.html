@@ -1,0 +1,1484 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>컨디션 신호등 MMA</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="신호등 MMA">
+<meta name="theme-color" content="#0e0e0e">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Barlow+Condensed:ital,wght@0,700;0,800;1,800;1,900&display=swap">
+<style>
+:root{--bg:#0e0e0e;--card:#181818;--card2:#202020;--ink:#f5f3ee;--mut:#9a978f;--line:#2c2c2c;--gold:#c9a96e;
+--g:#22d07a;--y:#ffd23f;--r:#ff3b30;--gS:#12291d;--yS:#2e2810;--rS:#331412;--chip:#202020;
+--acc:#f5f3ee;--accInk:#111;
+--cond:"Barlow Condensed","Arial Narrow",Pretendard,sans-serif;--disp:"Black Han Sans",Pretendard,sans-serif;color-scheme:dark}
+body.sg-g{--acc:var(--g)}body.sg-y{--acc:var(--y)}body.sg-r{--acc:var(--r);--accInk:#fff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;word-break:keep-all}
+body::before{content:"";position:fixed;right:-120px;top:30px;width:300px;height:560px;background:repeating-linear-gradient(135deg,var(--gold) 0 2px,transparent 2px 22px);opacity:.12;transform:skewX(-12deg) translateZ(0);will-change:transform;pointer-events:none;z-index:0}
+main{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top)) 18px calc(104px + env(safe-area-inset-bottom))}
+a{color:var(--gold)}
+h1{font:400 28px/1.15 var(--disp);margin:4px 0 14px;letter-spacing:-.01em}
+h2{font:400 21px/1.2 var(--disp);margin:26px 0 10px}
+.kick{font:italic 800 14px var(--cond);letter-spacing:.16em;color:var(--gold);text-transform:uppercase}
+.card{background:var(--card);border:0;border-top:2px solid var(--line);border-radius:0;padding:16px;margin:0 0 12px}
+.mut{color:var(--mut);font-size:14px}
+label.f{display:block;font-weight:700;margin:16px 0 7px}
+input[type=number],input[type=text],select{width:100%;font:inherit;padding:12px;border:0;border-bottom:2px solid var(--gold);border-radius:0;background:var(--card2);color:var(--ink)}
+input[type=number]{font:italic 800 24px var(--cond)}
+input:focus,select:focus{outline:none;border-bottom-color:var(--acc)}
+:focus-visible{outline:2px solid var(--gold)!important;outline-offset:2px}
+.chip:focus-visible,.scale button:focus-visible,.vbtns button:focus-visible,.vtools button:focus-visible,.btn:focus-visible{clip-path:none!important;outline:3px solid var(--gold)!important;outline-offset:2px}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:0;background:var(--chip);color:#cfccc4;border-radius:0;padding:10px 14px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
+.chip.on{background:var(--acc);color:var(--accInk);font-weight:800}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.scale button{padding:10px 0;border:0;border-radius:0;background:var(--chip);color:var(--mut);font:italic 900 22px var(--cond);clip-path:polygon(8% 0,100% 0,92% 100%,0 100%)}
+.scale button.on{background:var(--acc);color:var(--accInk)}
+.ends{display:flex;justify-content:space-between;font-size:12px;color:#6c6a64;margin-top:4px}
+.btn{display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;width:100%;padding:15px 20px;border:0;border-radius:0;background:var(--acc);color:var(--accInk);font:400 20px var(--disp);cursor:pointer;margin-top:16px;transform:skewX(-8deg)}
+.btn::after{content:"›";font-family:var(--cond);font-size:26px;line-height:1}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink)}
+.btn.danger{background:transparent;color:var(--r);box-shadow:inset 0 0 0 2px var(--r)}
+.btn:disabled{opacity:1;background:#2a2a2a;color:#bdbab2;cursor:default}
+.light{display:flex;gap:14px;align-items:center}
+.lamp{display:flex;flex-direction:column;gap:5px;padding:6px;background:#000;border-radius:14px;flex:none}
+.lamp i{width:16px;height:16px;border-radius:50%;background:#2a2a2a}
+.lamp i.on{background:var(--c);box-shadow:0 0 14px var(--c)}
+.dot{flex:none;width:44px;height:44px;border-radius:50%}
+.dot.g{background:var(--g)}.dot.y{background:var(--y)}.dot.r{background:var(--r)}.dot.n{background:var(--line)}
+.sig{border-top:0;border-left:6px solid var(--c);background:var(--card)}
+.sig.g{--c:var(--g)}.sig.y{--c:var(--y)}.sig.r{--c:var(--r)}
+.sigh:focus{outline:none}ul.why a{display:inline-block;padding:12px 4px;margin:-12px -4px}.sigh{margin:0;padding:0;border:0;font:inherit}.sigh .t,.sigh .big{display:block}
+.sig .t{font:italic 800 13px var(--cond);letter-spacing:.2em;color:var(--c)}
+.big{font:400 32px/1.05 var(--disp);margin:2px 0 0}
+.sig .msg{font-size:16px;color:var(--ink);font-weight:600;margin-top:10px;line-height:1.5}.sig.r .msg{border-left:3px solid var(--r);padding-left:10px}
+ul.why{margin:12px 0 0;padding:0;list-style:none;counter-reset:w}
+ul.why li{counter-increment:w;display:flex;gap:10px;align-items:baseline;font-size:15px;padding:8px 0;border-bottom:1px solid var(--line)}
+ul.why li::before{content:counter(w,decimal-leading-zero);font:italic 800 16px var(--cond);color:var(--gold);flex:none;width:24px}
+ul.why li.hi{color:var(--ink)}ul.why li.lo{color:#cfccc4}
+.wcard{position:relative;margin:4px 0 14px;background:var(--card);color:var(--ink);border-left:6px solid var(--gold);padding:12px 16px 14px}
+.wcard .cap{font:700 12px var(--cond);letter-spacing:.16em;opacity:.7;color:inherit}
+.wcard b{display:block;font:italic 900 28px/1 var(--cond);margin-top:4px}.wcard b small{font-size:16px}
+.wcard p{font-size:14px;font-weight:700;margin:6px 0 0}.wcard p .over{color:var(--y)}body.sg-r .wcard p .over{color:var(--ink);font-weight:600}
+.stats{display:flex;gap:6px;margin:0 0 12px}.stats div{flex:1;background:var(--card);border-top:2px solid var(--gold);padding:9px 10px 8px}
+.stats b{display:block;font:italic 900 30px/1 var(--cond)}.stats b small{font-size:14px;color:var(--mut)}
+.cap{font:700 11px var(--cond);letter-spacing:.16em;color:var(--mut);text-transform:uppercase}.stats .cap{font:600 12px/1.35 Pretendard,sans-serif;letter-spacing:0;text-transform:none}
+.banner a{display:inline-block;padding:12px 4px;margin:-12px -4px}.banner{border-radius:0;padding:12px 14px;margin:0 0 12px;font-size:15px;border-left:4px solid var(--gold)}
+.banner.warn{background:var(--yS);border-color:var(--y)}.banner.bad{background:var(--rS);border-color:var(--r)}.banner.info{background:var(--card)}
+nav[hidden]{display:none!important}
+nav{position:fixed;z-index:5;left:0;right:0;bottom:0;background:#080808;border-top:1px solid #222;display:flex;padding:10px max(6px,calc(50% - 280px)) env(safe-area-inset-bottom)}
+nav button{flex:1;border:0;background:none;color:#5d5b56;font:inherit;font-size:12px;font-weight:600;padding:2px 0 12px}
+nav button svg{display:block;margin:0 auto 5px;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{color:var(--ink)}nav button.on svg{stroke:var(--acc)}
+.hist{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}button.hist{width:100%;text-align:left;background:none;border-left:0;border-right:0;border-top:0;color:inherit;font:inherit;cursor:pointer}button.hist::after{content:"›";color:var(--mut);font-size:20px}
+.hist:last-child{border-bottom:0}
+.hd{width:12px;height:12px;border-radius:50%;flex:none}
+.steps{display:flex;gap:4px;margin:0 0 16px}.steps i{flex:1;height:4px;background:var(--line)}.steps i.on{background:var(--gold)}
+.yn{display:flex;gap:8px;margin:8px 0 4px}.yn .chip{flex:1;text-align:center;min-height:52px;font-size:16px}.yn .chip.on[data-v="예"]{box-shadow:inset 0 0 0 2px var(--y)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;z-index:9}
+.modal .card{width:100%;max-width:560px;border-radius:0;margin:0;border-top:3px solid var(--gold);padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+small.src{display:block;color:#7a776f;font-size:12px;margin-top:8px}
+svg.spark{width:100%;height:60px;display:block}
+.vl{list-style:none;padding:0;margin:10px 0 0}.vl li{display:flex;gap:8px;margin:6px 0;font-size:15px}
+.vi{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;color:#111}
+.vi.g{background:var(--g)}.vi.y{background:var(--y)}.vi.r{background:var(--r);color:#fff}
+.mbar{margin-top:10px}.mlab{display:flex;justify-content:space-between;font-size:14px}.track{height:8px;background:var(--chip);overflow:hidden;transform:skewX(-12deg)}.track i{display:block;height:100%}
+.fi{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.x{flex:none;width:36px;height:36px;border:0;border-radius:50%;background:var(--chip);color:var(--mut);font-size:15px}
+.btn.sm{padding:10px 16px;font-size:16px;margin-top:10px}
+.intro{display:flex;gap:12px;align-items:center;background:var(--card);border-left:4px solid var(--gold);padding:12px 14px;margin:6px 0 4px}.intro p{margin:0;font-size:15px;line-height:1.5}.intro .dots{display:flex;flex-direction:column;gap:4px;flex:none}.intro .dots i{width:10px;height:10px;border-radius:50%;display:block}
+.dietbtn{display:block;width:100%;text-align:left;color:inherit;font:inherit;border:0;cursor:pointer}
+#editck{flex-direction:row}#editck::after{content:"›"}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.stepn{font:700 13px var(--cond);letter-spacing:.16em;color:var(--mut);text-align:right;margin:-6px 0 6px}
+.sheet{max-height:88vh;overflow-y:auto}
+.fl{max-height:42vh;overflow-y:auto;border:1px solid var(--line)}
+.fr{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);font:inherit;font-size:16px;padding:12px}
+.fr:last-child{border-bottom:0}.fr .mut{flex:none}
+.tag2{font-style:normal;font-size:12px;color:var(--gold);border:1px solid var(--gold);padding:0 6px}
+.grid4{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chip:disabled{opacity:.4}
+input[type=date],input[type=search]{width:100%;font:inherit;padding:12px;border:0;border-bottom:2px solid var(--gold);border-radius:0;background:var(--card2);color:var(--ink)}
+.symr{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);font:inherit;font-size:15px;padding:12px 2px;cursor:pointer}
+.symr:last-child{border-bottom:0}
+.sbox{flex:none;width:20px;height:20px;border:2px solid #555;transform:skewX(-10deg)}
+.symr.on .sbox{background:var(--ink);border-color:var(--ink)}
+.slv{flex:none;font:italic 800 14px var(--cond);color:var(--c);border:1.5px solid var(--c);padding:1px 6px}
+.sym{border-top:0;border-left:6px solid var(--c)}.sym .t{font:italic 800 13px var(--cond);letter-spacing:.2em;color:var(--c)}.sym .msg{font-size:14px;color:var(--mut);margin-top:10px}
+input[type=datetime-local]{width:100%;font:inherit;padding:12px;border:0;border-bottom:2px solid var(--gold);border-radius:0;background:var(--card2);color:var(--ink)}
+.pick{display:flex;gap:8px}.pick select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23c9a96e' stroke-width='2'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 12px center!important;flex:1.5;font:italic 800 22px var(--cond);border:0;border-bottom:2px solid var(--gold);border-radius:0;background:var(--card2);color:var(--ink);padding:10px 12px;-webkit-appearance:none;appearance:none}
+.pick input{flex:1;min-width:0}.pick input::placeholder{font:600 14px Pretendard,sans-serif;color:#6c6a64}
+.hmbox{flex:1.2;display:flex;align-items:center;gap:4px;background:var(--card2);border-bottom:2px solid var(--gold);padding:0 10px}
+.hmbox input{width:100%;min-width:0;border:0!important;background:none!important;padding:10px 0!important;text-align:right;font:italic 800 24px var(--cond)!important;color:var(--ink)}
+.hmbox input::placeholder{font:italic 800 24px var(--cond);color:#555}
+.hmbox span{font:italic 800 18px var(--cond);color:var(--gold);flex:none}
+.vgrid{display:grid;gap:8px;margin-top:14px}.vgrid.two{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.vslot{background:#000;position:relative;min-width:0}
+.vslot video{display:block;width:100%;height:46vh;object-fit:contain;background:#000}
+.vgrid.two .vslot video{height:40vh}
+.vbar{display:flex;align-items:center;gap:6px;padding:6px 6px 8px;background:var(--card)}
+.vbar input[type=range]{flex:1;min-width:0;accent-color:var(--acc)}
+.vk{font:italic 900 18px var(--cond);color:var(--gold)}.vt{font:italic 800 14px var(--cond);color:var(--mut);min-width:44px;text-align:right}
+.vchg{position:absolute;right:6px;top:6px;font-size:12px;font-weight:700;background:rgba(0,0,0,.6);color:var(--ink);padding:4px 8px;cursor:pointer}
+.vpick{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:200px;border:2px dashed #444;color:var(--ink);font-weight:700;cursor:pointer;text-align:center;padding:10px}
+.vpick b{font:italic 900 44px/1 var(--cond);color:var(--gold)}
+.vctl{margin-top:12px}.vrow{display:flex;align-items:center;gap:10px;margin:10px 0}.vrow .cap{flex:none;width:52px;line-height:1.3}
+.vbtns{display:grid;grid-template-columns:1fr 64px 1fr;gap:6px}
+.vbtns button{border:0;background:var(--chip);color:var(--ink);font:700 15px Pretendard,sans-serif;padding:14px 4px;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
+.vbtns button.pl{background:var(--acc);color:var(--accInk);font-size:20px}
+textarea{width:100%;font:inherit;padding:12px;border:0;border-bottom:2px solid var(--gold);border-radius:0;background:var(--card2);color:var(--ink);resize:vertical}
+input.mk{width:100%;margin-top:4px;padding:6px 8px!important;font-size:14px!important;border-bottom-width:1px!important}
+
+/* 뒤로 가기 */
+#back{position:fixed;z-index:8;left:10px;top:calc(8px + env(safe-area-inset-top));display:flex;align-items:center;gap:4px;border:0;background:rgba(14,14,14,.88);color:var(--ink);font:800 26px/1 var(--cond);padding:6px 12px 8px 8px;cursor:pointer;}
+#back span{font:700 14px Pretendard,sans-serif}
+#back[hidden]{display:none}
+main{padding-top:calc(54px + env(safe-area-inset-top))!important}
+/* 고르기 + 직접 입력 */
+.pick2 select:has(option[value=""]:checked),select:has(option[value=""]:checked){color:#8a877f;font-style:normal;font-weight:600}
+.pick2 select{width:100%;font:italic 800 22px var(--cond);border:0;border-bottom:2px solid var(--gold);border-radius:0;background:var(--card2);color:var(--ink);padding:10px 36px 10px 12px;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23c9a96e' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.unitbox,.pick2 .hmbox{display:flex;align-items:center;gap:6px;margin-top:8px;background:var(--card2);border-bottom:2px solid var(--acc);padding:0 12px}
+.unitbox input{flex:1;min-width:0;border:0!important;background:none!important;padding:10px 0!important;font:800 24px var(--cond)!important;color:var(--ink)}
+.unitbox span{font:800 18px var(--cond);color:var(--gold);flex:none}
+.hid{display:none!important}
+/* 커서가 마지막 숫자를 가리지 않게: 입력칸 글자는 기울이지 않음 */
+input[type=number],input[type=text],.hmbox input{font-style:normal!important}
+.pick2 .hmbox{justify-content:flex-start}.hmbox input{flex:none!important;width:2.4em!important;text-align:right;padding-right:3px!important}.hmbox span{margin-right:10px}
+/* 오늘 신호 색: 누를 수 있는 것과 고른 것에 모두 적용 */
+.btn.ghost{box-shadow:inset 0 0 0 2px var(--acc);color:var(--acc)}
+body[class^="sg-"] main::before{content:"";position:fixed;left:0;right:0;top:0;height:calc(4px + env(safe-area-inset-top));background:var(--acc);z-index:7}
+body[class^="sg-"] nav{border-top:3px solid var(--acc)}
+input:focus,select:focus,textarea:focus{border-bottom-color:var(--acc)!important}
+.vseek{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin-top:6px}
+.vseek button{border:0;background:var(--chip);color:#cfccc4;font:800 15px var(--cond);padding:11px 0;white-space:nowrap}
+.vbar input[type=range]{height:28px}
+.vtools{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.vtools button{border:0;background:var(--chip);color:var(--ink);font:700 14px Pretendard,sans-serif;padding:11px 4px}
+.vtools button.on{background:var(--acc);color:var(--accInk)}
+/* 크게 보기: 영상이 화면을 꽉 채우고 조작 버튼만 아래에 남음 */
+body.vfs nav,body.vfs #back,body.vfs main>.kick,body.vfs main>h1,body.vfs main>.chips,body.vfs main>h2,body.vfs main>.card:not(.vctl),body.vfs main>p,body.vfs .vctl small.src,body.vfs main::before{display:none!important}
+body.vfs::before{display:none}
+body.vfs main{padding:0!important;max-width:none}
+body.vfs .vgrid{grid-template-rows:minmax(0,1fr);position:fixed;z-index:20;left:0;right:0;top:env(safe-area-inset-top);margin:0;gap:2px;background:#000;bottom:var(--vctlh,240px)}
+body.vfs .vslot{display:flex;flex-direction:column;height:100%;min-height:0;overflow:hidden}
+body.vfs .vslot video,body.vfs .vgrid.two .vslot video{flex:1;height:auto;min-height:0}
+body.vfs .vctl{position:fixed;z-index:21;left:0;right:0;bottom:0;margin:0;padding:8px 10px calc(8px + env(safe-area-inset-bottom));border-top:2px solid var(--acc);max-height:50vh;overflow-y:auto}
+body.vfs .vctl .vrow{margin:6px 0}
+@media (orientation:landscape){ body.vfs .vctl{left:auto;width:min(340px,42vw);top:0;border-top:0;border-left:2px solid var(--acc);max-height:none} body.vfs .vgrid{right:min(340px,42vw);bottom:0} }
+
+/* ── 루프 v2: 평가·검증 반영 ── */
+#undo{position:fixed;z-index:31;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:14px;background:var(--card2);color:var(--ink);border-left:4px solid var(--gold);padding:6px 6px 6px 16px;box-shadow:0 10px 30px rgba(0,0,0,.5);font-size:15px;max-width:calc(100% - 24px)}#undo[hidden]{display:none}#undo button{min-height:44px;padding:0 14px;background:none;border:0;color:var(--gold);font:700 15px Pretendard,sans-serif;text-decoration:underline;cursor:pointer}
+#toast{position:fixed;z-index:30;left:50%;bottom:auto;top:calc(14px + env(safe-area-inset-top));transform:translateX(-50%);max-width:320px;width:max-content;background:var(--card2);color:var(--ink);border-left:4px solid var(--acc);padding:12px 16px;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.5);pointer-events:none}
+#toast[hidden]{display:none}
+.btn.danger{background:#262626;color:var(--ink);box-shadow:inset 0 0 0 2px #4a4a4a}
+.btn.danger,body.offt .btn.danger{background:#262626!important;color:var(--ink)!important;box-shadow:inset 0 0 0 2px #4a4a4a}
+body.offt nav button.on svg{stroke:var(--ink)}body.offt .unitbox,body.offt .pick2 .hmbox,body.offt input:focus,body.offt select:focus,body.offt textarea:focus{border-bottom-color:var(--gold)!important}.btn.call119,body.offt .btn.call119{background:var(--r)!important;color:#fff!important}body.offt .vbar input[type=range]{accent-color:var(--ink)}body.offt main::before{display:none}body.offt nav{border-top-color:#222!important;border-top-width:1px!important}
+.btn.danger::before{content:"🗑";font-size:16px;transform:skewX(8deg)}.btn.danger::after{content:""}.btn.danger{justify-content:center;gap:10px}
+.btn.back-l{flex-direction:row-reverse;justify-content:flex-end;gap:8px;width:auto;display:inline-flex;box-shadow:none!important;color:var(--mut)!important;background:none!important;font:600 15px Pretendard,sans-serif;transform:none;padding:12px 4px;margin-top:8px}.btn.back-l::after{content:"‹"}
+.chip{min-height:44px}
+.x{width:44px;height:44px}
+.ends{font-size:14px;color:#8f8c84}.ferr{display:block;color:var(--y);font-size:14px;font-weight:600;margin-top:6px}input[aria-invalid="true"]{border-bottom-color:var(--y)!important}input::placeholder{font:500 15px Pretendard,sans-serif;color:#8a877f;font-style:normal}h2[id],#exj{scroll-margin-top:calc(84px + env(safe-area-inset-top))}body[class^="sg-"] .card .chip.on{background:var(--ink)!important;color:#111!important}body[class^="sg-"] .scale button.on{background:var(--ink)!important;color:#111!important}.ends.goodL span:first-child,.ends.goodR span:last-child{color:var(--ink);font-weight:600}
+.dirnote{margin:20px 0 -4px;color:#cfccc4;font-size:15px;border-left:3px solid var(--gold);padding-left:10px}label.f .dir{font-weight:500;font-size:13px;color:#9a978f;margin-left:6px}
+nav button{color:#8a877f}
+.vchg{padding:8px 12px}
+.hmbox input::placeholder,.unitbox input::placeholder{color:#8a877f!important}
+.pick2 .hmbox input{background:#151515!important;box-shadow:inset 0 0 0 1px #3a3a3a;min-width:64px;width:64px!important;padding:8px 8px!important}
+.symbar{position:fixed;z-index:6;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));display:flex;gap:6px;align-items:center;border:0;border-left:6px solid var(--c);background:var(--card2);color:var(--ink);font:600 15px Pretendard,sans-serif;padding:12px 14px;box-shadow:0 8px 24px rgba(0,0,0,.6);text-align:left}
+.symbar b{color:var(--c)}.symbar span{margin-left:auto;color:var(--mut);font-size:13px}
+button.vmore{display:none;width:100%;border:0;background:#202020;color:var(--mut);font:700 13px Pretendard,sans-serif;padding:10px;margin-top:6px}
+body.vfs button.vmore{display:block}
+body.vfs:not(.vopt-open) .vopt{display:none!important}
+body.vfs .vctl{max-height:40vh}
+@media (orientation:landscape){ body.vfs .vctl{max-height:none} }
+.btn.ghost.neutral{box-shadow:inset 0 0 0 2px var(--ink);color:var(--ink)}
+/* 신호 색은 오늘 화면에서만. 다른 탭의 버튼·선택은 흰색 */
+body.offt .btn:not(.ghost):not(.danger){background:var(--ink);color:#111}body.offt .btn.ghost{box-shadow:inset 0 0 0 2px var(--ink);color:var(--ink)}
+body.offt .chip.on,body.offt .scale button.on,body.offt .vtools button.on,body.offt .vbtns button.pl{background:var(--ink);color:#111}
+small.src{color:#9a978f}
+small.src a,.src a{display:inline-block;padding:12px 4px;margin:-12px -4px}
+#back{min-height:44px;background:#0e0e0e;box-shadow:0 4px 14px rgba(0,0,0,.6)}
+.vtools button,.vseek button{min-height:44px}
+body.hasback::after{content:"";position:fixed;z-index:7;left:0;right:0;top:0;height:calc(60px + env(safe-area-inset-top));background:linear-gradient(#0e0e0e 70%,rgba(14,14,14,0));pointer-events:none}
+body.vfs.hasback::after{display:none}
+small.src a,.src a{padding:14px 4px;margin:-14px -4px}
+#toast{bottom:auto;top:calc(14px + env(safe-area-inset-top))}
+small.src{font-size:14px}
+html,body{overflow-x:hidden;max-width:100%;overscroll-behavior-x:none}
+/* 버튼을 빨리 두 번 누르면 화면이 확대돼 옆으로 쏠리던 것 막기 */
+button,a,input,select,label,.vslot,.vctl{touch-action:manipulation}
+main{overflow-x:clip}
+.vctl,.vgrid,.vslot,.vbar{max-width:100%;min-width:0}
+.vseek button{min-width:0;overflow:hidden;font-size:14px;letter-spacing:-.02em}
+.vbtns{grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr)}
+.vrow{flex-wrap:wrap;min-width:0}.vrow .chips{min-width:0}
+.fl.fixh{height:min(34vh,280px);max-height:none}
+.wipe-row{margin-top:14px;padding-top:4px;border-top:1px solid var(--line)}
+details.fold{border-bottom:1px solid var(--line)}
+details.fold summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;min-height:48px;font-weight:700}
+details.fold summary::-webkit-details-marker{display:none}
+details.fold summary::after{content:"＋";color:var(--gold);font-weight:800}
+details.fold[open] summary::after{content:"－"}
+details.fold>div{padding:0 0 14px;color:#dcd9d2}
+</style>
+</head>
+<body>
+<button id="back" hidden aria-label="뒤로">‹ <span>뒤로</span></button>
+<main id="app"></main>
+<div id="toast" hidden role="status" aria-live="polite"></div>
+<div id="undo" hidden role="status"><span></span><button type="button">되돌리기</button></div>
+<nav id="nav" hidden></nav>
+<div id="modal"></div>
+<script>
+"use strict";
+/* ───────── 저장: 이 폰 안(localStorage)에만 ───────── */
+const KEY = "condition-mma-v1";
+const blank = () => ({ profile: null, logs: {}, lastBackup: null, created: today() });
+let S = fixMMA(load());
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || blank(); }catch(e){ return blank(); } }
+// MMA 전용: 다른 종목 기록을 가져와도 종목은 MMA로 맞춤
+function fixMMA(d){ const p=d&&d.profile; if(p&&typeof p==="object"&&(p.cat!=="투기"||p.sub!=="MMA")){ p.cat="투기"; p.sub="MMA"; p.pos=""; p.subName=""; p.weightClass=""; p.classLimit=null; } return d; }
+// 가져온 백업 값 정리: 정해진 값·숫자만 남김 (화면에 HTML로 들어가지 않게)
+function cleanData(d){
+  if(!d||typeof d!=="object"||Array.isArray(d)) throw new Error("bad");
+  const DT0=/^\d{4}-\d{2}-\d{2}$/, DT={test:k=>typeof k==="string"&&DT0.test(k)&&!isNaN(new Date(k+"T12:00:00"))&&new Date(k+"T12:00:00").toISOString().slice(0,10)===k}, numOr=(v,lo,hi)=>{ const n=+v; return v!==""&&v!=null&&isFinite(n)&&n>=lo&&n<=hi?n:null; };
+  const str=v=>typeof v==="string"?v.slice(0,40):"";
+  const PT=["목","어깨","팔꿈치·손목","허리","엉덩이","무릎","발목·발","허벅지","종아리","기타"];
+  const p=d.profile;
+  if(p&&typeof p==="object"){
+    p.sex=["남성","여성"].includes(p.sex)?p.sex:"";
+    p.birthYear=numOr(p.birthYear,1900,2100)??""; p.birthMonth=numOr(p.birthMonth,1,12)??"";
+    p.height=numOr(p.height,80,250)??""; p.weight=numOr(p.weight,20,250)??""; p.classLimit=numOr(p.classLimit,20,250);
+    if(!["hobby","amateur","pro"].includes(p.level)) p.level="amateur";
+    p.wcSet=Number.isInteger(p.wcSet)&&p.wcSet>=0&&p.wcSet<10?p.wcSet:0; p.weeklySessions=str(String(p.weeklySessions??"")); p.weightClass=str(p.weightClass); p.subName=str(p.subName); p.pos="";
+    if(!p.screening||typeof p.screening!=="object") p.screening={};
+    if(!p.sex||!p.birthYear||!p.height||!p.weight) d.profile=null;
+  } else d.profile=null;
+  const L={}; for(const [k,x] of Object.entries(d.logs||{})){ if(!DT.test(k)||!x||typeof x!=="object") continue;
+    const int=(v,lo,hi)=>{ const n=numOr(v,lo,hi); return Number.isInteger(n)?n:null; }, sc=v=>int(v,1,5)||0;
+    L[k]={...x, sleepH:numOr(x.sleepH,0,24), sleepQ:sc(x.sleepQ), fatigue:sc(x.fatigue), soreness:sc(x.soreness), stress:sc(x.stress),
+      pain:int(x.pain,0,3)||0, painPart:PT.includes(x.painPart)?x.painPart:"", weight:numOr(x.weight,20,250),
+      trainMin:numOr(x.trainMin,0,1440)||0, rest:x.rest===true||undefined, rpe:int(x.rpe,1,10)||0, sym:Array.isArray(x.sym)?x.sym.filter(v=>typeof v==="string"&&/^\w+$/.test(v)):[]}; }
+  // 점수 4개가 다 있어야 체크인한 날로 봄 (일부만 있으면 점수를 비워 신호를 만들지 않음)
+  for(const o of Object.values(L)) if(!(o.sleepQ&&o.fatigue&&o.soreness&&o.stress)){ o.sleepQ=0; o.fatigue=0; o.soreness=0; o.stress=0; }
+  d.logs=L;
+  d.lastBackup=DT.test(d.lastBackup)?d.lastBackup:null; d.created=DT.test(d.created)?d.created:today();
+  const num=v=>{ const n=+v; return isFinite(n)&&n>=0?Math.min(n,1e5):0; }, obj=v=>v&&typeof v==="object"&&!Array.isArray(v);
+  const food=b=>({...(obj(b)?b:{}), n:str(b&&b.n)||"음식", k:num(b&&b.k), c:num(b&&b.c), p:num(b&&b.p), f:num(b&&b.f), na:num(b&&b.na), sv:numOr(b&&b.sv,1,5000)||100, u:b&&b.u==="ml"?"ml":"g"});
+  if(obj(d.meals)){ const M={}; for(const [k,m] of Object.entries(d.meals)){ if(!DT.test(k)||!obj(m)) continue; M[k]={};
+    for(const t of ["아침","점심","저녁","간식"]) M[k][t]=(Array.isArray(m[t])?m[t]:[]).filter(obj).map(x=>({n:str(x.n)||"음식", g:numOr(x.g,0,5000)||0, u:x.u==="ml"?"ml":"g",
+      k:num(x.k), c:num(x.c), p:num(x.p), f:num(x.f), na:num(x.na), base:food(x.base||x), over:obj(x.over)?{k:num(x.over.k),c:num(x.over.c),p:num(x.over.p),f:num(x.over.f)}:null})); }
+    d.meals=M; } else delete d.meals;
+  if(obj(d.goal)){ const g=d.goal; d.goal={type:["maintain","lose","gain"].includes(g.type)?g.type:"maintain", targetKg:numOr(g.targetKg,20,250), date:DT.test(g.date)?g.date:null}; } else delete d.goal;
+  d.myFoods=Array.isArray(d.myFoods)?d.myFoods.filter(Array.isArray).map(f=>[str(f[0])||"음식",0,...[2,3,4,5,6].map(i=>num(f[i])),numOr(f[7],1,5000)||100,f[8]?1:0]):[];
+  d.recent=Array.isArray(d.recent)?d.recent.filter(x=>typeof x==="string").map(str).slice(0,20):[];
+  const DTL=/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+  if(obj(d.cut)){ const c=d.cut; d.cut={usualKg:numOr(c.usualKg,20,250)??"", weighKg:numOr(c.weighKg,20,250)??"", weighAt:DTL.test(c.weighAt)?c.weighAt:"", fightAt:DTL.test(c.fightAt)?c.fightAt:"",
+    checks:Array.isArray(c.checks)?c.checks.filter(x=>Array.isArray(x)&&DTL.test(x[0])&&numOr(x[1],20,250)!=null).map(x=>[x[0],+x[1]]):[]}; } else delete d.cut;
+  d.vnotes=(Array.isArray(d.vnotes)?d.vnotes:[]).filter(n=>obj(n)&&DT.test(n.date)).map(n=>({date:n.date, names:(Array.isArray(n.names)?n.names:[]).map(str),
+    memo:String(n.memo??"").slice(0,2000), marks:(Array.isArray(n.marks)?n.marks:[]).filter(obj).map(m=>({k:m.k==="B"?"B":"A", t:num(m.t), txt:String(m.txt??"").slice(0,200)}))}));
+  return d;
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ toast("저장 공간에 쓰지 못했어요. 백업을 먼저 해 주세요."); } }
+
+/* ───────── 날짜·나이 ───────── */
+function today(d=new Date()){ const z=n=>String(n).padStart(2,"0"); return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate()); }
+function addDays(s,n){ const d=new Date(s+"T12:00:00"); d.setDate(d.getDate()+n); return today(d); }
+function ageOf(p){ const n=new Date(); let a=n.getFullYear()-p.birthYear; if(n.getMonth()+1 < p.birthMonth) a--; return a; }
+function band(p){ const a=ageOf(p);
+  if(a<14) return {id:"u14",name:"유소년 (만 14세 미만)",youth:true};
+  if(a<19) return {id:"youth",name:"유소년",youth:true};
+  if(a<35) return {id:"adult",name:"성인",youth:false};
+  if(a<50) return {id:"masters",name:"성인 · 마스터즈 (35~49세)",youth:false};
+  return {id:"m50",name:"성인 · 50세 이상",youth:false}; }
+
+/* ───────── 종목 ───────── */
+const APP_VER = "0.1.11";
+// subs 값: null = 포지션 없음 / [[묶음 이름, [포지션…]], …]
+const SPORTS = {
+  "투기": { subs:{ "MMA":null }, weightClass:true }
+};
+const SUB_HINT = { "단거리":"100·200·400m, 허들", "중장거리":"800m ~ 10,000m", "도약":"멀리·세단·높이·장대높이뛰기", "투척":"포환·원반·창·해머던지기" };
+// '기타'를 골랐을 때 누르면 이름이 들어가는 예시
+const EXAMPLES = {
+  "기타 구기":[["",["배구","핸드볼","럭비","하키","테니스","배드민턴","탁구","소프트볼","족구","세팍타크로"]]],
+  "기타 육상":[["",["마라톤","경보","혼성경기 (10종·7종)","3000m 장애물","크로스컨트리","산악·트레일 달리기"]]],
+  "기타 투기":[["",["극진가라데","가라데 (WKF)","삼보","킥복싱","무에타이","씨름","우슈 산타"]]],
+  "기타":[["하계",["골프","수영","사이클","트라이애슬론","체조","역도","양궁","사격","조정","카누","스포츠클라이밍"]],
+          ["동계",["스키","스노보드","스피드스케이팅","쇼트트랙","피겨스케이팅","아이스하키","컬링"]],
+          ["그 밖",["볼링","크로스핏","보디빌딩","등산"]]]
+};
+// 포지션별 경기 부담 차이 (참고용 설명, 계산에는 쓰지 않음)
+const POS_NOTE = {
+  "골키퍼":"뛰는 거리는 가장 짧고, 다이빙·점프 같은 짧고 폭발적인 동작이 많아요.",
+  "센터백":"필드 선수 중 고강도 달리기는 가장 적은 편이고, 공중볼·몸싸움이 많아요.",
+  "풀백·윙백":"측면을 오르내리며 고강도 달리기와 스프린트가 많은 편이에요.",
+  "수비형 미드필더":"미드필더는 경기 중 총 이동 거리가 가장 많은 포지션이에요.",
+  "중앙 미드필더":"미드필더는 경기 중 총 이동 거리가 가장 많은 포지션이에요.",
+  "공격형 미드필더":"미드필더는 경기 중 총 이동 거리가 가장 많은 포지션이에요.",
+  "윙어":"측면 선수는 고강도 달리기와 스프린트가 가장 많은 편이에요.",
+  "스트라이커":"총 이동 거리는 중간이지만 짧은 스프린트와 몸싸움 비중이 커요.",
+  "포인트가드":"가드는 이동 거리와 고강도 움직임이 가장 많은 편이에요.",
+  "슈팅가드":"가드는 이동 거리와 고강도 움직임이 가장 많은 편이에요.",
+  "스몰포워드":"포워드는 가드와 센터의 중간 정도 움직임을 보여요.",
+  "파워포워드":"포워드는 가드와 센터의 중간 정도 움직임을 보여요.",
+  "센터":"뛰는 거리는 적은 편이고, 자리싸움·리바운드 같은 몸싸움이 많아요.",
+  "선발투수":"투구 수와 쉬는 날이 가장 중요해요. 팔꿈치·어깨 통증은 꼭 기록해 두세요.",
+  "불펜투수":"연투(이틀 이상 연속 등판)가 쌓이지 않게 투구 수와 쉬는 날을 같이 보세요.",
+  "포수":"쪼그려 앉았다 일어나는 동작이 많아 무릎·허리 부담을 같이 보세요.",
+  "지명타자":"수비 부담이 없고 타격과 주루 위주예요."
+};
+["1루수","2루수","유격수","3루수"].forEach(k=>POS_NOTE[k]="짧은 전력 질주와 순간 방향 전환이 많아요.");
+["좌익수","중견수","우익수"].forEach(k=>POS_NOTE[k]="타구를 쫓는 짧은 전력 질주와 송구가 많아요.");
+const POS_SRC = { "축구":"Di Salvo 등 (2007) Int J Sports Med 28(3); Bradley 등 (2009) J Sports Sci 27(2)",
+  "농구":"Stojanović 등 (2018) Sports Med 48(1)", "야구":"MLB·USA Baseball 'Pitch Smart' 투구 지침" };
+
+// 체급표: [이름, 한계 kg(무제한은 null)]
+const WC = {
+  "복싱":[
+    {org:"아마추어 (World Boxing, 2025~)",
+     m:[["플라이급",50],["밴텀급",55],["라이트급",60],["웰터급",65],["라이트미들급",70],["미들급",75],["라이트헤비급",80],["크루저급",85],["헤비급",90],["슈퍼헤비급",null]],
+     f:[["라이트플라이급",48],["플라이급",51],["밴텀급",54],["페더급",57],["라이트급",60],["웰터급",65],["라이트미들급",70],["미들급",75],["라이트헤비급",80],["헤비급",null]]},
+    {org:"프로",
+     m:[["미니멈급",47.6],["라이트플라이급",49],["플라이급",50.8],["슈퍼플라이급",52.2],["밴텀급",53.5],["슈퍼밴텀급",55.3],["페더급",57.2],["슈퍼페더급",59],["라이트급",61.2],["슈퍼라이트급",63.5],["웰터급",66.7],["슈퍼웰터급",69.9],["미들급",72.6],["슈퍼미들급",76.2],["라이트헤비급",79.4],["크루저급",90.7],["헤비급",null]],
+     f:"m"}],
+  "MMA":[
+    {org:"통합 규정 (UFC 등)",
+     m:[["스트로급",52.2],["플라이급",56.7],["밴텀급",61.2],["페더급",65.8],["라이트급",70.3],["웰터급",77.1],["미들급",83.9],["라이트헤비급",93],["헤비급",120.2]],
+     f:[["스트로급",52.2],["플라이급",56.7],["밴텀급",61.2],["페더급",65.8]]}],
+  "주짓수":[
+    {org:"IBJJF 성인 · 도복 포함",
+     m:[["루스터",57.5],["라이트페더",64],["페더",70],["라이트",76],["미들",82.3],["미디엄헤비",88.3],["헤비",94.3],["슈퍼헤비",100.5],["울트라헤비",null]],
+     f:[["루스터",48.5],["라이트페더",53.5],["페더",58.5],["라이트",64],["미들",69],["미디엄헤비",74],["헤비",79.3],["슈퍼헤비",null]]}],
+  "레슬링":[
+    {org:"자유형 (UWW 시니어)", m:[57,61,65,70,74,79,86,92,97,125], f:[50,53,55,57,59,62,65,68,72,76]},
+    {org:"그레코로만형 (UWW 시니어)", m:[55,60,63,67,72,77,82,87,97,130], f:null}],
+  "태권도":[
+    {org:"세계선수권 (WT)", m:[54,58,63,68,74,80,87,"+87"], f:[46,49,53,57,62,67,73,"+73"]},
+    {org:"올림픽", m:[58,68,80,"+80"], f:[49,57,67,"+67"]}],
+  "유도":[{org:"IJF", m:[60,66,73,81,90,100,"+100"], f:[48,52,57,63,70,78,"+78"]}],
+  "삼보":[{org:"FIAS 성인", m:[58,64,71,79,88,98,"+98"], f:[50,54,59,65,72,80,"+80"]}],
+  "가라데 (WKF)":[{org:"WKF 시니어 겨루기", m:[60,67,75,84,"+84"], f:[50,55,61,68,"+68"]}],
+  "극진가라데":[{org:"단체마다 달라요 · 예: WKO 성인", m:[65,70,75,80,90,"+90"], f:[55,60,65,"+65"]}]
+};
+// 숫자만 있는 표를 [이름, 한계] 형태로 바꿈
+function wcList(set, sex){
+  let L = sex==="여성" ? set.f : set.m;
+  if(L==="m") L=set.m;
+  if(!L) return null;
+  return L.map(x=> Array.isArray(x) ? x : (typeof x==="string" ? [x+"kg급",null] : ["-"+x+"kg급",x]));
+}
+function wcSets(p){
+  const key = p.sub==="기타 투기" ? p.subName : p.sub;
+  return WC[key] || null;
+}
+function b4youth(p){ return !!(p.birthYear&&p.birthMonth&&band(finalProfile(p)).youth); }
+function posList(cat,sub){ const g=SPORTS[cat]&&SPORTS[cat].subs[sub]; return g ? g.flatMap(x=>x[1]) : null; }
+const LEVELS = { hobby:"취미 (대회 안 나감)", amateur:"아마추어 대회 출전", pro:"프로·선수 등록" };
+
+/* ───────── 화면 전환 ───────── */
+let tab = "today", ob = null;
+// 뒤로 가기: 바로 전 화면으로 (안드로이드 뒤로 버튼도 같이 동작)
+let NAV=[], obPrev=null, viaLink=false;   // viaLink: 오늘 화면 안 링크로 설정에 온 경우 ‹ 뒤로를 보임
+function go(t,back){ if(t!==tab){ const u=$("#undo"); if(u) u.hidden=true; } const tt=$("#toast"); if(tt&&!tt.hidden&&t!==tab){ tt.hidden=true; tt.textContent=""; clearTimeout(toast._t); }
+  if(t!=="symptom") symSel=null; if(t!=="video"&&VID.full) setFull(false);
+  if(tab==="edit"&&t!=="edit") draft=null;                       // 고치기 화면을 떠나면 저장 안 한 값은 버림
+  // E) 버린 '체크인 고치기' 화면으로는 돌아가지 않고 오늘 화면으로
+  if(!back && t!==tab){ const from = tab==="edit" ? "today" : tab; if(from!==t && NAV[NAV.length-1]!==from) NAV.push(from); }
+  tab=t; render(); window.scrollTo(0,0); arm(); }
+const canBack=()=>!!$("#modal").innerHTML || !!VID.full || (!S.profile&&ob ? ((ob.step>0&&!ob.only)||!!obPrev) : NAV.length>0);
+function goBack(){
+  if($("#modal").innerHTML){ $("#modal").innerHTML=""; _sheetBusy=false; const r=_mBack; _mBack=null; if(r&&r.isConnected) r.focus({preventScroll:true}); return; }
+  if(VID.full){ setFull(false); renderVideo(); return; }
+  if(!S.profile&&ob){ if(ob.step>0&&!ob.only){ ob.step--; renderOnboard(); window.scrollTo(0,0); }
+    else if(obPrev){ S.profile=obPrev; obPrev=null; ob=null; render(); } return; }
+  if(tab==="edit") draft=null;
+  if(NAV.length) go(NAV.pop(),true);
+}
+// 폰의 뒤로 버튼: 앱 안에서 돌아갈 곳이 있으면 처리하고 보호 기록을 다시 깔아 둠. 없으면 다음 번에 앱을 나감
+function arm(){ try{ const g=history.state&&history.state.guard;
+  if(canBack()&&!g) history.pushState({guard:1},"");
+  else if(!canBack()&&g&&!_skipPop){ _skipPop=true; history.back(); } }catch(e){} }
+// 오늘(맨 처음 화면)로 초기화: 남은 보호 기록을 지워서 다음 뒤로 한 번에 앱을 나가게 함
+let _skipPop=false;
+function toRoot(){ NAV=[]; go("today",true); }   // go → arm이 남은 보호 기록을 걷어 냄
+window.addEventListener("popstate",()=>{ if(_skipPop){ _skipPop=false; arm(); return; } if(canBack()){ goBack(); arm(); } });
+const SUB_TABS=["symptom","recovery","edit"];
+function backBtn(){ const show = !S.profile&&ob ? (ob.step>0||!!obPrev) : (NAV.length>0 && (SUB_TABS.includes(tab) || (tab==="settings"&&viaLink))); $("#back").hidden=!show; document.body.classList.toggle("hasback",show); }
+function uiBack(){ goBack(); }
+const $ = s => document.querySelector(s);
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function render(){
+  if(!S.profile){ $("#nav").hidden=true; ["sg-g","sg-y","sg-r","offt"].forEach(c=>document.body.classList.remove(c)); renderOnboard(); backBtn(); return; }
+  $("#nav").hidden=false; renderNav();
+  paintSig();
+  ({today:renderToday, history:renderHistory, food:renderFood, video:renderVideo, settings:renderSettings, symptom:renderSymptom, recovery:renderRecovery,
+    edit:()=>{ if(!draft){ const L=S.logs[today()]; if(!L||!L.sleepQ){ tab="today"; return renderToday(); } draft={...L}; } renderTodayEdit(S.logs[today()]); }})[tab]();
+  backBtn(); arm();
+}
+const NAV_IC={
+ today:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="17" r="2"/></svg>',
+ history:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V12M10 20V6M16 20v-9M22 20H2"/></svg>',
+ food:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11h18a9 9 0 0 1-18 0zM8 7c0-2 2-2 2-4M13 7c0-2 2-2 2-4"/></svg>',
+ video:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 9l5 3-5 3z"/></svg>',
+ settings:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>'};
+function renderNav(){
+  const T=[["today","오늘"],["history","기록"],["food","식단"],["video","영상"],["settings","설정"]];
+  const cur=["symptom","recovery","edit"].includes(tab)?"today":tab;
+  $("#nav").innerHTML=T.map(([k,n])=>`<button class="${cur===k?"on":""}" data-go="${k}" ${cur===k?'aria-current="page"':""}>${NAV_IC[k]}${n}</button>`).join("");
+}
+document.addEventListener("click", e=>{ const b=e.target.closest("[data-go]"); if(b){ e.preventDefault(); if($("#modal").innerHTML){ $("#modal").innerHTML=""; _sheetBusy=false; _mBack=null; }
+    viaLink = !b.closest("#nav") && b.dataset.go==="settings";
+    if(b.closest("#nav")){ // '오늘'은 맨 처음 화면: 여기서 뒤로 하면 앱을 나감
+      if(b.dataset.go==="today"){ toRoot(); return; }
+      NAV=NAV.filter(x=>!SUB_TABS.includes(x)); const i=NAV.indexOf(b.dataset.go); if(i>=0) NAV=NAV.slice(0,i); } go(b.dataset.go);
+    if(b.dataset.anchor){ const t=document.getElementById(b.dataset.anchor); if(t){ t.scrollIntoView({block:"start"}); t.focus({preventScroll:true}); const fd=t.nextElementSibling&&t.nextElementSibling.querySelector("details.fold"); if(fd) fd.open=true; } } } });
+
+
+/* ───────── 고르기 + 직접 입력 (잠 0.5시간, 몸무게 1kg 단위) ───────── */
+const inRange=(v,lo,hi,step)=>{ if(v===""||v==null||isNaN(+v)) return false; const k=(+v-lo)/step; return +v>=lo&&+v<=hi&&Math.abs(k-Math.round(k))<1e-6; };
+function pickOpts(v,lo,hi,step,unit,cus){
+  const o=[]; for(let x=lo;x<=hi+1e-9;x=Math.round((x+step)*10)/10) o.push(x);
+  const custom = cus || (v!==""&&v!=null&&!inRange(v,lo,hi,step));
+  return `<option value="">고르기</option><option value="__c" ${custom?"selected":""}>직접 입력${custom&&v!==""&&v!=null?` · ${esc(v)}${unit}`:""}</option>`+
+    o.map(x=>`<option value="${x}" ${!custom&&x===+v?"selected":""}>${x}${unit}</option>`).join("");
+}
+// 고르기 바로 밑 '직접 입력'을 고르면 아래에 입력칸이 열림
+function picker(id,v,lo,hi,step,unit,ph,open){
+  const custom = open || (v!==""&&v!=null&&!inRange(v,lo,hi,step));
+  return `<div class="pick2"><select id="${id}_s" data-pick="${id}" data-lo="${lo}" data-hi="${hi}" data-st="${step}" data-u="${unit}">${pickOpts(v,lo,hi,step,unit)}</select>
+  <div class="unitbox ${custom?"":"hid"}" id="${id}_box" ${open?'data-open="1"':""}><input id="${id}" type="text" inputmode="decimal" value="${esc(v??"")}" placeholder="${ph||"예: 70.4"}"><span>${unit}</span></div></div>`;
+}
+const wRange = w => { const c=Math.round(+w||70); return [Math.max(25,c-12), Math.min(200,c+12)]; };
+// 닫힌 목록을 키보드 화살표로 바꿀 때는 '직접 입력'을 지나가도 입력칸으로 초점을 옮기지 않음
+document.addEventListener("keydown",e=>{ const t=e.target; if(t&&t.tagName==="SELECT") t._kbd=/^(Arrow|Home|End|Page)/.test(e.key); },true);
+document.addEventListener("change",e=>{ const s=e.target; if(!s.matches||!s.matches("select[data-pick]")) return;
+  const inp=document.getElementById(s.dataset.pick), box=document.getElementById(s.dataset.pick+"_box"); if(!inp) return;
+  if(s.value==="__c"){ box.classList.remove("hid"); if(!s._kbd) inp.focus(); s._kbd=false; return; }
+  if(!box.dataset.open) box.classList.add("hid"); inp.value=s.value;
+  inp.dispatchEvent(new Event("input",{bubbles:true})); inp.dispatchEvent(new Event("change",{bubbles:true})); });
+document.addEventListener("input",e=>{ const inp=e.target; if(!e.isTrusted||inp.tagName!=="INPUT"||!inp.id) return; const s=document.getElementById(inp.id+"_s"); if(!s||!s.dataset.pick) return;
+  inp.value=inp.value.replace(/[^\d.]/g,"");
+  s.innerHTML=pickOpts(inp.value,+s.dataset.lo,+s.dataset.hi,+s.dataset.st,s.dataset.u,true); }, true);   // capture: 칸 자체 핸들러보다 먼저 숫자만 남김
+
+/* ───────── 잠 시간: 0.5시간 단위 고르기 + 직접 입력 (1H 24M) ───────── */
+const hasSleep = v => v!=="" && v!=null && !isNaN(+v);
+function hm(v){ const t=Math.round(+v*60); return [Math.floor(t/60), t%60]; }
+function fmtSleep(v){ const [h,m]=hm(v); return m?`${h}시간 ${m}분`:`${h}시간`; }
+function sleepOpts(v,cus){ const o=[]; for(let x=3;x<=12;x+=0.5) o.push(x);
+  const custom = cus || (hasSleep(v)&&!o.some(x=>Math.abs(x-v)<1e-6));
+  return `<option value="">고르기</option><option value="__c" ${custom?"selected":""}>직접 입력${custom&&hasSleep(v)?` · ${fmtSleep(v)}`:""}</option>`+
+    o.map(x=>`<option value="${x}" ${!custom&&hasSleep(v)&&Math.abs(x-v)<1e-6?"selected":""}>${fmtSleep(x)}</option>`).join(""); }
+function sleepPicker(v){ const [h,m]=hasSleep(v)?hm(v):["",""];
+  const custom = hasSleep(v) && !(v>=3&&v<=12&&Math.abs(v*2-Math.round(v*2))<1e-6);
+  return `<div class="pick2"><select id="sh_s">${sleepOpts(v)}</select>
+  <div class="hmbox ${custom?"":"hid"}" id="sh_box"><input id="sh_h" type="text" inputmode="numeric" maxlength="2" value="${h}" placeholder="0"><span>시간</span>
+  <input id="sh_m" type="text" inputmode="numeric" maxlength="2" value="${hasSleep(v)?String(m).padStart(2,"0"):""}" placeholder="00"><span>분</span></div></div>`; }
+function bindSleep(onv){
+  const S_=$("#sh_s"), H=$("#sh_h"), M=$("#sh_m"), box=$("#sh_box");
+  const fromFields=()=>{ const h=H.value.replace(/\D/g,""), m=M.value.replace(/\D/g,"");
+    if(h===""&&m===""){ onv(""); S_.innerHTML=sleepOpts("",true); return; }
+    const mm=Math.min(59,+m||0), v=Math.min(24,Math.round(((+h||0)+mm/60)*100)/100); onv(v); S_.innerHTML=sleepOpts(v,true); };
+  H.oninput=()=>{ H.value=H.value.replace(/\D/g,"").slice(0,2); if(+H.value>24) H.value="24"; fromFields();
+    // 2자리거나 2 이상이면 분(M) 칸으로 넘어감 (1은 10~14시간일 수 있어 기다림)
+    if(H.value.length===2 || +H.value>=2 || H.value==="0") { M.focus(); M.select(); } };
+  M.oninput=()=>{ M.value=M.value.replace(/\D/g,"").slice(0,2); if(+M.value>59) M.value="59"; fromFields(); };
+  S_.onchange=()=>{ const v=S_.value;
+    if(v==="__c"){ box.classList.remove("hid"); if(!S_._kbd) H.focus(); S_._kbd=false; return; }
+    box.classList.add("hid");
+    if(v===""){ H.value=""; M.value=""; onv(""); return; } const [h,m]=hm(v); H.value=h; M.value=String(m).padStart(2,"0"); onv(+v); };
+}
+/* ───────── 처음 설정 ───────── */
+function renderOnboard(){
+  ob = ob || { step:0, p:{ birthYear:"", birthMonth:"", sex:"", height:"", weight:"", weeklySessions:"", level:"", cat:"투기", sub:"MMA", pos:"", weightClass:"", classLimit:"", screening:{} } };
+  const p=ob.p, N=6, st=ob.step;
+  let bar=`<div class="steps" role="progressbar" aria-valuemin="1" aria-valuemax="${N}" aria-valuenow="${st+1}" aria-label="처음 설정 ${st+1}/${N}단계">${Array.from({length:N},(_,i)=>`<i class="${i<=st?"on":""}"></i>`).join("")}</div><div class="stepn">${st+1} / ${N}</div>`;
+  if(ob.only) bar=`<div class="stepn" style="text-align:left">체급만 바꿔요 · 뒤로 가면 그대로 둬요</div>`;
+  const years=[]; const y=new Date().getFullYear(); for(let i=y-6;i>=y-90;i--) years.push(i);
+  let h="", ok=false;
+  if(st===0){
+    h=`<div class="intro"><span class="dots" aria-hidden="true"><i style="background:var(--g)"></i><i style="background:var(--y)"></i><i style="background:var(--r)"></i></span><p>매일 아침 30초 체크인을 하면 오늘 훈련 강도를 <b>초록·노랑·빨강</b> 신호와 그 이유로 알려 줘요.</p></div>
+    <h1>처음 설정</h1><p class="mut">나이와 성별로 맞는 기준을 골라요. 이 정보는 이 휴대폰 밖으로 나가지 않아요.</p>
+    <label class="f">태어난 해와 달</label>
+    <div class="row"><select id="by"><option value="">년</option>${years.map(v=>`<option ${+p.birthYear===v?"selected":""}>${v}</option>`).join("")}</select>
+    <select id="bm"><option value="">월</option>${Array.from({length:12},(_,i)=>`<option ${+p.birthMonth===i+1?"selected":""}>${i+1}</option>`).join("")}</select></div>
+    <label class="f">성별</label><div class="chips">${["남성","여성"].map(v=>`<button class="chip ${p.sex===v?"on":""}" data-sex="${v}">${v}</button>`).join("")}</div>
+    ${!obPrev?`<div class="obimp"><button class="btn sm ghost neutral" id="obimp">폰을 바꿨나요? 백업 파일로 기록 가져오기</button><input type="file" id="obimpf" accept=".json,application/json" hidden></div>`:""}`;
+    ok=p.birthYear&&p.birthMonth&&p.sex;
+  } else if(st===1){
+    h=`<h1>몸과 훈련</h1>
+    <div class="row"><div><label class="f">키 (cm)</label><input id="ht" type="number" inputmode="decimal" value="${esc(p.height)}" placeholder="예: 175"></div>
+    </div><label class="f">몸무게 (kg)</label>${picker("wt",p.weight,45,130,1,"kg")}
+    <label class="f">평소 일주일에 몇 번 훈련하나요?</label>
+    <div class="chips">${["0~1","2~3","4~5","6 이상"].map(v=>`<button class="chip ${p.weeklySessions===v?"on":""}" data-ws="${v}">${v==="6 이상"?"6회 이상":v+"회"}</button>`).join("")}</div>`;
+    ok=+p.height>=80&&+p.height<=250&&+p.weight>=20&&+p.weight<=250&&p.weeklySessions;
+  } else if(st===2){
+    h=`<h1>대회나 경기에 나가나요?</h1><p class="mut">대회 일정이 있으면 경기 날짜에 맞춰 조절해요.</p>
+    <div class="chips" style="flex-direction:column">${Object.entries(LEVELS).map(([k,v])=>`<button class="chip ${p.level===k?"on":""}" data-lv="${k}">${v}</button>`).join("")}</div>`;
+    ok=!!p.level;
+  } else if(st===3){
+    const groups=(G,attr,cur)=>G.map(([g,L])=>`${g?`<div class="glab">${g}</div>`:""}<div class="chips">${L.map(v=>`<button class="chip ${cur===v?"on":""}" ${attr}="${esc(v)}">${esc(v)}</button>`).join("")}</div>`).join("");
+    const subs=p.cat?Object.keys(SPORTS[p.cat].subs):[];
+    const PG=p.sub&&SPORTS[p.cat].subs[p.sub];
+    const sets=p.sub&&SPORTS[p.cat].weightClass?wcSets(p):null;
+    const si=sets?Math.max(0,Math.min(+p.wcSet||0,sets.length-1)):0;
+    const wl=sets?wcList(sets[si],p.sex):null;
+    h=`<h1>체급</h1><p class="mut">MMA 전용 앱이에요. 내 체급을 골라 주세요.</p>
+    ${p.cat&&subs.length>1?`<label class="f">세부 종목</label><div class="chips">${subs.map(v=>`<button class="chip ${p.sub===v?"on":""}" data-sub="${v}">${v}</button>`).join("")}</div>
+      ${SUB_HINT[p.sub]?`<div class="mut" style="margin-top:6px">${SUB_HINT[p.sub]}</div>`:""}`:""}
+    ${p.sub&&EXAMPLES[p.sub]?`<label class="f">종목 이름</label><input id="subname" type="text" value="${esc(p.subName||"")}" placeholder="아래에서 고르거나 직접 써 주세요">
+      <div class="mut" style="margin:8px 0 2px">예시 (누르면 들어가요)</div>${groups(EXAMPLES[p.sub],"data-ex",p.subName)}`:""}
+    ${PG?`<label class="f">포지션</label>${groups(PG,"data-pos",p.pos)}
+      ${POS_NOTE[p.pos]?`<div class="banner info" style="margin-top:10px"><b>${esc(p.pos)}</b> · ${POS_NOTE[p.pos]}<small class="src">참고 설명이에요. 신호등 계산은 포지션과 상관없이 내 기록으로 해요. 출처: ${POS_SRC[p.sub]}</small></div>`:""}`:""}
+    ${p.sub&&SPORTS[p.cat].weightClass?`
+      ${sets&&sets.length>1?`<div class="chips">${sets.map((s,i)=>`<button class="chip ${si===i?"on":""}" data-wcset="${i}">${esc(s.org)}</button>`).join("")}</div>`:""}
+      ${sets&&!wl?`<div class="mut">${esc(sets[si].org)}은 ${esc(p.sex)} 체급이 없어요. 아래에 직접 써 주세요.</div>`:""}
+      ${wl?`${sets.length===1?`<div class="mut">${esc(sets[0].org)}</div>`:""}<div class="chips" style="margin-top:8px">${wl.map(([n,k],i)=>`<button class="chip ${p.weightClass===n&&String(p.classLimit)===String(k??"")?"on":""}" data-wc="${i}">${esc(n)}${k!=null&&!/kg/.test(n)?` · ${k}kg`:""}</button>`).join("")}</div>`:""}
+      ${!sets?`<div class="mut">${p.sub==="기타 투기"?"위 예시 중 삼보·가라데·극진가라데는 체급표가 나와요. ":""}체급표가 없는 종목은 아래에 직접 써 주세요.</div>`:""}
+      ${!p.weightClass?`<div class="mut" style="margin-top:8px">체급을 고르면 오늘 화면에 계체 카드가 생겨요. 나중에 설정 → 체급 바꾸기에서 골라도 돼요.</div>`:""}
+      ${(()=>{ const chipOn=wl&&wl.some(([n,k])=>p.weightClass===n&&String(p.classLimit)===String(k??"")); const inner=`<div class="row"><div><label class="f">체급 이름</label><input id="wc" type="text" value="${esc(p.weightClass)}" placeholder="예: 라이트급"></div>
+      <div><label class="f">한계 kg</label><input id="wl" type="number" inputmode="decimal" step="0.1" value="${esc(p.classLimit)}" placeholder="비우면 무제한"></div></div>`;
+        return wl ? `<details class="fold" ${(p.weightClass||(p.classLimit!==""&&p.classLimit!=null))&&!chipOn?"open":""}><summary>목록에 없거나 대회 규정이 달라요 (직접 쓰기)</summary><div>${inner}</div></details>${b4youth(p)?`<div class="mut" style="margin-top:6px">표는 성인 기준이에요.</div>`:""}` : inner; })()}`:""}`;
+    const pl=posList(p.cat,p.sub);
+    ok=p.cat&&p.sub&&(!pl||pl.includes(p.pos));
+  } else if(st===4){
+    const Q=[["heart","의사에게 심장 질환이나 고혈압 진단을 받은 적이 있나요?"],["chest","운동하거나 쉴 때 가슴 통증·답답함을 느낀 적이 있나요?"],["faint","어지러워서 균형을 잃거나 정신을 잃은 적이 있나요?"]];
+    h=`<h1>운동 전 건강 확인</h1><p class="mut">하나라도 '예'면 고강도 운동 전에 진료를 받아 보라고 안내해요. 진단이 아니에요.</p>
+    ${Q.map(([k,q])=>`<div class="card"><div>${q}</div><div class="yn">${["예","아니요"].map(v=>`<button class="chip ${p.screening[k]===v?"on":""}" data-scr="${k}" data-v="${v}">${v}</button>`).join("")}</div></div>`).join("")}`;
+    ok=Q.every(([k])=>p.screening[k]);
+  } else {
+    const prof=finalProfile(p), b=band(prof);
+    h=`<h1>준비됐어요</h1>
+    <div class="card"><div><b>${b.name}</b> · 만 ${ageOf(prof)}세 · ${esc(prof.sex)} · ${esc(prof.height)}cm · ${esc(prof.weight)}kg · 주 ${prof.weeklySessions==="6 이상"?"6회 이상":esc(prof.weeklySessions)+"회"} 훈련</div>
+    <div class="mut">${esc(prof.subName||prof.sub)}${prof.pos?" · "+esc(prof.pos):""}${prof.weightClass?" · "+esc(prof.weightClass)+(prof.classLimit?` (${prof.classLimit}kg)`:""):""} · ${LEVELS[prof.level]}</div></div>
+    ${b.youth?`<div class="banner info">유소년은 <b>감량·수분 감량 기능이 열리지 않아요.</b> 성장기에는 잘 먹고 잘 쉬는 게 우선이에요.${b.id==="u14"?" 만 14세 미만은 보호자와 함께 써 주세요.":""}</div>`:""}
+    ${!b.youth&&prof.cat==="투기"&&prof.level!=="hobby"?`<div class="banner info">MMA 대회 출전으로 설정돼서, 오늘 화면에서 <b>계체 후 회복 계산기</b>를 쓸 수 있어요.</div>`:""}
+    ${prof.screeningFlag?`<div class="banner bad">건강 확인에 '예'가 있어요. <b>고강도 운동 전에 진료를 받아 보세요.</b></div>`:""}
+    <p class="mut">이 앱은 의학적 진단을 하지 않아요. 기록을 바탕으로 참고할 신호를 보여 줘요.</p>`;
+    ok=true;
+  }
+  $("#app").innerHTML=bar+h+`<button class="btn" id="next" ${ok?"":"disabled"}>${nextLabel(p,st,ok)}</button>${st>0&&!ob.only?`<button class="btn sm ghost neutral back-l" id="prev">이전 단계</button>`:""}`;
+  bindOnboard(); backBtn(); arm();
+}
+function obMissing(p,st){
+  if(st===0) return [[p.birthYear&&p.birthMonth,"태어난 해·달"],[p.sex,"성별"]].filter(a=>!a[0]).map(a=>a[1]);
+  if(st===1) return [[+p.height>=80&&+p.height<=250,"키"],[+p.weight>=20&&+p.weight<=250,"몸무게"],[p.weeklySessions,"훈련 횟수"]].filter(a=>!a[0]).map(a=>a[1]);
+  if(st===2) return p.level?[]:["대회 출전 여부"];
+  if(st===3){ const pl=p.cat&&p.sub?posList(p.cat,p.sub):null; return [[p.cat,"종목"],[p.sub,"세부 종목"],[!pl||pl.includes(p.pos),"포지션"]].filter(a=>!a[0]).map(a=>a[1]); }
+  if(st===4){ const n=["heart","chest","faint"].filter(k=>!p.screening[k]).length; return n?[`건강 질문 ${n}개`]:[]; }
+  return [];
+}
+function nextLabel(p,st,ok){ if(ok) return ob&&ob.only?"저장":st<5?"다음":"시작하기"; const m=obMissing(p,st); return m.length?`채워 주세요 · ${m.join(", ")}`:"다음"; }
+function finalProfile(p){
+  const prof={...p, birthYear:+p.birthYear, birthMonth:+p.birthMonth, height:+p.height, weight:+p.weight, classLimit:(+p.classLimit>=20&&+p.classLimit<=250)?+p.classLimit:null};
+  prof.screeningFlag=Object.values(p.screening).includes("예");
+  const sets=prof.cat==="투기"?wcSets(prof):null;
+  prof.classOrg = sets&&prof.weightClass ? sets[Math.max(0,Math.min(+prof.wcSet||0,sets.length-1))].org : "";
+  return prof;
+}
+function bindOnboard(){
+  const p=ob.p, re=()=>renderOnboard();
+  const on=(sel,fn)=>document.querySelectorAll(sel).forEach(b=>b.onclick=()=>{fn(b);re();});
+  const inp=(id,k)=>{ const el=$("#"+id); if(el) el.oninput=()=>{ p[k]=el.value;
+    if(k==="weightClass"||k==="classLimit") document.querySelectorAll("[data-wc]").forEach(b=>{ b.classList.remove("on"); b.setAttribute("aria-pressed","false"); }); const ok=okStep(); $("#next").disabled=!ok; $("#next").textContent=nextLabel(p,ob.step,ok); }; };
+  const sel=(id,k)=>{ const el=$("#"+id); if(el) el.onchange=()=>{ p[k]=el.value; re(); const n=$("#"+id); if(n) n.focus(); }; };
+  sel("by","birthYear"); sel("bm","birthMonth");
+  on("[data-sex]",b=>p.sex=b.dataset.sex); on("[data-ws]",b=>p.weeklySessions=b.dataset.ws);
+  on("[data-lv]",b=>p.level=b.dataset.lv);
+  const clearWC=()=>{ p.weightClass=""; p.classLimit=""; p.wcSet=0; };
+  on("[data-cat]",b=>{ if(p.cat!==b.dataset.cat){ p.cat=b.dataset.cat; const ks=Object.keys(SPORTS[p.cat].subs); p.sub=ks.length===1?ks[0]:""; p.pos=""; p.subName=""; clearWC(); } });
+  on("[data-sub]",b=>{ if(p.sub!==b.dataset.sub){ p.sub=b.dataset.sub; p.pos=""; p.subName=""; clearWC();
+    if(p.sub==="복싱") p.wcSet = p.level==="pro" ? 1 : 0; } });
+  on("[data-pos]",b=>p.pos=b.dataset.pos);
+  on("[data-ex]",b=>{ if(p.subName!==b.dataset.ex){ p.subName=b.dataset.ex; clearWC(); } });
+  on("[data-wcset]",b=>{ p.wcSet=+b.dataset.wcset; p.weightClass=""; p.classLimit=""; });
+  on("[data-wc]",b=>{ const sets=wcSets(p), L=wcList(sets[Math.max(0,Math.min(+p.wcSet||0,sets.length-1))],p.sex), x=L[+b.dataset.wc];
+    p.weightClass=x[0]; p.classLimit=x[1]==null?"":String(x[1]); });
+  on("[data-scr]",b=>p.screening[b.dataset.scr]=b.dataset.v);
+  inp("ht","height"); inp("wt","weight"); inp("wc","weightClass"); inp("wl","classLimit"); inp("subname","subName");
+  $("#next").onclick=()=>{ if(ob.step===3&&p.classLimit!==""&&p.classLimit!=null&&!(+p.classLimit>=20&&+p.classLimit<=250)){ const fd=$("details.fold"); if(fd) fd.open=true; const wlI=$("#wl"); if(wlI) wlI.focus(); toast("한계 kg를 확인해 주세요 (20~250kg, 비우면 무제한)."); return; }
+    if(ob.only){ S.profile=finalProfile(p); ob=null; obPrev=null; save(); tab="settings"; render(); window.scrollTo(0,0); toast("체급을 바꿨어요."); return; }
+    if(ob.step<5){ob.step++;re();window.scrollTo(0,0);} else { S.profile=finalProfile(p); ob=null; obPrev=null; save(); NAV=[]; tab="today"; render(); window.scrollTo(0,0); arm(); } };
+  const pv=$("#prev"); if(pv) pv.onclick=()=>{ob.step--;re();};
+  const oi=$("#obimp"); if(oi){ oi.onclick=()=>$("#obimpf").click(); $("#obimpf").onchange=handleImport; }
+  arm();
+  function okStep(){ return ob.step!==1 || (+p.height>=80&&+p.height<=250&&+p.weight>=20&&+p.weight<=250&&p.weeklySessions); }
+}
+
+/* ───────── 신호등 (판단 근거를 같이 보여 줌) ───────── */
+const wsum = l => (l.sleepQ||0)+(l.fatigue||0)+(l.soreness||0)+(l.stress||0);
+const tload = l => (l.trainMin||0)*(l.rpe||0);          // 세션 RPE = 시간(분) × 힘든 정도 (Foster 2001)
+// 나쁜 쪽(나쁨·피곤·심함 이상)으로 나온 항목 이름 (점수가 낮을 때 무엇이 떨어졌는지)
+function lowItems(L){ const a=[["잠의 질","sleepQ"],["피로","fatigue"],["근육통","soreness"],["스트레스","stress"]].filter(x=>L[x[1]]&&L[x[1]]<=2);
+  return a.length?` 안 좋은 항목: ${a.map(x=>`${x[0]} ${scoreTxt(x[1],L[x[1]])}`).join(", ")}.`:""; }
+// 평소(지난 기록 평균)보다 많이 떨어진 항목 1~2개: "잠의 질 4.0→3(보통)"
+function dropItems(date,L){
+  const K=[["잠의 질","sleepQ"],["피로","fatigue"],["근육통","soreness"],["스트레스","stress"]], P=[];
+  for(let i=1;i<=28;i++){ const x=S.logs[addDays(date,-i)]; if(x&&x.sleepQ) P.push(x); }
+  if(P.length<7) return "";
+  const a=K.map(([n,k])=>{ const m=P.reduce((s,x)=>s+(x[k]||0),0)/P.length; return {n,k,m,d:L[k]-m}; }).filter(x=>x.d<=-0.5).sort((x,y)=>x.d-y.d).slice(0,2);
+  if(!a.length) return "";
+  const sh=(k,v)=>REV_K.includes(k)?6-v:v;
+  return `<br>평소보다 나빠진 것: ${a.map(x=>{ const pm=sh(x.k,x.m); return `${x.n} 평소 ${pm.toFixed(1)}(${ENDW[x.k][Math.min(4,Math.max(0,Math.round(pm)-1))]}) → 오늘 ${scoreTxt(x.k,L[x.k])}`; }).join(", ")}.`;
+}
+function signal(date){
+  const p=S.profile, b=band(p), L=S.logs[date]; if(!L||!L.sleepQ) return null;
+  const masters = b.id==="masters"||b.id==="m50";
+  let lv=0; const why=[]; const up=(n,t)=>{ lv=Math.max(lv,n); why.push([n,t]); };
+  // 1) 통증
+  const pp=L.painPart?`${esc(L.painPart)}에 `:"";
+  if(L.pain===3) up(2,`${pp}심한 통증이 있어요.`);
+  else if(L.pain===2) up(1,`${pp}중간 정도 통증이 있어요.`);
+  else if(L.pain===1) why.push([0,`${pp}약간 통증이 있어요. 심해지면 강도를 낮추세요.`]);
+  // 2) 컨디션 점수: 내 평소(지난 28일)와 비교
+  const past=[]; for(let i=1;i<=28;i++){ const x=S.logs[addDays(date,-i)]; if(x&&x.sleepQ) past.push(wsum(x)); }
+  const w=wsum(L);
+  if(past.length>=7){
+    const m=past.reduce((a,c)=>a+c,0)/past.length, sd=Math.max(1,Math.sqrt(past.reduce((a,c)=>a+(c-m)**2,0)/past.length));
+    const z=(w-m)/sd, yz=masters?-0.75:-1;
+    // 빨강은 평소보다 크게 벗어나고(z≤-1.5) 실제로 4점 이상 낮을 때만. 점수가 늘 일정한 사람이 2~3점만 내려도 빨강이 되는 것을 막음
+    const E=1e-9;   // 소수점 오차로 경계값(정확히 -1.5, -1, -0.75)에서 한 단계 낮게 나오지 않게
+    if(z<=-1.5+E && m-w>=4-E) up(2,`컨디션 점수(${w}/20)가 평소(${m.toFixed(1)})보다 많이 낮아요.${dropItems(date,L)||lowItems(L)}`);
+    else if(z<=yz+E) up(1,`컨디션 점수(${w}/20)가 평소(${m.toFixed(1)})보다 낮아요.${dropItems(date,L)||lowItems(L)}`);
+  } else {
+    if(w<=8) up(2,`컨디션 점수가 매우 낮아요 (${w}/20).${lowItems(L)}`); else if(w<=11) up(1,`컨디션 점수가 낮은 편이에요 (${w}/20).${lowItems(L)}`);
+  }
+  // 3) 잠
+  const need=b.youth?8:7;
+  if(hasSleep(L.sleepH) && L.sleepH<need-1) up(1,`잠잔 시간 ${fmtSleep(L.sleepH)} · 권장 ${b.youth?"8~10시간":"7시간 이상"}보다 적어요.`);
+  // 4) 훈련량 급증: 최근 7일 합 ÷ 최근 28일 주평균 (참고 지표)
+  let acute=0, chronic=0, days=0;
+  for(let i=0;i<28;i++){ const x=S.logs[addDays(date,-i)]; if(x){ days++; const v=tload(x); chronic+=v; if(i<7) acute+=v; } }
+  if(days>=21 && chronic>0){
+    const ratio=acute/(chronic/4), yr=masters?1.2:1.3;
+    if(ratio>1.5) up(2,`이번 주 훈련량이 평소의 ${ratio.toFixed(1)}배로 급하게 늘었어요.`);
+    else if(ratio>yr) up(1,`이번 주 훈련량이 평소의 ${ratio.toFixed(1)}배로 늘었어요.`);
+  }
+  // 5) 몸무게 급변 (지난 7일 평균 대비)
+  if(L.weight){ const ws=[]; for(let i=1;i<=7;i++){const x=S.logs[addDays(date,-i)]; if(x&&x.weight) ws.push(x.weight);}
+    if(ws.length>=3){ const m=ws.reduce((a,c)=>a+c,0)/ws.length, d=(L.weight-m)/m*100;
+      if(d<=-2) up(1,`몸무게가 평소보다 ${Math.abs(d).toFixed(1)}% 줄었어요. 덜 먹었거나 물이 부족할 수 있어요.`); } }
+  // 6) 증상 체크 기록
+  if(L.sym&&L.sym.length){ const sl=symLevel(L.sym);
+    const nm=L.sym.map(id=>{ const x=symById(id); return x&&x[2]>=1?x[3]:null; }).filter(Boolean);
+    if(sl>=1) up(2,`증상 체크에 ${sl===2?"119":"병원 진료"}가 필요한 증상을 기록했어요: ${esc(nm.join(" / "))} <a href="#" data-go="symptom">증상 체크 다시 보기</a>`); else if(sl===0) why.push([0,"증상 체크: 쉬면서 지켜볼 증상이 있어요."]); }
+  // 7) 투수 투구 수 (Pitch Smart, 만 7~22세)
+  const pr=pitchRest(date);
+  if(pr) up(1,`오늘은 투구 쉬는 날이에요. ${md(pr.from)}에 ${pr.n}개를 던져서 ${pr.rest}일 휴식이 필요해요 (만 ${pr.R.age}세 기준). 던지기 말고 다른 훈련만 하세요.`);
+  if(L.pitches&&isPitcher(p)){ const R=psRule(p); if(R&&L.pitches>R.max) up(1,`오늘 투구 수 ${L.pitches}개가 하루 최대 ${R.max}개(만 ${R.age}세)를 넘었어요.`); }
+  if(!why.some(a=>a[0])){
+    const sum=`${hasSleep(L.sleepH)?`잠 ${fmtSleep(L.sleepH)} · `:""}잠의 질 ${scoreTxt("sleepQ",L.sleepQ)}, 피로 ${scoreTxt("fatigue",L.fatigue)}, 근육통 ${scoreTxt("soreness",L.soreness)}, 스트레스 ${scoreTxt("stress",L.stress)}<br><b>컨디션 점수 ${w}/20</b> (좋은 쪽으로 맞춰 더한 값, 높을수록 좋음)`;
+    const li=lowItems(L);
+    why.unshift([0, past.length>=7 ? `${sum}, 평소(최근 ${past.length}일)와 비슷하거나 좋아요.${li?"<br>"+li.trim()+" 이 항목은 살펴 주세요.":""}` : li ? `${sum}.<br>${li.trim()} 합계로는 괜찮은 편이에요.` : `${sum}. 안 좋게 나온 항목이 없어요.`]);
+  }
+  const msg=["평소대로 훈련해도 좋아요.","강도를 조금 낮추거나 회복(잠·식사·수분)에 신경 써 주세요.",
+    "오늘은 쉬세요. 움직인다면 가벼운 회복 운동(걷기·스트레칭)만 하세요."+(L.pain===3?" 심한 통증이 계속되면 진료를 받아 보세요.":"")][lv]
+    +(L.sym&&L.sym.length&&symLevel(L.sym)===2?" 지금 119에 전화하세요.":L.sym&&L.sym.length&&symLevel(L.sym)===1?" 오늘 병원 진료를 받아 보세요.":"");
+  why.sort((a,b)=>b[0]-a[0]);   // 멈춤 → 주의 → 참고 순
+  return { lv, color:["g","y","r"][lv], name:["초록","노랑","빨강"][lv], msg, why, baseline:past.length };
+}
+
+/* ───────── 오늘 ───────── */
+let draft=null;
+// 오늘 신호 색을 버튼·선택칸·탭 강조색으로 씀 (신호 전에는 흰색)
+function paintSig(){ const L=S.logs[today()], s=L&&L.sleepQ?signal(today()):null, cl=document.body.classList;
+  ["sg-g","sg-y","sg-r","offt"].forEach(c=>cl.remove(c));
+  // body[class^="sg-"] 규칙이 맞도록 신호 클래스를 맨 앞에 둠
+  if(s) document.body.className=("sg-"+s.color+" "+document.body.className).trim();
+  if(S.profile&&!["today","edit"].includes(tab)) cl.add("offt"); }
+const SIG_UI = [["좋아요","평소대로"],["주의","강도 낮춰서"],["멈추세요","오늘은 쉬기"]];
+function dateTitle(d){ const x=new Date(d+"T12:00:00"); return `${x.getMonth()+1}월 ${x.getDate()}일 ${"일월화수목금토"[x.getDay()]}요일`; }
+function kicker(p){ return [p.cat==="투기"&&p.level!=="hobby"?"FIGHT CAMP":"", p.subName||p.sub, p.pos].filter(Boolean).map(esc).join(" · "); }
+function weighCard(p,L){
+  if(p.cat!=="투기"||!p.classLimit||band(p).youth) return "";
+  const w=(L&&L.weight)||curWeight(), gap=Math.round((w-p.classLimit)*10)/10;
+  return `<div class="wcard"><div class="cap">계체 · ${esc(p.weightClass||"")} ${esc(p.classLimit)}KG</div><b>${esc(w)}<small>kg</small></b>
+  <p>${gap>0?`<span class="over">한계보다 ${gap}kg 초과</span>`:`한계까지 여유 ${Math.abs(gap)}kg`}${L&&L.weight?"":" · 최근 기록 기준"}${cutDday()?` · ${cutDday()}`:""}</p></div>`;
+}
+function renderToday(){
+  paintSig();
+  const d=today(), L=S.logs[d], p=S.profile, b=band(p);
+  let top=`<div class="kick">${kicker(p)}</div>`;
+  const daysSinceBackup = S.lastBackup ? Math.floor((new Date(d)-new Date(S.lastBackup))/864e5) : Math.floor((new Date(d)-new Date(S.created))/864e5);
+  const bk = daysSinceBackup>=14 ? `<div class="banner warn">백업한 지 ${daysSinceBackup}일 지났어요. <a href="#" data-go="settings" data-anchor="exj">설정에서 기록 내보내기</a></div>` : "";
+  const checked=!!(L&&L.sleepQ);
+  if(!checked) top+=bk;     // 체크인 뒤에는 신호 카드 아래로 내림
+  // 어제 체크인은 했는데 훈련을 안 적었으면 지금 적을 수 있게
+  const yd=addDays(d,-1), Y=S.logs[yd], yAsk = Y&&Y.sleepQ&&!Y.trainMin&&!Y.rest;
+  if(p.screeningFlag) top+=`<div class="banner bad">건강 확인에 '예'가 있었어요. 고강도 운동 전에 진료를 받아 보세요.</div>`;
+  if(!L||!L.sleepQ){
+    draft = draft || { sleepH:"", sleepQ:0, fatigue:0, soreness:0, stress:0, pain:0, painPart:"", weight:"" };
+    $("#app").innerHTML=top+`<h1>오늘 몸 상태</h1><p class="mut">30초면 끝나요. 아침에 하면 가장 정확해요.</p>${checkinForm(draft,false)}
+    <button class="btn ghost neutral" data-go="symptom">증상 체크하기</button>${canRecover(p)?`<button class="btn ghost neutral" data-go="recovery">계체 후 회복 계산기${cutDday()?` · ${cutDday()}`:""}</button>`:""}`;
+    bindCheckin(false);
+  } else {
+    const s=signal(d);
+    $("#app").innerHTML=top+`<h1>${dateTitle(d)}</h1>
+    <div class="card sig ${s.color}"><div class="light"><div class="lamp" role="img" aria-label="${s.name} 신호">${[2,1,0].map(i=>`<i class="${s.lv===i?"on":""}"></i>`).join("")}</div>
+    <h2 class="sigh" tabindex="-1"><span class="t">${s.name} · ${SIG_UI[s.lv][0]}</span><span class="big">${SIG_UI[s.lv][1]}</span></h2></div>
+    <div class="msg">${s.msg}</div>
+    <ul class="why">${s.why.map(([n,t])=>`<li class="${n?"hi":"lo"}"><span>${n?`<span class="sr-only">${n===2?"멈춤 이유: ":"주의 이유: "}</span>`:""}${t}</span></li>`).join("")}</ul>
+    ${s.baseline<7?`<small class="src">평소 기준을 만드는 중이에요 (${s.baseline}/7일). 기록이 쌓이면 내 평소와 비교해요.</small>`:""}
+    <small class="src">참고 신호예요. 진단이 아니에요. <a href="#" data-go="settings" data-anchor="crit">판단 기준 보기</a></small>
+    <button class="btn back-l" id="editck">체크인 고치기</button></div>
+    ${yAsk?`<div class="banner info">어제 훈련을 안 적었어요. <a href="#" id="yfill">지금 적기</a> · <a href="#" id="yrest">어제는 쉬었어요</a></div>`:""}
+    ${bk}${weighCard(p,L)}${ageTipToday(p)}
+    <button class="btn ghost neutral" data-go="symptom">증상 체크하기</button>
+    ${canRecover(p)?`<button class="btn ghost neutral" data-go="recovery">계체 후 회복 계산기${cutDday()?` · ${cutDday()}`:""}</button>`:""}
+    <h2>오늘 훈련</h2>${trainForm(L,s.lv===2)}
+    <h2>식단</h2>${dietCard()}`;
+    bindTrain(L,d,renderToday,$("#app"));
+    $("#editck").onclick=()=>{ draft={...L}; go("edit"); };
+    const yf=$("#yfill"); if(yf){ yf.onclick=e=>{ e.preventDefault(); openDay(yd,renderToday); }; $("#yrest").onclick=e=>{ e.preventDefault(); S.logs[yd].rest=true; save(); renderToday(); toast("어제는 쉰 날로 적었어요."); }; }
+  }
+}
+function renderTodayEdit(L){ paintSig(); $("#app").innerHTML=`<div class="kick">MORNING CHECK-IN</div><h1>체크인 고치기</h1>${checkinForm(draft,true)}`; bindCheckin(true,L); }
+// 피로·근육통·스트레스는 화면에서 1=좋음(없음)~5=나쁨(심함)으로 보여 주고, 저장·계산은 원래대로(5=좋음) 둠
+const REV_K=["fatigue","soreness","stress"];
+const shownN=(k,v)=>REV_K.includes(k)?6-v:v;
+const ENDW={sleepQ:["아주 나쁨","나쁨","보통","좋음","아주 좋음"],fatigue:["아주 상쾌","상쾌","보통","피곤","아주 피곤"],
+  soreness:["전혀 없음","조금","보통","심함","아주 심함"],stress:["전혀 없음","조금","보통","심함","아주 심함"]};
+const scoreTxt=(k,v)=>{ if(!(v>=1&&v<=5)) return "-"; const d=shownN(k,v); return `${d}(${ENDW[k][d-1]})`; };
+function scaleHtml(k,v,lo,hi,label){ return `<label class="f">${label} <span class="dir">${REV_K.includes(k)?"1 좋음 → 5 나쁨":"1 나쁨 → 5 좋음"}</span></label><div class="scale">${[1,2,3,4,5].map(d=>{ const n=REV_K.includes(k)?6-d:d; return `<button data-k="${k}" data-n="${n}" class="${v===n?"on":""}">${d}</button>`; }).join("")}</div><div class="ends ${REV_K.includes(k)?"goodL":"goodR"}"><span>${lo}</span><span>${hi}</span></div>`; }
+const PARTS=["목","어깨","팔꿈치·손목","허리","엉덩이","무릎","발목·발","허벅지","종아리","기타"];
+function checkinForm(x){
+  return `<div class="card">
+  <label class="f">잠잔 시간</label>${sleepPicker(x.sleepH)}
+  <label class="f">아침 몸무게 <span class="mut">(선택 · 최근 ${curWeight()}kg)</span></label>${picker("mw",x.weight,...wRange(curWeight()),1,"kg")}
+  ${scaleHtml("sleepQ",x.sleepQ,"1 아주 나쁨","5 아주 좋음","잠은 어땠나요?")}
+  <p class="dirnote">아래 3개는 <b>1이 가장 좋아요</b> (상쾌·없음)</p>
+  ${scaleHtml("fatigue",x.fatigue,"1 아주 상쾌","5 아주 피곤","피로는?")}
+  ${scaleHtml("soreness",x.soreness,"1 전혀 없음","5 아주 심함","근육통은?")}
+  ${scaleHtml("stress",x.stress,"1 전혀 없음","5 아주 심함","스트레스는?")}
+  <label class="f">아픈 곳이 있나요?</label>
+  <div class="chips">${["없음","약간","중간","심함"].map((v,i)=>`<button class="chip ${x.pain===i?"on":""}" data-pain="${i}">${v}</button>`).join("")}</div>
+  ${x.pain>0?`<label class="f">어디가 아픈가요?</label><div class="chips">${PARTS.map(v=>`<button class="chip ${x.painPart===v?"on":""}" data-part="${v}">${v}</button>`).join("")}</div>`:""}
+  </div>${saveCkBtn(x)}`;
+}
+function ckMissing(x){ return [[hasSleep(x.sleepH),"잠잔 시간"],[x.sleepQ,"잠의 질"],[x.fatigue,"피로"],[x.soreness,"근육통"],[x.stress,"스트레스"]].filter(a=>!a[0]).map(a=>a[1]); }
+function saveCkBtn(x){ const m=ckMissing(x); return `<button class="btn" id="saveck" ${m.length?"disabled":""}>${m.length?`${m.length}개 남았어요 · ${m.join(", ")}`:"저장하고 신호 보기"}</button>`; }
+function updSaveCk(){ const b=$("#saveck"); if(!b) return; const m=ckMissing(draft); b.disabled=!!m.length; b.textContent=m.length?`${m.length}개 남았어요 · ${m.join(", ")}`:"저장하고 신호 보기";
+}
+function bindCheckin(edit,L){
+  const re=()=>{ edit?renderTodayEdit(L):renderToday(); };
+  // 점수는 그 줄만 바꿈 (화면 전체를 다시 그리지 않아 화면 읽기 초점이 유지됨)
+  document.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{ draft[b.dataset.k]=+b.dataset.n;
+    b.parentNode.querySelectorAll("button").forEach(x=>{ const on=x===b; x.classList.toggle("on",on); x.setAttribute("aria-pressed",on?"true":"false"); }); updSaveCk(); });
+  document.querySelectorAll("[data-pain]").forEach(b=>b.onclick=()=>{ draft.pain=+b.dataset.pain; if(!draft.pain) draft.painPart=""; re(); });
+  document.querySelectorAll("[data-part]").forEach(b=>b.onclick=()=>{ draft.painPart=b.dataset.part; re(); });
+  bindSleep(v=>{ draft.sleepH=v; updSaveCk(); });
+  $("#mw").oninput=e=>{ draft.weight=e.target.value; };
+  $("#saveck").onclick=()=>{
+    const wv=+draft.weight; if(draft.weight!==""&&draft.weight!=null&&!(wv>=20&&wv<=250)){ const el=$("#mw"); if(el){ const bx=$("#mw_box"); if(bx) bx.classList.remove("hid"); fieldErr(el,"20~250kg 사이로 적어 주세요."); } toast("몸무게를 확인해 주세요 (20~250kg)."); return; }
+    if(!(+draft.sleepH>=0&&+draft.sleepH<=24)){ const el=$("#sh_h"); if(el) fieldErr(el,"0~24시간 사이로 적어 주세요."); toast("잠잔 시간을 확인해 주세요 (0~24시간)."); return; }
+    const d=today(); const prev=S.logs[d]||{};
+    S.logs[d]={...prev, sleepH:+draft.sleepH, sleepQ:draft.sleepQ, fatigue:draft.fatigue, soreness:draft.soreness, stress:draft.stress, pain:draft.pain, painPart:draft.painPart, weight:draft.weight?+draft.weight:null};
+    draft=null; save(); if(tab==="edit"){ tab="today"; goBack(); if(tab!=="today") go("today",true); } else renderToday();
+    window.scrollTo(0,0); const sh=$(".sigh"); if(sh) sh.focus({preventScroll:true});
+  };
+}
+function trainForm(L,red,d=today()){ L=L||{};
+  return `<div class="card"><p class="mut">${red?"오늘은 쉬는 날이에요. 회복 운동만 했다면 시간과 힘든 정도를 적어 주세요.":"훈련이 끝나면 적어 주세요. 쉬는 날이면 비워 두면 돼요."}</p>
+  <label class="f">훈련 시간 (분)</label><input id="tm" type="number" inputmode="numeric" min="0" max="1440" value="${L.trainMin||""}" placeholder="예: 60">
+  <label class="f">얼마나 힘들었나요? (1~10)</label>
+  <div class="scale" style="grid-template-columns:repeat(5,1fr)">${Array.from({length:10},(_,i)=>`<button data-rpe="${i+1}" class="${L.rpe===i+1?"on":""}" aria-label="힘든 정도 ${i+1}점 (1 아주 쉬움 ~ 10 최대로 힘듦)">${i+1}</button>`).join("")}</div>
+  <div class="ends"><span>1 아주 쉬움</span><span>10 최대로 힘듦</span></div>
+  <small class="src tl" ${L.trainMin&&L.rpe?"":"hidden"}>${L.trainMin&&L.rpe?loadTxt(d,L):""}</small>${pitchForm(L)}</div>`;
+}
+function pitchForm(L){
+  const p=S.profile; if(!isPitcher(p)) return "";
+  const R=psRule(p), pr=pitchRest(today()), n=L.pitches||0;
+  const next=R&&n?restDays(n,R.th):null;
+  return `<label class="f">오늘 경기 투구 수</label><input id="pc" type="number" inputmode="numeric" value="${L.pitches||""}" placeholder="0">
+  ${!R?`<small class="src">만 23세 이상은 Pitch Smart 기준이 없어서 기록만 해요.</small>`:
+   `${pr?`<div class="banner warn" style="margin-top:10px">오늘은 투구 쉬는 날이에요 · ${md(pr.until)}부터 던질 수 있어요.</div>`:""}
+   ${n>R.max?`<div class="banner bad" style="margin-top:10px">하루 최대 ${R.max}개를 넘었어요.</div>`:""}
+   ${next!=null?`<div class="banner info" style="margin-top:10px">오늘 ${n}개 → <b>${next?`${next}일 쉬고 ${md(addDays(today(),next+1))}부터`:"다음날 바로"}</b> 던질 수 있어요.</div>`:""}
+   <small class="src">만 ${R.age}세 하루 최대 ${R.max}개. 출처: MLB·USA Baseball 'Pitch Smart'</small>`}`;
+}
+// root 안의 훈련 칸만 묶음 (오늘 화면, 기록의 지난 날 시트에서 같이 씀)
+function bindTrain(L,d=today(),after=renderToday,root=document,onTime=null){
+  const q=x=>root.querySelector(x), lg=()=>(S.logs[d]=S.logs[d]||{});
+  const msg=L=>L.trainMin&&L.rpe?`훈련 기록했어요 · 훈련량 ${tload(L)}`:L.trainMin?"시간을 저장했어요. 힘든 정도도 눌러 주세요.":"저장했어요";
+  const done=()=>{ save(); after(); toast(msg(lg())); };
+  root.querySelectorAll("[data-rpe]").forEach(b=>b.onclick=()=>{ const n=+b.dataset.rpe, x=lg(); x.rpe = x.rpe===n ? 0 : n; done(); });   // 같은 숫자를 다시 누르면 선택 풀기
+  // 시간 칸에서는 다시 그리지 않음: 칸을 벗어나며 바로 '힘든 정도'를 누를 때 그 누름이 사라지지 않게
+  q("#tm").onchange=e=>{ const v=e.target.value, x=lg(); if(v!==""&&!(+v>=0&&+v<=1440)){ fieldErr(e.target,"0~1440분 사이로 적어 주세요."); e.target.value=x.trainMin||""; return; } fieldErr(e.target,null); x.trainMin=v?+v:0; delete x.rest; save();
+    const sm=e.target.closest(".card").querySelector("small.tl"); if(sm){ const ok=x.trainMin&&x.rpe; sm.hidden=!ok; sm.innerHTML=ok?loadTxt(d,x):""; }
+    if(onTime) onTime(); toast(msg(x)); };
+  const pc=q("#pc"); if(pc) pc.onchange=e=>{ lg().pitches=e.target.value?+e.target.value:0; save(); after(); toast(`투구 수 ${lg().pitches}개 저장했어요`); };
+}
+// 훈련량을 내 평소(지난 28일 중 훈련한 날 평균)와 비교해서 보여 줌
+function loadTxt(d,L){ let s=0,n=0; for(let i=1;i<=28;i++){ const x=S.logs[addDays(d,-i)]; if(x&&tload(x)){ s+=tload(x); n++; } }
+  const t=tload(L); return `${d===today()?"오늘":"이날"} 훈련량 <b>${t}</b> (시간 × 힘든 정도) · ${n>=3?`평소 훈련한 날 평균 ${r0(s/n)}의 ${r1(t/(s/n))}배`:"훈련 기록이 3일 이상 쌓이면 평소와 비교해요"}`; }
+// 입력칸 바로 아래에 오류 문구 (null이면 지움)
+function fieldErr(el,text){ const box=el.closest(".unitbox,.pick2")||el, nx=box.nextElementSibling;
+  if(nx&&nx.classList.contains("ferr")) nx.remove(); el.removeAttribute("aria-invalid");
+  if(!text) return; el.setAttribute("aria-invalid","true"); box.insertAdjacentHTML("afterend",`<small class="ferr" role="alert">${esc(text)}</small>`);
+  el.scrollIntoView({block:"center"}); el.focus({preventScroll:true}); }
+
+/* ───────── 3차: 증상 체크 (목록형, 진단 아님) ───────── */
+// lv 2 = 119, 1 = 오늘 병원, 0 = 쉬면서 관찰
+const SYM_LV = [
+  {k:"관찰", c:"var(--g)", head:"쉬면서 지켜보세요", body:"2~3일 지나도 나아지지 않거나 점점 심해지면 진료를 받아 보세요."},
+  {k:"병원", c:"#ff8a1f", head:"오늘 병원 진료를 받으세요", body:"진료를 받기 전까지 운동은 쉬세요. 더 나빠지면 119에 전화하세요."},
+  {k:"119", c:"var(--r)", head:"지금 119에 전화하세요", body:"운동을 바로 멈추고, 혼자 있지 말고 주변에 알리세요."}
+];
+const SYM_SRC = {
+  em:"응급의료에 관한 법률 시행규칙 [별표 1] 응급증상 및 이에 준하는 증상",
+  acsm:"Riebe 등 (2015) Med Sci Sports Exerc 47(11) · ACSM 운동 전 건강 확인",
+  cc:"Patricios 등 (2023) Br J Sports Med 57(11) · 제6차 국제 스포츠 뇌진탕 합의",
+  heat:"Roberts 등 (2023) Curr Sports Med Rep 22(4) · ACSM 운동성 열질환 합의",
+  ott:"Stiell 등 (1993) JAMA 269(9) · 오타와 발목 규칙",
+  issn:"ISSN 2025 입장문 (계체 감량)"
+};
+const BALL=["축구","풋살","농구","기타 구기"];
+const SYMPTOMS = [
+  ["가슴·숨","c1",2,"가슴이 아프거나 조이는 느낌이 있어요 (특히 운동 중)","em"],
+  ["가슴·숨","c2",2,"운동 중 갑자기 쓰러지거나 정신을 잃었어요","em"],
+  ["가슴·숨","c3",2,"숨이 너무 차서 말을 이어 하기 어려워요","em"],
+  ["가슴·숨","c4",1,"운동할 때 평소와 다르게 숨이 차거나 가슴이 두근거려요","acsm"],
+  ["머리·목","h1",2,"머리를 다친 뒤 구토를 반복하거나, 두통이 점점 심해지거나, 정신이 흐려요","cc"],
+  ["머리·목","h2",2,"목을 다친 뒤 목이 심하게 아프거나 팔다리가 저리고 힘이 빠져요","cc"],
+  ["머리·목","h3",1,"머리를 부딪친 뒤 두통·어지럼·멍함·울렁거림이 있어요 (뇌진탕 의심 · 오늘 운동 중단)","cc"],
+  ["더위","w1",2,"더운 곳에서 운동하다 헛소리·비틀거림·의식 흐림이 생겼어요","heat"],
+  ["더위","w2",0,"더운 날 운동 뒤 어지럽고 지쳤지만, 시원한 곳에서 쉬고 물을 마시니 나아졌어요","heat"],
+  ["뼈·관절","b1",1,"다친 발목·발에 체중을 못 싣고 네 걸음도 걷기 어려워요","ott"],
+  ["뼈·관절","b2",1,"관절이 빠졌거나 뼈·관절 모양이 틀어져 보여요",""],
+  ["뼈·관절","b3",1,"통증이나 붓기가 1주 넘게 계속되거나 점점 심해져요",""],
+  ["뼈·관절","b4",1,"저리거나 감각이 이상한 게 계속돼요",""],
+  ["근육","m1",0,"운동 다음날 근육이 전체적으로 뻐근해요 (지연성 근육통)",""],
+  ["근육","m2",0,"가볍게 부딪혀서 멍이 들었어요",""],
+  ["근육","m3",0,"쥐가 났다가 풀렸어요",""],
+  ["근육","m4",1,"운동 중 근육이 '툭' 끊어지는 느낌이 든 뒤 힘을 못 줘요",""],
+  // 종목별 (MMA 앱에선 투기 항목만 보임)
+  ["MMA","sb1",0,"발목을 접질렸지만 걸을 수 있고, 붓기가 조금 있어요","ott",p=>BALL.includes(p.sub)],
+  ["MMA","sb2",1,"무릎이 '뚝' 하며 꺾인 뒤 금방 부었어요","",p=>BALL.includes(p.sub)],
+  ["MMA","sy1",1,"던질 때 팔꿈치 안쪽이 아파요 (던지기 멈추고 진료)","ps",p=>p.sub==="야구"],
+  ["MMA","sy2",1,"던질 때 어깨가 아프거나, 공 속도·제구가 갑자기 떨어졌어요 (던지기 멈추고 진료)","ps",p=>p.sub==="야구"],
+  ["MMA","sf1",1,"귀가 붓고 말랑하게 부풀었어요 (귀 혈종)","",p=>p.cat==="투기"],
+  ["MMA","sf2",1,"코피가 20분 넘게 멈추지 않아요","",p=>p.cat==="투기"],
+  ["MMA","sf3",1,"감량 중 어지럼이 심하고 소변이 거의 안 나와요","issn",p=>p.cat==="투기"],
+  ["MMA","sf4",2,"감량 중 정신이 흐리거나 쓰러질 것 같아요","issn",p=>p.cat==="투기"],
+  ["MMA","st1",1,"정강이·발등의 한 점이 아프고 쉬어도 낫지 않아요 (피로골절 의심)","",p=>p.cat==="육상"],
+  ["MMA","st2",1,"달리다 허벅지 뒤가 찌릿한 뒤 계속 달릴 수 없어요","",p=>p.cat==="육상"]
+];
+const symById = id => SYMPTOMS.find(x=>x[1]===id);
+const symLevel = ids => ids.reduce((m,id)=>{ const s=symById(id); return s?Math.max(m,s[2]):m; }, -1);
+let symSel=null;
+function renderSymptom(){
+  const p=S.profile, L=S.logs[today()]||{};
+  if(!symSel) symSel=new Set(L.sym||[]);
+  const list=SYMPTOMS.filter(x=>!x[5]||x[5](p));
+  const areas=[...new Set(list.map(x=>x[0]))];
+  const lv=symLevel([...symSel]), R=lv>=0?SYM_LV[lv]:null;
+  const srcs=[...new Set(list.map(x=>x[4]).filter(Boolean))];
+  $("#app").innerHTML=`<div class="kick">SYMPTOM CHECK</div><h1>증상 체크</h1>
+  <p class="mut">지금 해당하는 걸 모두 눌러 주세요. 누르면 바로 오늘 기록에 남고, 가장 급한 단계로 안내해요. <b>진단이 아니에요.</b> 판단이 어렵거나 불안하면 119에 전화해 상담하세요.</p>
+  ${R?`<div class="card sym" style="--c:${R.c}"><div class="t">${R.k} · ${R.k==="119"?"EMERGENCY":R.k==="병원"?"SEE A DOCTOR":"WATCH"}</div><p class="big">${R.head}</p><div class="msg">${R.body}</div>
+    ${lv===2?`<a class="btn call119" href="tel:119" style="text-decoration:none">119 전화하기</a>`:""}</div>`:""}
+  ${areas.map(a=>`<h2>${a}</h2><div class="card" style="padding:4px 12px">${list.filter(x=>x[0]===a).map(x=>`<button class="symr ${symSel.has(x[1])?"on":""}" data-sym="${x[1]}">
+    <span class="sbox"></span><span style="flex:1">${x[3]}</span>${symSel.has(x[1])?`<em class="slv" style="--c:${SYM_LV[x[2]].c}">${SYM_LV[x[2]].k}</em>`:""}</button>`).join("")}</div>`).join("")}
+  <button class="btn" id="symsave">다 골랐어요 · 오늘 신호 보기</button>
+  ${symSel.size?`<button class="btn ghost" id="symclr">모두 지우기</button>`:""}
+  <small class="src">근거: ${srcs.map(k=>SYM_SRC[k]).join(" / ")}</small>
+  ${R?`<div style="height:64px"></div><button class="symbar" id="symbar" style="--c:${R.c}">지금 단계: <b>${R.k}</b> · ${symSel.size}개 선택 <span>↑ 안내 보기</span></button>`:""}`;
+  const sbar=$("#symbar"); if(sbar) sbar.onclick=()=>window.scrollTo({top:0,behavior:"smooth"});
+  // 누르는 즉시 오늘 기록에 저장 (화면을 떠나도 사라지지 않게)
+  const keep=()=>{ const d=today(); S.logs[d]=S.logs[d]||{}; S.logs[d].sym=[...symSel]; save(); };
+  document.querySelectorAll("[data-sym]").forEach(b=>b.onclick=()=>{ const id=b.dataset.sym; symSel.has(id)?symSel.delete(id):symSel.add(id); keep(); renderSymptom(); });
+  $("#symsave").onclick=()=>{ const d=today(); S.logs[d]=S.logs[d]||{}; S.logs[d].sym=[...symSel]; save(); symSel=null; if(NAV.length) goBack(); else go("today"); requestAnimationFrame(()=>{ window.scrollTo(0,0); const sh=$(".sigh"); if(sh) sh.focus({preventScroll:true}); }); const sg=S.logs[d].sleepQ?signal(d):null; toast(sg?`증상을 기록했어요 · 오늘 신호 ${sg.name}`:"증상을 기록했어요. 체크인을 하면 신호에 반영돼요."); };
+  const c=$("#symclr"); if(c) c.onclick=()=>{ const was=[...symSel]; symSel.clear(); keep(); renderSymptom(); undoBar("증상 선택을 모두 지웠어요",()=>{ symSel=new Set(was); keep(); renderSymptom(); }); };
+}
+
+/* ───────── 3차: 투수 투구 수 (MLB·USA Baseball Pitch Smart, 만 7~22세) ───────── */
+const isPitcher = p => p.sub==="야구" && /투수/.test(p.pos||"");
+// [최소 나이, 최대 나이, 하루 최대, 휴식일 경계(이 개수를 넘으면 하루씩 더)]
+const PS = [[7,8,50,[20,35]],[9,10,75,[20,35,50,65]],[11,12,85,[20,35,50,65]],[13,14,95,[20,35,50,65]],
+            [15,16,95,[30,45,60,75]],[17,18,105,[30,45,60,80]],[19,22,120,[30,45,60,80,105]]];
+function psRule(p){ const a=ageOf(p); const r=PS.find(x=>a>=x[0]&&a<=x[1]); return r?{age:a,max:r[2],th:r[3]}:null; }
+const restDays = (n,th) => th.filter(t=>n>t).length;
+function pitchRest(date){   // 오늘이 쉬는 날이면 {from, n, rest, until}
+  const p=S.profile, R=psRule(p); if(!isPitcher(p)||!R) return null;
+  for(let i=1;i<=6;i++){ const X=addDays(date,-i), n=(S.logs[X]||{}).pitches; if(n>0){ const r=restDays(n,R.th); if(i<=r) return {from:X,n,rest:r,until:addDays(X,r+1),R}; } }
+  return null;
+}
+const md = d => d.slice(5).replace("-","/");
+
+/* ───────── 3차: 계체 후 회복 계산기 (성인 + 투기 + 대회 출전) ───────── */
+const canRecover = p => p.cat==="투기" && p.level!=="hobby" && !band(p).youth;
+const hoursBetween = (a,b) => (new Date(b)-new Date(a))/36e5;
+function nowLocal(){ const d=new Date(), z=n=>String(n).padStart(2,"0"); return `${today(d)}T${z(d.getHours())}:${z(d.getMinutes())}`; }
+function cutDday(){ const c=S.cut; if(!c||!c.weighAt) return "";
+  const dd=Math.round((new Date(c.weighAt.slice(0,10)+"T12:00:00")-new Date(today()+"T12:00:00"))/864e5);
+  if(dd>0) return `계체 D-${dd}`; if(dd===0) return new Date()<new Date(c.weighAt)?"계체 D-DAY":"계체 끝 · 회복 중";
+  return c.fightAt&&new Date()<new Date(c.fightAt)?"계체 끝 · 회복 중":""; }
+function recoveryPlan(c){
+  const gap=hoursBetween(c.weighAt,c.fightAt), lost=c.usualKg-c.weighKg, pct=lost/c.usualKg*100;
+  const fl=[lost*1.25, lost*1.5];                       // 잃은 수분의 125~150% (ISSN 2025)
+  const cph=Math.min(60, Math.round(c.weighKg));        // 시간당 약 1g/kg, 최대 60g
+  const big=pct>=5;                                     // 앱 기준: 5% 이상을 큰 감량으로 봄
+  const carb=big?[8,12]:[4,7];                          // g/kg (ISSN 2025)
+  const carbTot=carb.map(x=>Math.round(x*c.weighKg));
+  const carbFit=Math.max(0,Math.floor(gap-2))*60;       // 2시간 뒤부터 시간당 최대 60g
+  const warn=[];
+  if(gap<12 && pct>=5) warn.push(`계체와 경기가 같은 날이면 감량은 5% 미만이 권장돼요. 지금 ${pct.toFixed(1)}%예요. (GSSI)`);
+  if(gap>=12 && pct>8) warn.push(`전날 계체여도 감량은 최대 8%까지가 권장돼요. 지금 ${pct.toFixed(1)}%예요. (GSSI)`);
+  if(fl[0]>Math.max(0,gap)*1.5) warn.push(`경기 전까지 시간이 짧아 잃은 수분을 다 채우기 어려워요. 무리해서 한 번에 많이 마시지 마세요.`);
+  if(carbFit<carbTot[0]) warn.push(`경기 전까지 시간당 60g씩 먹어도 탄수화물 목표(${carbTot[0]}g)를 다 채우기 어려워요. 가능한 만큼만 나눠 드세요.`);
+  return {gap,lost,pct,fl,cph,big,carb,carbTot,warn,target:Math.min(c.usualKg,c.weighKg*1.10)};
+}
+function renderRecovery(){
+  const p=S.profile; if(!S.cut){ S.cut={weighKg:"",usualKg:curWeight(),weighAt:"",fightAt:"",checks:[]}; } const c=S.cut;
+  // 입력칸은 한 번만 그림 (고르는 중에 다시 그리면 휠이 닫히며 멋대로 선택됨). 결과만 아래에서 다시 그림
+  $("#app").innerHTML=`<div class="kick">FIGHT CAMP · ${esc(p.subName||p.sub)}</div><h1>계체 후 회복 계산기</h1>
+  <p class="mut">계체 뒤 경기 전까지 무엇을 얼마나 먹고 마실지 계산해요. 대회 규정과 팀 의료진의 안내가 먼저예요.</p>
+  <div class="card"><label class="f">평소 체중</label>${picker("ru",c.usualKg,...wRange(c.usualKg||curWeight()),1,"kg")}
+  <label class="f">계체 체중 <span class="mut">(공식 계체 숫자 그대로, 소수점까지)</span></label>${picker("rw",c.weighKg,...wRange(p.classLimit||c.usualKg||curWeight()),1,"kg",p.classLimit?`예: ${p.classLimit}`:"예: 70.3")}<small class="src">소수점이 있으면 목록에서 '직접 입력'을 골라 주세요.</small>
+  <label class="f">계체 시각</label><input id="rwa" type="datetime-local" value="${esc(c.weighAt)}">
+  <label class="f">경기 시각</label><input id="rfa" type="datetime-local" value="${esc(c.fightAt)}"></div>
+  <div id="rres"></div>
+  <h2>참고: 급속 감량 범위</h2><div class="card" style="font-size:15px">
+  <ul class="why"><li class="lo">계체 72시간 전부터 6.7% · 48시간 5.7% · 24시간 4.4% 이내</li>
+  <li class="lo">땀 빼기는 24시간 안 체중의 2~4%, 감독이 있을 때만</li>
+  <li class="lo">계체가 경기 전날이면 최대 8%, 당일이면 5% 미만</li></ul>
+  <small class="src">ISSN 2025 입장문 (계체 감량·회복); GSSI (Reale) 자료; Lewis James 발표. 진단·처방이 아니에요.</small></div>
+  <button class="btn danger" id="rclr">계산기 비우기</button>`;
+  const num=(id,k)=>{ const el=$("#"+id); const f=()=>{ const v=parseFloat(el.value), nv=v>=20&&v<=250?v:""; if(nv===c[k]) return; c[k]=nv; save(); drawRecovery(); }; el.oninput=f; el.onchange=f; };
+  num("ru","usualKg"); num("rw","weighKg");
+  // 날짜·시각은 값만 저장하고 화면은 그대로 둠
+  ["rwa","rfa"].forEach((id,i)=>{ const el=$("#"+id); const f=()=>{ const key=i?"fightAt":"weighAt"; if(el.value===c[key]) return; c[key]=el.value; save(); drawRecovery(); }; el.onchange=f; el.onblur=f; });
+  $("#rclr").onclick=()=>ask("계체 후 회복 계산기 내용을 비울까요?","비우기",()=>{ S.cut={weighKg:"",usualKg:"",weighAt:"",fightAt:"",checks:[]}; save(); renderRecovery(); });
+  drawRecovery();
+}
+const sgn=x=>(x>=0?"+":"")+r1(x);
+function drawRecovery(){
+  const c=S.cut, box=$("#rres"); if(!box) return;
+  const ready=c.weighKg>0&&c.usualKg>0&&c.weighAt&&c.fightAt&&hoursBetween(c.weighAt,c.fightAt)>0;
+  if(ready&&!(c.weighKg<c.usualKg)){ box.innerHTML=`<p class="mut">계체 체중이 평소 체중보다 가벼워야 계획을 계산할 수 있어요. 숫자를 확인해 주세요.</p>`; return; }
+  if(ready&&(c.usualKg-c.weighKg)/c.usualKg>0.2){ box.innerHTML=`<p class="mut">평소보다 20% 넘게 가벼워요. 계체 체중이나 평소 체중을 잘못 넣지 않았는지 확인해 주세요.</p>`; return; }
+  if(!ready){ box.innerHTML=`<p class="mut">${c.weighAt&&c.fightAt&&hoursBetween(c.weighAt,c.fightAt)<=0?"경기 시각이 계체 시각보다 뒤여야 해요.":"네 칸을 모두 채우면 계획이 나와요."}</p>`; return; }
+  const P=recoveryPlan(c), after=c.checks.filter(x=>hoursBetween(c.weighAt,x[0])>=0), last=after.length?after[after.length-1]:null;
+  const gain=last?last[1]-c.weighKg:0, goal=P.target-c.weighKg, prog=last?Math.max(0,Math.min(100,gain/goal*100)):0;
+  box.innerHTML=`<div class="stats"><div><b>${r1(P.lost)}<small>kg</small></b><span class="cap">감량 (${P.pct.toFixed(1)}%)</span></div>
+  <div><b>${r1(P.gap)}<small>h</small></b><span class="cap">경기까지</span></div>
+  <div><b>${r1(P.target)}<small>kg</small></b><span class="cap">회복 목표</span></div></div><small class="src" style="display:block;margin-top:-4px">회복 목표 = 평소 체중 (계체 체중 +10%를 넘지 않게)</small>
+  ${P.warn.map(w=>`<div class="banner bad">${w}</div>`).join("")}
+  <h2>시간대별 계획</h2><div class="card">
+  <ul class="why">
+   <li class="hi"><span><b>계체 직후 ~1시간</b> · 경구수액(이온음료보다 짠 것) <b>600~900mL</b>. 나트륨 1L당 50~90mmol.</span></li>
+   <li class="hi"><span><b>1~2시간</b> · 시간당 <b>1~1.5L</b>씩 나눠 마시기. 총 <b>${r1(P.fl[0])}~${r1(P.fl[1])}L</b>까지 (잃은 무게의 125~150%).</span></li>
+   <li class="hi"><span><b>2시간 뒤부터</b> · 탄수화물 시간당 약 <b>${P.cph}g</b> (1g/kg, 최대 60g). 소화 잘 되는 저섬유 음식으로.</span></li>
+   <li class="hi"><span><b>경기 전까지 탄수화물 합</b> · <b>${P.carbTot[0]}~${P.carbTot[1]}g</b> (${P.carb[0]}~${P.carb[1]}g/kg, ${P.big?"감량 폭이 큰 편":"감량 폭이 작은 편"})</span></li>
+  </ul><small class="src">감량한 무게를 모두 수분으로 보고 계산한 값이에요. 이 앱은 5% 이상을 '감량 폭이 큰 편'으로 봐요.</small></div>
+  <h2>회복 확인</h2><div class="card">
+  <p class="mut">중간중간 몸무게를 재서 넣으면 회복 목표(${r1(P.target)}kg) 대비 얼마나 올라왔는지 보여 줘요.</p>
+  ${last?`<div class="mlab"><span>지금 ${last[1]}kg · ${sgn(gain)}kg</span><span>${Math.round(prog)}%</span></div><div class="track"><i style="width:${prog}%;background:var(--acc)"></i></div>
+   `:""}${c.checks.length?`<ul class="why">${c.checks.map(([t,kg],i)=>{ const h=hoursBetween(c.weighAt,t); return `<li class="lo"><span style="flex:1">${h>=0?`계체 뒤 ${r1(h)}시간 · ${kg}kg (${sgn(kg-c.weighKg)})`:`계체 전 · ${kg}kg (회복 계산에서 빠져요)`}</span><button class="x" data-cdel="${i}" aria-label="이 기록 지우기">✕</button></li>`; }).join("")}</ul>`:""}
+  <label class="f">지금 몸무게</label>${picker("rnow","",...wRange(last?last[1]:c.weighKg),1,"kg")}
+  <button class="btn sm" id="radd">기록</button></div>`;
+  box.querySelectorAll("[data-cdel]").forEach(b=>b.onclick=()=>{ const i=+b.dataset.cdel, [it]=c.checks.splice(i,1); save(); drawRecovery();
+    undoBar(`지웠어요 · ${it[1]}kg 기록`,()=>{ c.checks.splice(i,0,it); save(); drawRecovery(); }); });
+  $("#radd").onclick=()=>{ const v=parseFloat($("#rnow").value); if(!(v>=20&&v<=250)){ const bx=$("#rnow_box"); if(bx) bx.classList.remove("hid"); fieldErr($("#rnow"),"20~250kg 사이로 적어 주세요."); return; } c.checks.push([nowLocal(),v]); save(); drawRecovery(); };
+}
+
+/* ───────── 3차: 나이대별 확인 (35세 이상, 하루 한 줄) ───────── */
+const AGE_SRC = { acsm:"Riebe 등 (2015) Med Sci Sports Exerc 47(11)", rx:"ACSM 운동 검사·처방 지침 (11판)", who:"Bull 등 (2020) Br J Sports Med 54(24) · WHO 신체활동 지침", app:"이 앱의 기준" };
+const AGE_TIPS = {
+  common:[
+    ["운동 중 가슴 불편감, 평소와 다른 숨참, 어지럼, 두근거림이 있었나요? 있으면 운동을 멈추고 진료를 받아 보세요.","acsm"],
+    ["심장·혈관·대사 질환이 있거나 위 증상이 있었다면, 강도를 크게 올리기 전에 진료로 먼저 확인해요.","acsm"],
+    ["준비운동과 정리운동을 각각 5~10분 했나요?","rx"],
+    ["근력 운동을 일주일에 2일 이상 하고 있나요?","who"],
+    ["35세 이상이면 신호를 조금 더 일찍 노랑으로 보여 줘요. 회복이 느려질 수 있어서예요.","app"]],
+  m50:[["한 발 서기 같은 균형 운동을 넣고 있나요? 65세 이상은 주 3일 이상 권장돼요.","who"]]
+};
+function ageTips(p){ const b=band(p); if(b.id==="masters") return AGE_TIPS.common; if(b.id==="m50") return [...AGE_TIPS.common,...AGE_TIPS.m50]; return null; }
+function ageTipToday(p){ const L=ageTips(p); if(!L) return "";
+  const n=Math.floor(new Date(today()+"T12:00:00")/864e5)%L.length, [t,s]=L[n], b=band(p);
+  return `<div class="banner info"><div class="cap" style="color:var(--gold)">나이대 체크 · ${b.id==="m50"?"50세 이상":"35~49세"}</div>${t}<small class="src">${AGE_SRC[s]} · <a href="#" data-go="settings">전체 보기</a></small></div>`; }
+
+/* ───────── 기록 ───────── */
+// 그날 신호 이유 + 훈련 적기/고치기 (기록 탭, 오늘 화면 '어제 훈련' 배너에서 엶)
+function openDay(k,after){
+  const L=S.logs[k]||{}, s=L.sleepQ?signal(k):null;
+  const why=s?`<h2 style="margin-top:4px">${s.name} · ${SIG_UI[s.lv][1]}</h2><p class="mut">${s.msg}</p>
+    <ul class="why">${s.why.map(([n,t])=>`<li class="${n?"hi":"lo"}"><span>${n?`<span class="sr-only">${n===2?"멈춤 이유: ":"주의 이유: "}</span>`:""}${k===today()?t:t.replace(/ ?<a [^>]*data-go="symptom"[^>]*>.*?<\/a>/,"")}</span></li>`).join("")}</ul>`
+    :`<h2 style="margin-top:4px">${L.sleepQ===undefined&&!S.logs[k]?"기록 없음":"체크인 없음"}</h2><p class="mut">${k===today()?"오늘 체크인은 오늘 화면에서 할 수 있어요.":"지난 날 체크인은 넣을 수 없어요(그날 아침 몸 상태가 기준이라서). 훈련은 지금 적을 수 있어요."}</p>`;
+  sheet(`<div class="kick">${k.slice(5).replace("-","/")}</div>${why}
+    <h2>이날 훈련</h2>${trainForm(L,false,k)}<button class="btn ghost neutral" id="cl">닫기</button>`);
+  const root=$("#mbg"); bindTrain(L,k,()=>{ after(); openDay(k,after); },root,after); $("#cl").onclick=closeSheet;
+}
+function renderHistory(){
+  const d=today(), rows=[], loads=[];
+  for(let i=27;i>=0;i--){ const k=addDays(d,-i); loads.push(S.logs[k]?tload(S.logs[k]):0); }
+  for(let i=0;i<14;i++){ const k=addDays(d,-i), L=S.logs[k]; if(!L){ if(k===d) continue; if(k>=S.created) rows.push(`<button class="hist miss" data-hday="${k}" aria-label="${k} 기록 없음, 훈련 적기"><span class="hd" style="background:var(--line)"></span><span style="flex:1;display:block"><b>${k.slice(5).replace("-","/")}</b><span class="mut"> · 기록 없음 · 훈련만 적을 수 있어요</span></span></button>`); continue; } const s=L.sleepQ?signal(k):null;
+    rows.push(`<button class="hist" data-hday="${k}" aria-label="${k} ${s?s.name+" 신호 이유와 ":""}훈련 보기"><span class="hd" style="background:var(--${s?s.color:"line"})"></span><span style="flex:1;display:block"><b>${k.slice(5).replace("-","/")}</b>
+    <span class="mut"> · 컨디션 ${L.sleepQ?wsum(L)+"/20":"-"} · 잠 ${L.sleepH!=null?fmtSleep(L.sleepH):"-"}${L.weight?" · "+esc(L.weight)+"kg":""}${L.rest?" · 쉬는 날":""}${L.trainMin?" · 훈련 "+esc(L.trainMin)+"분"+(L.rpe?" × 힘든 정도 "+esc(L.rpe):""):""}${L.pain?" · 통증 "+["","약간","중간","심함"][L.pain]+(L.painPart?"("+esc(L.painPart)+")":""):""}</span></span></button>`); }
+  const mx=Math.max(1,...loads);
+  const bars=loads.map((v,i)=>`<rect x="${i*(100/28)+0.4}" y="${60-v/mx*56}" width="${100/28-0.8}" height="${v/mx*56}" rx="0.6" fill="var(--gold)" opacity="${i>=21?1:.45}"/>`).join("");
+  $("#app").innerHTML=`<div class="kick">HISTORY</div><h1>기록</h1>
+  <div class="card"><b>최근 4주 훈련량</b>${loads.some(v=>v)?`<svg class="spark" viewBox="0 0 100 60" preserveAspectRatio="none" role="img" aria-label="최근 4주 하루 훈련량 막대">${bars}</svg><small class="src"><span style="display:flex;justify-content:space-between"><span>← 4주 전</span><span>오늘 →</span></span>진한 막대가 최근 7일이에요. 빈 칸은 훈련 기록이 없는 날이에요.</small>`:`<p class="mut" style="margin:10px 0 0">아직 막대가 없어요. 오늘 화면에서 훈련 시간과 힘든 정도를 적으면 하루 훈련량 막대가 생겨요.</p>`}</div>
+  <div class="card">${rows.length?`<small class="src" style="display:block;margin:0 0 4px">컨디션 점수는 20점 만점, 높을수록 좋아요. 줄을 누르면 그날 신호 이유가 나오고, 훈련을 적거나 고칠 수 있어요.</small>`+rows.join(""):`<p class="mut">아직 기록이 없어요.</p>`}</div>`;
+  document.querySelectorAll("[data-hday]").forEach(b=>b.onclick=()=>openDay(b.dataset.hday,renderHistory));
+}
+
+/* ───────── 준비 중 탭 ───────── */
+/* ───────── 4차: 영상 (느리게 · 한 프레임씩 · 두 영상 나란히) ─────────
+   영상 파일은 저장하지 않음(사진 앱에 원본). 앱에는 메모와 표시한 시점만 저장. */
+// 영상 프레임 수 자동 재기: 재생될 때 화면에 나온 프레임 사이 간격으로 계산 (지원 브라우저만)
+// 영상 프레임 수 자동 재기: 재생 중 1초 동안 디코드된 프레임 수로 계산 (화면 주사율 60Hz에 묶이지 않게)
+function measureFps(v,k){ if(!v.getVideoPlaybackQuality||!VID[k]||VID[k].fpsDone) return;
+  const go=()=>{ if(VID[k].fpsDone) return; const q0=v.getVideoPlaybackQuality().totalVideoFrames, t0=v.currentTime;
+    setTimeout(()=>{ if(!v.isConnected||v.paused||VID[k].fpsDone) return; const dt=v.currentTime-t0, n=v.getVideoPlaybackQuality().totalVideoFrames-q0; if(dt<0.5) return;
+      const raw=n/dt, STD=[24,25,30,48,50,60,90,100,120,240], nr=STD.reduce((a,b)=>Math.abs(b-raw)<Math.abs(a-raw)?b:a), f=Math.abs(nr-raw)/nr<0.12?nr:Math.round(raw); /* 흔한 값(30·60·120·240)에 맞춤 */ if(f>=10&&f<=480){ VID[k].fpsDone=true; VID.measured=f; if(VID.fpsAuto) VID.fps=f; fpsUI(); } },1200); };
+  v.addEventListener("playing",go); }
+function fpsNote(){ return VID.fpsAuto ? (VID.measured?`자동: 이 영상은 초당 약 ${VID.measured}프레임이에요. 1프레임 버튼이 여기에 맞춰 움직여요.`:"자동: 영상을 한 번 재생하면 초당 프레임을 재서 맞춰요. 재기 전에는 30으로 움직여요.") : "직접 고른 값이에요. 슬로모션은 120이나 240을 고르세요."; }
+function fpsUI(){ document.querySelectorAll("[data-fps]").forEach(x=>x.classList.toggle("on", x.dataset.fps==="auto"?VID.fpsAuto:(!VID.fpsAuto&&+x.dataset.fps===VID.fps))); const n=$("#fpsnote"); if(n) n.textContent=fpsNote(); }
+const VID = { A:null, B:null, mode:"one", target:"A", rate:1, fps:30, fpsAuto:true, measured:0, linked:false, offset:0, marks:[], memo:"", full:false, sound:false };
+function setFull(on){ VID.full=on; document.body.classList.toggle("vfs",on);
+  // 안드로이드 크롬은 주소창까지 숨김. 아이폰은 앱 안에서 화면을 꽉 채우는 방식만 됨
+  try{ if(on&&document.documentElement.requestFullscreen&&!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+       if(!on&&document.fullscreenElement) document.exitFullscreen().catch(()=>{}); }catch(e){} }
+function fitFull(){ const c=document.querySelector(".vctl"); if(VID.full&&c) document.documentElement.style.setProperty("--vctlh", (matchMedia("(orientation:landscape)").matches?0:c.offsetHeight)+"px"); }
+window.addEventListener("resize",()=>{ if(VID.full) fitFull(); });
+document.addEventListener("fullscreenchange",()=>{ if(!document.fullscreenElement&&VID.full&&tab==="video"){ VID.full=false; document.body.classList.remove("vfs"); const fb=$("#vfull"); if(fb) fb.textContent="⛶ 크게 보기"; } });
+const vEl = k => document.getElementById("vid"+k);
+const fmtT = t => (Math.round((t||0)*100)/100).toFixed(2)+"s";
+function renderVideo(){
+  ["A","B"].forEach(k=>{ const el=vEl(k); if(el&&VID[k]&&el.readyState>=1) VID[k].t=el.currentTime; });   // 다시 그려도 보던 위치 유지
+  const two=VID.mode==="two", keys=two?["A","B"]:["A"];
+  if(!two) VID.target="A";
+  const slot=k=>VID[k]?`<div class="vslot"><video id="vid${k}" src="${VID[k].url}" playsinline ${VID.sound?"":"muted"} preload="metadata" disableremoteplayback></video>
+      <div class="vbar"><span class="vk">${k}</span><input type="range" id="sc${k}" min="0" max="1000" step="1" value="0" aria-label="영상 ${k} 시간 막대"><span class="vt" id="vt${k}">0.00s</span></div>
+      <label class="vchg" tabindex="0" role="button">바꾸기<input type="file" accept="video/*" data-vf="${k}" hidden></label></div>`
+    :`<label class="vpick" tabindex="0" role="button"><input type="file" accept="video/*" data-vf="${k}" hidden><b>+</b>영상 ${k} 고르기<span class="mut">사진 앱에서 골라요</span></label>`;
+  const notes=(S.vnotes||[]).slice().reverse();
+  $("#app").innerHTML=`<div class="kick">VIDEO</div><h1>영상 보기</h1>
+  <div class="chips"><button class="chip ${!two?"on":""}" data-vm="one">한 개</button><button class="chip ${two?"on":""}" data-vm="two">두 개 나란히</button></div>
+  <div class="vgrid ${two?"two":""}">${keys.map(slot).join("")}</div>
+  ${keys.some(k=>VID[k])?`<div class="card vctl">
+    ${two?`<div class="vrow"><span class="cap">움직일 영상</span><div class="chips">${["A","B","AB"].map(t=>`<button class="chip ${VID.target===t?"on":""}" data-vtg="${t}">${t==="AB"?"둘 다":t}</button>`).join("")}</div></div>`:""}
+    <div class="vbtns"><button data-step="-1">◀ 1프레임</button><button id="vplay" class="pl">▶</button><button data-step="1">1프레임 ▶</button></div>
+    <div class="vtools"><button id="vfull">${VID.full?"✕ 작게 보기":"⛶ 크게 보기"}</button><button id="vsnd" class="${VID.sound?"on":""}">${VID.sound?"🔊 소리 켜짐":"🔇 소리 꺼짐"}</button></div>
+    <div class="vseek">${[-10,-5,-1,1,5,10].map(n=>`<button data-seek="${n}">${n<0?"◀"+(-n)+"초":n+"초▶"}</button>`).join("")}</div>
+    <small class="src">영상 아래 막대는 시간 막대예요. 손가락으로 끌면 그 시점으로 바로 이동해요.</small>
+    <button class="vmore" id="vmore">${VID.more?"속도·프레임 접기 ▴":"속도·프레임 설정 ▾"}</button>
+    <div class="vrow vopt"><span class="cap">속도</span><div class="chips">${[0.25,0.5,1].map(r=>`<button class="chip ${VID.rate===r?"on":""}" data-rate="${r}">${r}×</button>`).join("")}</div></div>
+    <div class="vrow vopt"><span class="cap">프레임</span><div class="chips"><button class="chip ${VID.fpsAuto?"on":""}" data-fps="auto">자동</button>${[30,60,120,240].map(f=>`<button class="chip ${!VID.fpsAuto&&VID.fps===f?"on":""}" data-fps="${f}">${f}</button>`).join("")}</div></div>
+    <small class="src" id="fpsnote">${fpsNote()}</small>
+    ${two?`<button class="btn ghost sm" id="vsync">${VID.linked?`맞춤 풀기 (B가 A보다 ${VID.offset>=0?"+":""}${VID.offset.toFixed(2)}초)`:"지금 위치로 두 영상 맞추기"}</button>
+      <small class="src">두 영상을 같은 순간(예: 발이 땅에 닿는 순간)에 멈춰 두고 누르면, 그다음부터 '둘 다'로 같이 움직여요.</small>`:""}
+  </div>
+  <h2>메모</h2><div class="card">
+    <button class="btn sm" id="vmark">지금 시점 표시하기</button>
+    <ul class="why" id="vmarks">${VID.marks.map((m,i)=>`<li class="lo"><span style="flex:1">${m.k} · ${fmtT(m.t)} <input type="text" data-mk="${i}" value="${esc(m.txt)}" placeholder="무엇을 봤나요?" class="mk"></span><button class="x" data-mdel="${i}">✕</button></li>`).join("")}</ul>
+    <label class="f">전체 메모</label><textarea id="vmemo" rows="3" placeholder="예: 착지 때 무릎이 안쪽으로 모임">${esc(VID.memo)}</textarea>
+    <button class="btn" id="vsave">메모 저장</button>
+    <small class="src">영상 파일은 앱에 저장하지 않아요. 원본은 사진 앱에 그대로 있어요.</small></div>`:`<p class="mut" style="margin-top:14px">영상을 고르면 느리게 보기, 한 프레임씩 넘기기, 두 영상 나란히 비교를 할 수 있어요. 영상은 이 폰 밖으로 나가지 않아요.</p>`}
+  ${notes.length?`<h2>지난 메모</h2>${notes.map((n,ri)=>{ const i=notes.length-1-ri; return `<div class="card"><div class="mlab"><b>${esc(n.date.slice(5).replace("-","/"))} · ${esc(n.names.join(" vs "))}</b><button class="x" data-ndel="${i}">✕</button></div>
+    ${n.marks.length?`<ul class="why">${n.marks.map(m=>`<li class="lo">${m.k} · ${fmtT(m.t)} ${esc(m.txt)}</li>`).join("")}</ul>`:""}${n.memo?`<p style="margin:8px 0 0">${esc(n.memo)}</p>`:""}</div>`; }).join("")}`:""}`;
+  document.body.classList.toggle("vfs",VID.full&&keys.some(k=>VID[k]));
+  bindVideo(); fitFull();
+}
+function vTargets(){ return (VID.target==="AB"?["A","B"]:[VID.target]).map(vEl).filter(Boolean); }
+function bindVideo(){
+  document.querySelectorAll("[data-vm]").forEach(b=>b.onclick=()=>{ VID.mode=b.dataset.vm; if(VID.mode==="one") VID.linked=false; renderVideo(); });
+  document.querySelectorAll("[data-vf]").forEach(inp=>inp.onchange=()=>{ const f=inp.files[0]; if(!f) return; const k=inp.dataset.vf;
+    VID.measured=0; if(VID.fpsAuto) VID.fps=30;     // 새 영상이면 이전 측정값을 버림
+    if(VID[k]) URL.revokeObjectURL(VID[k].url); VID[k]={url:URL.createObjectURL(f), name:f.name.replace(/\.[^.]+$/,"")}; VID.linked=false; renderVideo(); });
+  document.querySelectorAll("[data-vtg]").forEach(b=>b.onclick=()=>{ VID.target=b.dataset.vtg; renderVideo(); });
+  document.querySelectorAll("[data-rate]").forEach(b=>b.onclick=()=>{ VID.rate=+b.dataset.rate; ["A","B"].map(vEl).filter(Boolean).forEach(v=>v.playbackRate=VID.rate); document.querySelectorAll("[data-rate]").forEach(x=>x.classList.toggle("on",+x.dataset.rate===VID.rate)); });
+  document.querySelectorAll("[data-fps]").forEach(b=>b.onclick=()=>{ const a=b.dataset.fps==="auto"; VID.fpsAuto=a; VID.fps=a?(VID.measured||30):+b.dataset.fps; fpsUI(); });
+  ["A","B"].forEach(k=>{ const v=vEl(k); if(!v) return; const sc=$("#sc"+k), vt=$("#vt"+k);
+    v.playbackRate=VID.rate;
+    v.addEventListener("loadedmetadata",()=>{ v.currentTime=VID[k].t||0.001; },{once:true});
+    measureFps(v,k);
+    let dragging=false;
+    const upd=()=>{ if(!dragging&&isFinite(v.duration)&&v.duration){ sc.value=Math.round(v.currentTime/v.duration*1000); } vt.textContent=fmtT(v.currentTime); };
+    v.addEventListener("timeupdate",upd); v.addEventListener("seeked",upd); v.addEventListener("durationchange",upd);
+    try{ v.load(); }catch(e){}
+    sc.addEventListener("pointerdown",()=>dragging=true); sc.addEventListener("touchstart",()=>dragging=true,{passive:true});
+    ["pointerup","touchend","change"].forEach(ev=>sc.addEventListener(ev,()=>{ dragging=false; }));
+    v.addEventListener("pause",()=>{ const p=$("#vplay"); if(p&&!["A","B"].map(vEl).some(x=>x&&!x.paused)) p.textContent="▶"; });
+    sc.oninput=()=>{ const seek=()=>{ v.pause(); v.currentTime=sc.value/1000*v.duration; vt.textContent=fmtT(v.currentTime); };
+      // 아이폰은 한 번도 재생하지 않은 영상의 길이를 모를 수 있어서, 잠깐 재생했다 멈춘 뒤 이동
+      if(!isFinite(v.duration)||!v.duration||v.readyState<1){ v.play().then(()=>{ seek(); }).catch(()=>{}); return; }
+      seek();
+      if(VID.linked&&VID.target==="AB"){ const o=vEl(k==="A"?"B":"A"); if(o) o.currentTime=Math.max(0,v.currentTime+(k==="A"?VID.offset:-VID.offset)); } };
+  });
+  const play=$("#vplay"); if(play) play.onclick=()=>{ const T=vTargets(); const anyPlaying=T.some(v=>!v.paused);
+    if(anyPlaying){ T.forEach(v=>v.pause()); play.textContent="▶"; }
+    else { if(VID.linked&&T.length===2){ const [a,b]=T; b.currentTime=Math.max(0,a.currentTime+VID.offset); }
+      T.forEach(v=>{ v.playbackRate=VID.rate; v.play().catch(()=>{}); }); play.textContent="❚❚"; } };
+  const vm=$("#vmore"); if(vm) vm.onclick=()=>{ VID.more=!VID.more; document.body.classList.toggle("vopt-open",VID.more); vm.textContent=VID.more?"속도·프레임 접기 ▴":"속도·프레임 설정 ▾"; fitFull(); };
+  document.body.classList.toggle("vopt-open",!!VID.more);
+  const fb=$("#vfull"); if(fb) fb.onclick=()=>{ setFull(!VID.full); fb.textContent=VID.full?"✕ 작게 보기":"⛶ 크게 보기"; window.scrollTo(0,0); fitFull(); };
+  const sb=$("#vsnd"); if(sb) sb.onclick=()=>{ VID.sound=!VID.sound; ["A","B"].map(vEl).filter(Boolean).forEach(v=>{ v.muted=!VID.sound; });
+    sb.classList.toggle("on",VID.sound); sb.textContent=VID.sound?"🔊 소리 켜짐":"🔇 소리 꺼짐"; };
+  document.querySelectorAll("[data-seek]").forEach(b=>b.onclick=()=>{ const d=+b.dataset.seek;
+    vTargets().forEach(v=>{ v.currentTime=Math.max(0,Math.min(v.duration||0,v.currentTime+d)); }); });
+  document.querySelectorAll("[data-step]").forEach(b=>b.onclick=()=>{ const d=+b.dataset.step/VID.fps;
+    vTargets().forEach(v=>{ v.pause(); v.currentTime=Math.max(0,Math.min(v.duration||0,v.currentTime+d)); }); if(play) play.textContent="▶"; });
+  const sy=$("#vsync"); if(sy) sy.onclick=()=>{ if(VID.linked){ VID.linked=false; } else { const a=vEl("A"), b=vEl("B"); if(!a||!b){ toast("영상 두 개를 먼저 골라 주세요."); return; } VID.offset=b.currentTime-a.currentTime; VID.linked=true; VID.target="AB"; } renderVideo(); };
+  const mk=$("#vmark"); if(mk) mk.onclick=()=>{ const T=VID.target==="AB"?["A","B"]:[VID.target]; T.forEach(k=>{ const v=vEl(k); if(v) VID.marks.push({k,t:v.currentTime,txt:""}); }); renderVideo(); };
+  document.querySelectorAll("[data-mk]").forEach(i=>i.oninput=()=>{ VID.marks[+i.dataset.mk].txt=i.value; });   // 입력 중 다시 그리지 않음
+  document.querySelectorAll("[data-mdel]").forEach(b=>b.onclick=()=>{ VID.marks.splice(+b.dataset.mdel,1); renderVideo(); });
+  const memo=$("#vmemo"); if(memo) memo.oninput=()=>{ VID.memo=memo.value; };
+  const sv=$("#vsave"); if(sv) sv.onclick=()=>{ if(!VID.memo.trim()&&!VID.marks.length){ toast("메모나 표시한 시점이 없어요."); return; }
+    S.vnotes=S.vnotes||[]; S.vnotes.push({date:today(), names:["A","B"].filter(k=>VID[k]&&(k==="A"||VID.mode==="two")).map(k=>VID[k].name), marks:VID.marks.map(m=>({...m,t:Math.round(m.t*100)/100})), memo:VID.memo.trim()});
+    VID.marks=[]; VID.memo=""; save(); toast("메모를 저장했어요."); renderVideo(); };
+  document.querySelectorAll("[data-ndel]").forEach(b=>b.onclick=()=>{ const i=+b.dataset.ndel, [it]=S.vnotes.splice(i,1); save(); renderVideo();
+    undoBar("메모를 지웠어요",()=>{ S.vnotes.splice(i,0,it); save(); renderVideo(); }); });
+}
+
+/* ───────── 설정·백업 ───────── */
+function renderSettings(){
+  const p=S.profile, b=band(p);
+  $("#app").innerHTML=`<div class="kick">SETTINGS</div><h1>설정</h1>
+  <div class="card"><b>${b.name}</b> · 만 ${ageOf(p)}세 · ${esc(p.sex)} · ${esc(p.height)}cm · ${esc(p.weight)}kg<div class="mut">${esc(p.subName||p.sub)}${p.pos?" · "+esc(p.pos):""}${p.weightClass?" · "+esc(p.weightClass)+(p.classLimit?` (${esc(p.classLimit)}kg)`:""):""} · ${esc(LEVELS[p.level]||"")}</div>
+  <button class="btn ghost neutral" id="rewc">체급 바꾸기</button>
+  <button class="btn ghost neutral" id="reprof">처음 설정 다시 하기 (기록은 그대로)</button></div>
+  <h2>백업 · 데이터</h2><div class="card"><p class="mut">기록은 이 휴대폰에만 있어요. 폰을 바꾸거나 사파리 데이터를 지우면 사라질 수 있으니 가끔 내보내 두세요.${S.lastBackup?` 마지막 백업: ${esc(S.lastBackup)}`:""}</p>
+  <button class="btn" id="exj">기록 내보내기 (복원용 파일)</button>
+  <button class="btn ghost neutral" id="exc">엑셀용 파일(CSV) 내보내기</button>
+  <button class="btn ghost neutral" id="imp">기록 가져오기</button><input type="file" id="impf" accept=".json,application/json" hidden>
+  <details class="fold"><summary>백업 파일은 어디에? 새 폰으로 옮기기</summary><div>아이폰은 저장할 곳을 고르는 창이 떠요. '파일' 앱이나 iCloud Drive에 두거나, 카톡 '나와의 채팅'으로 보내 두면 안전해요. 안드로이드는 '다운로드' 폴더에 저장돼요.<br>새 폰에서는 앱을 연 뒤 처음 화면의 '백업 파일로 기록 가져오기'(또는 설정 → 기록 가져오기)를 누르고 <b>컨디션신호등MMA_백업_날짜.json</b> 파일을 고르세요. 엑셀용(CSV) 파일로는 되살릴 수 없어요.</div></details>
+  <div class="wipe-row"><button class="btn danger" id="wipe">이 폰의 모든 기록 지우기</button></div></div>
+  ${ageTips(p)?`<h2>나이대별 확인 (${band(p).id==="m50"?"50세 이상":"35~49세"})</h2><div class="card" style="font-size:15px"><ul class="why">${ageTips(p).map(([t,k])=>`<li class="lo"><span>${t}<small class="src">${AGE_SRC[k]}</small></span></li>`).join("")}</ul></div>`:""}
+  <h2 id="crit" tabindex="-1">판단 기준과 출처</h2><div class="card fold-card" style="font-size:15px"><p class="mut" style="margin-top:0">누르면 펼쳐져요.</p>
+  <details class="fold"><summary>컨디션 점수</summary><div>잠·피로·근육통·스트레스를 1~5로 매겨요. 잠은 5가 좋고, 피로·근육통·스트레스는 1이 좋아요(없음·상쾌). 더할 때는 좋은 쪽이 높게 되도록 맞춰서 20점 만점, 높을수록 좋은 컨디션이에요. 7일 이상 쌓이면 내 지난 28일 평균과 비교해요. 평소보다 낮으면 노랑, 평소보다 크게 벗어나면서 4점 이상 낮으면 빨강이에요. 기록이 7일보다 적을 때는 8점 이하면 빨강, 11점 이하면 노랑이에요. 운동선수의 주관적 컨디션 설문 방식을 단순하게 옮겼어요.<small class="src">Hooper & Mackinnon (1995) Sports Medicine 20(5); McLean 등 (2010) 웰니스 설문</small></div></details>
+  <details class="fold"><summary>훈련량</summary><div>훈련 시간(분) × 힘든 정도(1~10). '세션 RPE'라고 불리는 방법이에요.<small class="src">Foster 등 (2001) J Strength Cond Res 15(1)</small></div></details>
+  <details class="fold"><summary>훈련량 급증</summary><div>최근 7일 합이 최근 4주 주평균의 몇 배인지 봐요. 21일 이상 기록이 있어야 계산해요. 이 비율은 부상 예측력에 논란이 있어서 <b>참고 지표</b>로만 써요.<small class="src">Gabbett (2016) Br J Sports Med 50; 비판: Impellizzeri 등 (2020) IJSPP 15(6)</small></div></details>
+  <details class="fold"><summary>잠</summary><div>성인 7시간 이상, 청소년 8~10시간 권장 기준에서 1시간 넘게 모자라면 노랑.<small class="src">미국수면의학회(AASM) 권고</small></div></details>
+  <details class="fold"><summary>나이</summary><div>35세 이상은 회복이 느려지는 점을 반영해 노랑 기준을 조금 더 일찍 잡아요.</div></details>
+  
+  <details class="fold"><summary>체급표</summary><div>MMA 통합 규정(Unified Rules) 체급이에요. 대회마다 체급 한계가 다르면 처음 설정에서 직접 고쳐 쓰세요.</div></details>
+  <details class="fold"><summary>증상 체크</summary><div>고른 증상 중 가장 급한 단계(119 / 오늘 병원 / 쉬면서 관찰)로 안내하고, 119·병원 단계를 기록하면 그날 신호가 빨강이 돼요.<small class="src">${Object.values(SYM_SRC).join(" / ")}</small></div></details>
+  
+  <details class="fold"><summary>계체 후 회복</summary><div>잃은 무게의 125~150%를 수분으로, 처음 600~900mL, 시간당 1~1.5L, 나트륨 50~90mmol/L. 2시간 뒤부터 탄수화물 시간당 약 1g/kg(최대 60g), 합계 4~7g/kg(감량 5% 이상이면 8~12g/kg).<small class="src">ISSN 2025 입장문; GSSI (Reale) 자료; Lewis James 발표</small></div></details>
+  <details class="fold"><summary>식단 목표</summary><div><p>하루 열량은 기초대사량(Mifflin-St Jeor 공식) × 주간 훈련 횟수 활동계수에서 시작해요. 단백질은 체중 1kg당 1.6g(감량 2.0g, 증량 1.8g, 청소년 1.5g), 탄수화물은 그날 훈련 시간에 따라 1kg당 3~8g이에요. 감량은 주 1%, 증량은 주 0.5%를 넘지 않게 막아요.<small class="src">Thomas 등 (2016) Med Sci Sports Exerc 48(3); Jäger 등 (2017) JISSN 14:20; Helms 등 (2014) JISSN 11:20; Mifflin 등 (1990) Am J Clin Nutr 51(2)</small></p><p>음식 영양값은 식품의약품안전처 식품영양성분 통합DB(공공데이터포털, 2026-09-29 기준)에서 가져왔어요.</p></div></details>
+  <p class="mut">이 앱은 의학적 진단·치료를 하지 않아요. 몸에 이상이 있으면 의료진과 상담하세요.</p></div>
+  <p class="mut" style="text-align:center">컨디션 신호등 MMA v${APP_VER}</p>`;
+  $("#rewc").onclick=()=>{ ob={step:3,only:true,p:{...S.profile, birthYear:String(S.profile.birthYear), birthMonth:String(S.profile.birthMonth), classLimit:S.profile.classLimit??"", subName:S.profile.subName||"", screening:{...S.profile.screening}}}; obPrev=S.profile; S.profile=null; render(); };
+  $("#reprof").onclick=()=>{ ob={step:0,p:{...S.profile, birthYear:String(S.profile.birthYear), birthMonth:String(S.profile.birthMonth), classLimit:S.profile.classLimit??"", subName:S.profile.subName||"", screening:{...S.profile.screening}}}; obPrev=S.profile; S.profile=null; render(); };
+  // 폰에서는 공유 시트로 저장 위치를 고르게 하고, 실제로 저장했을 때만 '백업함'으로 기록
+  $("#exj").onclick=()=>{ const name=`컨디션신호등MMA_백업_${today()}.json`, text=JSON.stringify({app:"condition-note",version:1,exported:new Date().toISOString(),data:S},null,1);
+    const done=()=>{ S.lastBackup=today(); save(); renderSettings(); toast("백업 파일을 저장했어요."); };
+    let file=null; try{ file=new File([text],name,{type:"application/json"}); }catch(_){}
+    if(file&&matchMedia("(pointer:coarse)").matches&&navigator.canShare&&navigator.canShare({files:[file]})){
+      navigator.share({files:[file],title:name}).then(done).catch(err=>{ if(err&&err.name==="AbortError") toast("저장을 취소했어요. 백업은 아직 안 됐어요."); else { download(name,text,"application/json"); done(); setTimeout(()=>toast("공유가 안 돼서 파일로 내려받았어요. 파일 앱의 다운로드에서 확인해 주세요."),50); } });
+    } else { download(name,text,"application/json"); done(); } };
+  $("#exc").onclick=()=>{ download(`컨디션신호등MMA_기록_${today()}.csv`, toCSV(), "text/csv"); toast("CSV 파일을 저장했어요."); };
+  $("#imp").onclick=()=>$("#impf").click();
+  $("#impf").onchange=handleImport;
+  $("#wipe").onclick=()=>ask("이 폰의 모든 기록과 설정을 지울까요? 되돌릴 수 없어요. 먼저 내보내기를 권해요.","모두 지우기",()=>{ S=blank(); save(); NAV=[]; tab="today"; draft=null; symSel=null; obPrev=null; ob=null; if(VID){ VID.marks=[]; VID.memo=""; } render(); });
+}
+const BADFILE="이 앱의 백업 파일이 아니에요. '컨디션신호등MMA_백업_날짜.json' 파일을 골라 주세요. 엑셀용(CSV) 파일로는 복원할 수 없어요.";
+// 백업 파일 가져오기 (설정, 처음 설정 1단계 두 곳에서 씀)
+async function handleImport(e){ const f=e.target.files[0]; if(!f) return; try{ const j=JSON.parse(await f.text()); if(j.app!=="condition-note"||!j.data||!j.data.logs) throw 0;
+      ask(`백업 파일의 기록 ${Object.keys(j.data.logs).length}일치로 바꿀까요? 지금 이 폰의 기록은 덮어써져요.`,"가져오기",()=>{ const wasMMA=!!(j.data.profile&&j.data.profile.sub==="MMA"); let nd; try{ nd=cleanData(fixMMA(j.data)); }catch(_){ toast(BADFILE); return; } S=nd; save(); ob=null; obPrev=null; NAV=[]; draft=null; symSel=null; toRoot(); toast(!S.profile?"기록은 가져왔어요. 프로필 값이 맞지 않아 처음 설정을 다시 해 주세요.":!wasMMA?"MMA로 맞췄어요. 설정에서 체급을 골라 주세요.":"가져왔어요."); });
+    }catch(_){ toast(BADFILE); } e.target.value=""; }
+function toCSV(){
+  const h=["날짜","잔시간","잠(5 좋음)","피로(1 상쾌)","근육통(1 없음)","스트레스(1 없음)","컨디션점수","통증","통증부위","몸무게","훈련분","힘든정도","훈련량","증상","신호"];
+  const rows=Object.keys(S.logs).sort().map(k=>{ const L=S.logs[k], s=L.sleepQ?signal(k):null;
+    return [k,L.sleepH??"",L.sleepQ??"",L.fatigue?6-L.fatigue:"",L.soreness?6-L.soreness:"",L.stress?6-L.stress:"",L.sleepQ?wsum(L):"",["없음","약간","중간","심함"][L.pain||0],L.painPart||"",L.weight??"",L.trainMin??"",L.rpe??"",tload(L)||"",(L.sym||[]).map(id=>{const x=symById(id);return x?x[3]:id;}).join(" / "),s?s.name:""]; });
+  return "﻿"+[h,...rows].map(r=>r.map(v=>/[",\n]/.test(String(v))?`"${String(v).replace(/"/g,'""')}"`:v).join(",")).join("\n");
+}
+function download(name, text, type){
+  const blob=new Blob([text],{type});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000);
+}
+let _mBack=null;   // 확인창·시트를 열기 전 초점 (닫으면 돌려줌)
+function ask(text, okLabel, fn){ { const u=$("#undo"); if(u) u.hidden=true; }
+  if(!$("#modal").innerHTML) _mBack=document.activeElement;
+  $("#modal").innerHTML=`<div class="modal"><div class="card"><p>${esc(text)}</p><button class="btn danger" id="mok">${okLabel}</button><button class="btn ghost neutral" id="mno">취소</button></div></div>`;
+  $("#modal").firstElementChild.setAttribute("role","dialog"); $("#modal").firstElementChild.setAttribute("aria-modal","true");
+  const back=document.activeElement, close=()=>{ $("#modal").innerHTML=""; if(back&&back.isConnected) back.focus(); };
+  $("#mok").onclick=()=>{ $("#modal").innerHTML=""; _mBack=null; fn(); }; $("#mno").onclick=close; $("#mno").focus();
+}
+// 지운 뒤 잠깐 '되돌리기'를 보여 줌 (삭제는 확인창 대신 이 방식으로 통일)
+function undoBar(msg,fn){ const el=$("#undo"); el.querySelector("span").textContent=msg; el.hidden=false; clearTimeout(undoBar._t);
+  el.querySelector("button").onclick=()=>{ el.hidden=true; clearTimeout(undoBar._t); fn(); toast("되돌렸어요."); };
+  undoBar._t=setTimeout(()=>{ el.hidden=true; },6000); }
+function toast(t){ const el=$("#toast"); el.hidden=false; el.textContent=""; requestAnimationFrame(()=>{ el.textContent=t; }); clearTimeout(toast._t); toast._t=setTimeout(()=>{ el.hidden=true; el.textContent=""; },Math.max(3000,t.length*90)); }
+
+/* ───────── 2차: 식단 + 목표 ─────────
+   하루 목표 = 기초대사량(Mifflin-St Jeor) × 활동계수 ± 목표 조정
+   단백질·탄수화물은 체중 1kg당 g으로 정하고, 남는 열량을 지방에 배분해요. */
+const MEALS=["아침","점심","저녁","간식"], SHARE={아침:.25,점심:.3,저녁:.3,간식:.15};
+const AF={"0~1":1.4,"2~3":1.55,"4~5":1.7,"6 이상":1.85};
+const r0=x=>Math.round(x), r1=x=>Math.round(x*10)/10;
+function curWeight(date=today()){ for(let i=0;i<14;i++){ const L=S.logs[addDays(date,-i)]; if(L&&L.weight) return L.weight; } return S.profile.weight; }
+function goalOf(){ return S.goal||{type:"maintain"}; }
+function weeksTo(d){ return d? Math.max(0.5,(new Date(d+"T12:00:00")-new Date(today()+"T12:00:00"))/6048e5) : null; }
+function plan(g=goalOf(), date=today()){
+  const p=S.profile, b=band(p), w=curWeight(date), a=ageOf(p);
+  const bmr=10*w+6.25*p.height-5*a+(p.sex==="남성"?5:-161);
+  const tdee=bmr*(AF[p.weeklySessions]||1.55);
+  const notes=[], warn=[]; let rate=0, adj=0, type=g.type;
+  if(type==="lose" && b.youth){ type="maintain"; warn.push("성장기에는 감량 목표를 세우지 않아요. 잘 먹고 잘 쉬는 게 우선이에요. 체중이 걱정되면 보호자와 함께 소아청소년과·스포츠의학 진료를 받아 보세요."); }
+  if(type==="lose"){
+    const diff=g.targetKg? w-g.targetKg : null, wk=weeksTo(g.date);
+    rate = diff&&wk ? diff/wk : w*0.005;              // 기한이 있으면 필요한 속도, 없으면 주 0.5%
+    if(diff!==null && diff<=0){ warn.push("목표 체중이 지금보다 무거워요. 증량 목표로 바꿔 주세요."); rate=0; }
+    const pct=rate/w*100;
+    if(pct>1){ warn.push(`이 기한이면 주 ${r1(rate)}kg(체중의 ${r1(pct)}%)씩 빼야 해요. 근육이 빠지기 쉬운 속도라 주 1%로 맞췄어요. 기한을 늘리거나 목표를 낮춰 주세요.`); rate=w*0.01; }
+    else if(pct>0.7) notes.push(`주 ${r1(rate)}kg(체중의 ${r1(pct)}%) 감량. 빠른 편이라 컨디션 신호를 같이 봐 주세요.`);
+    else if(rate>0) notes.push(`주 ${r1(rate)}kg(체중의 ${r1(pct)}%) 감량 속도예요.`);
+    adj=-Math.min(rate*7700/7, 1000);
+  } else if(type==="gain"){
+    const diff=g.targetKg? g.targetKg-w : null, wk=weeksTo(g.date);
+    rate = diff&&wk ? diff/wk : w*0.0025;
+    if(diff!==null && diff<=0){ warn.push("목표 체중이 지금보다 가벼워요. 감량 목표로 바꿔 주세요."); rate=0; }
+    const pct=rate/w*100;
+    if(pct>0.5){ warn.push(`이 기한이면 주 ${r1(rate)}kg씩 늘려야 해요. 근육보다 지방이 늘기 쉬운 속도라 주 0.5%로 맞췄어요.`); rate=w*0.005; }
+    else if(rate>0) notes.push(`주 ${r1(rate)}kg 증량 속도예요.`);
+    adj=Math.min(rate*7700/7, 500);
+  }
+  if(g.targetKg && g.date && rate>0){ notes.push(`${g.date.slice(5).replace("-","/")}까지 ${g.targetKg}kg 목표.`); }
+  const floor=Math.max(p.sex==="남성"?1500:1200, bmr);
+  let kcal=tdee+adj;
+  if(kcal<floor){ warn.push(`계산값이 최소 섭취량보다 낮아서 ${r0(floor)}kcal로 올렸어요. 이보다 덜 먹으면 훈련·회복·호르몬에 문제가 생길 수 있어요.`); kcal=floor; }
+  // 탄수화물: 오늘 훈련 시간 기준 (기록 없으면 평소 횟수로 추정)
+  const L=S.logs[date]; const avgMin={"0~1":10,"2~3":30,"4~5":55,"6 이상":80}[p.weeklySessions]||30;
+  const est = !(L&&L.trainMin);
+  const min = est ? avgMin : +L.trainMin;
+  let ck = min<30?3 : min<60?5 : min<120?6 : 8;
+  const pk = b.youth?1.5 : type==="lose"?2.0 : type==="gain"?1.8 : 1.6;
+  const P=pk*w; let C=ck*w; let F=(kcal-4*P-4*C)/9;
+  const fmin=0.7*w;
+  if(F<fmin){ C=Math.max(3*w,(kcal-4*P-9*fmin)/4); F=Math.max(fmin,(kcal-4*P-4*C)/9); }
+  kcal=4*P+4*C+9*F;
+  return { kcal:r0(kcal), p:r0(P), c:r0(C), f:r0(F), w, bmr:r0(bmr), tdee:r0(tdee), adj:r0(adj), min, est, ck:r1(C/w), pk, notes, warn, type, youth:b.youth };
+}
+
+/* 음식 DB: 처음 식단 탭을 열 때만 불러와요 */
+let FOODLIST=null;
+function loadFoods(cb){ if(window.FOODS){ FOODLIST=FOODLIST||window.FOODS; return cb(); }
+  const s=document.createElement("script"); s.src="foods.js"; s.onload=()=>{ FOODLIST=window.FOODS; cb(); }; s.onerror=()=>{ FOODLIST=[]; toast("음식 목록을 불러오지 못했어요. 인터넷 연결을 확인해 주세요."); cb(); }; document.head.appendChild(s); }
+const norm=s=>String(s).replace(/[\s_·ㆍ()/]/g,"").toLowerCase();
+function searchFoods(q){
+  const mine=(S.myFoods||[]).map(f=>[...f,"mine"]);
+  const all=[...mine,...(FOODLIST||[])]; const n=norm(q);
+  if(!n){ const rec=(S.recent||[]).map(nm=>all.find(f=>f[0]===nm)).filter(Boolean); return rec.slice(0,15); }
+  const hit=[]; for(const f of all){ const k=norm(f[0]); const i=k.indexOf(n); if(i<0) continue; hit.push([f, (f[9]==="mine"?-2:0)+(f[1]?-1:0)+(i===0?0:2)+k.length/40]); }
+  return hit.sort((a,b)=>a[1]-b[1]).slice(0,40).map(x=>x[0]);
+}
+const shown=n=>String(n).replace(/_/g," · ");
+const dayMeals=(d=today())=>{ S.meals=S.meals||{}; return S.meals[d]=S.meals[d]||{아침:[],점심:[],저녁:[],간식:[]}; };
+function sum(items){ const t={k:0,c:0,p:0,f:0,na:0}; items.forEach(x=>{t.k+=x.k;t.c+=x.c;t.p+=x.p;t.f+=x.f;t.na+=x.na||0;}); return t; }
+function dayTotal(d=today()){ const m=(S.meals||{})[d]; return sum(m?MEALS.flatMap(k=>m[k]):[]); }
+
+/* 끼니 평가 · 다음 끼니 제안 · 저녁 후 하루 평가 (모두 규칙 기반) */
+function mealVerdict(meal, items, T){
+  if(!items.length) return null;
+  const t=sum(items), tk=T.kcal*SHARE[meal], tp=T.p*SHARE[meal], out=[];
+  const rk=t.k/tk;
+  out.push(rk<0.7?["↓",`열량 ${r0(t.k)}kcal, 이 끼니 목표(${r0(tk)})보다 적어요.`]: rk>1.3?["↑",`열량 ${r0(t.k)}kcal, 이 끼니 목표(${r0(tk)})보다 많아요.`]:["✓",`열량 ${r0(t.k)}kcal, 알맞아요.`]);
+  if(meal!=="간식"){ out.push(t.p<Math.min(tp*0.7,20)?["↓",`단백질 ${r0(t.p)}g. 한 끼에 20g 이상이 근육 회복에 좋아요.`]:["✓",`단백질 ${r0(t.p)}g.`]); }
+  return out;
+}
+function nextMealTip(d, T){
+  const m=dayMeals(d), eaten=dayTotal(d);
+  const order=["아침","점심","저녁"]; const left=order.filter(k=>!m[k].length && order.indexOf(k)>Math.max(-1,...order.map((k2,i)=>m[k2].length?i:-1)));
+  if(!left.length) return null;
+  const n=left.length, rk=(T.kcal-eaten.k)/n, rp=(T.p-eaten.p)/n, rc=(T.c-eaten.c)/n;
+  if(rk<=50) return {meal:left[0], text:"오늘 목표 열량을 이미 채웠어요. 다음 끼니는 채소·국 위주로 가볍게 드세요."};
+  const ideas=[];
+  if(rp>=25) ideas.push("닭가슴살 100g(단백질 28g)","달걀 2개(13g)","두부 반 모(15g 정도)");
+  else if(rp>=12) ideas.push("달걀 2개(단백질 13g)","우유 한 잔(6g)");
+  if(rc>=70) ideas.push("밥 한 공기(탄수화물 78g)"); else if(rc>=35) ideas.push("고구마 150g(탄수화물 59g)","바나나 1개(20g)");
+  return {meal:left[0], text:`${left[0]}은 약 ${r0(rk)}kcal · 단백질 ${r0(Math.max(0,rp))}g · 탄수화물 ${r0(Math.max(0,rc))}g 정도면 하루 목표에 맞아요.`, ideas};
+}
+function dayVerdict(d, T){
+  const t=dayTotal(d), w=T.w, out=[];
+  const rk=t.k/T.kcal;
+  out.push(rk<0.85?["↓",`열량 ${r0(t.k)} / ${T.kcal}kcal. ${r0(T.kcal-t.k)}kcal 모자라요.${T.type==="lose"?" 감량 중이어도 너무 적게 먹으면 근육이 빠져요.":" 회복이 늦어질 수 있어요."}`]
+          : rk>1.15?["↑",`열량 ${r0(t.k)} / ${T.kcal}kcal. ${r0(t.k-T.kcal)}kcal 많아요.`]:["✓",`열량 ${r0(t.k)} / ${T.kcal}kcal. 알맞아요.`]);
+  out.push(t.p<T.p*0.85?["↓",`단백질 ${r0(t.p)} / ${T.p}g (체중 1kg당 ${r1(t.p/w)}g). 내일 아침에 달걀이나 우유를 더해 보세요.`]:["✓",`단백질 ${r0(t.p)} / ${T.p}g (1kg당 ${r1(t.p/w)}g).`]);
+  out.push(t.c<T.c*0.8?["↓",`탄수화물 ${r0(t.c)} / ${T.c}g (1kg당 ${r1(t.c/w)}g). 오늘 훈련(${T.min}분)에 비해 적어서 내일 힘이 덜 날 수 있어요.`]:t.c>T.c*1.25?["↑",`탄수화물 ${r0(t.c)} / ${T.c}g. 훈련량에 비해 많은 편이에요.`]:["✓",`탄수화물 ${r0(t.c)} / ${T.c}g (1kg당 ${r1(t.c/w)}g).`]);
+  if(t.na>3000) out.push(["!",`나트륨 ${r0(t.na).toLocaleString()}mg. 국물·젓갈·장아찌가 많았는지 보세요. (땀을 많이 흘린 날은 괜찮아요)`]);
+  return out;
+}
+const vIcon=s=>({"✓":"g","↓":"y","↑":"y","!":"r"}[s]);
+function verdictList(v){ return `<ul class="vl">${v.map(([s,t])=>`<li><span class="vi ${vIcon(s)}">${s}</span>${t}</li>`).join("")}</ul>`; }
+
+function renderFood(){
+  if(!FOODLIST){ $("#app").innerHTML=`<div class="kick">NUTRITION</div><h1>식단</h1><p class="mut">음식 목록 불러오는 중…</p>`; return loadFoods(renderFood); }
+  const d=today(), T=plan(), m=dayMeals(d), t=dayTotal(d), g=goalOf();
+  const bar=(v,max,lab,unit)=>{ const pc=Math.min(100,v/max*100); return `<div class="mbar"><div class="mlab"><span>${lab}</span><span><b>${r0(v)}</b> / ${max}${unit}</span></div><div class="track"><i style="width:${pc}%;background:${v>max*1.15?"var(--y)":"var(--acc)"}"></i></div></div>`; };
+  const gname={maintain:"체중 유지",lose:"감량",gain:"증량"}[T.type];
+  let h=`<div class="kick">NUTRITION</div><h1>식단</h1>
+  <div class="card"><div class="row" style="align-items:center"><div><b>${gname}</b>${g.targetKg&&T.type!=="maintain"?` · 목표 ${g.targetKg}kg`:""}<div class="mut">하루 ${T.kcal.toLocaleString()}kcal · ${T.est?`평소 훈련 ${T.min}분 기준 (오늘 훈련을 적으면 바뀌어요)`:`오늘 훈련 ${T.min}분 기준`}</div></div><button class="chip" id="goalbtn" style="flex:none">목표 바꾸기</button></div>
+  ${T.warn.map(x=>`<div class="banner warn" style="margin:10px 0 0">${x}</div>`).join("")}
+  ${bar(t.k,T.kcal,"열량","kcal")}${bar(t.p,T.p,"단백질","g")}${bar(t.c,T.c,"탄수화물","g")}${bar(t.f,T.f,"지방","g")}
+  <small class="src"><a href="#" id="whyplan">이 숫자는 어떻게 나왔나요?</a></small></div>`;
+  for(const k of MEALS){
+    const items=m[k], v=mealVerdict(k,items,T), s=sum(items);
+    h+=`<div class="card"><div class="row" style="align-items:center"><b style="flex:1">${k}</b><span class="mut" style="flex:none">${items.length?r0(s.k)+"kcal":""}</span></div>
+    ${items.map((x,i)=>`<div class="fi" data-edit="${k}|${i}" tabindex="0" role="button" aria-label="${esc(shown(x.n))} 양 고치기"><div style="flex:1"><div>${esc(shown(x.n))}</div><div class="mut">${x.g}${x.u||"g"} · ${r0(x.k)}kcal · 탄${r0(x.c)} 단${r0(x.p)} 지${r0(x.f)}</div></div><button class="x" data-del="${k}|${i}" aria-label="삭제">✕</button></div>`).join("")}
+    <button class="btn ghost sm" data-add="${k}">＋ ${k} 추가</button>
+    ${v?verdictList(v):""}</div>`;
+  }
+  const tip=nextMealTip(d,T);
+  if(tip) h+=`<div class="card"><b>다음 끼니(${tip.meal}) 제안</b><p style="margin:6px 0">${tip.text}</p>${tip.ideas&&tip.ideas.length?`<div class="mut">예: ${tip.ideas.join(" · ")}</div>`:""}</div>`;
+  if(m.저녁.length) h+=`<div class="card"><b>오늘 하루 평가</b>${verdictList(dayVerdict(d,T))}<small class="src">저녁을 기록하면 하루 전체를 평가해요. 참고용이에요.</small></div>`;
+  $("#app").innerHTML=h;
+  $("#goalbtn").onclick=goalSheet;
+  $("#whyplan").onclick=e=>{ e.preventDefault(); whyPlan(T); };
+  document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>foodSheet(b.dataset.add));
+  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); const [k,i]=b.dataset.del.split("|"); const [it]=m[k].splice(+i,1); save(); renderFood();
+    undoBar(`지웠어요 · ${shown(it.n)}`,()=>{ m[k].splice(+i,0,it); save(); renderFood(); }); });
+  document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{ const [k,i]=b.dataset.edit.split("|"); portionSheet(k,null,+i); });
+}
+let _sheetBusy=false;
+function sheet(html){ if(_sheetBusy) return; { const u=$("#undo"); if(u) u.hidden=true; } const first=!$("#modal").innerHTML; if(first) _mBack=document.activeElement; _sheetBusy=true; arm(); try{ $("#modal").innerHTML=`<div class="modal" id="mbg"><div class="card sheet">${html}</div></div>`; } finally{ _sheetBusy=false; } $("#mbg").onclick=e=>{ if(e.target.id==="mbg") closeSheet(); };
+  $("#mbg").setAttribute("role","dialog"); $("#mbg").setAttribute("aria-modal","true");
+  // 처음 열 때 시트 자체에 초점 (입력칸에 주면 폰 키보드가 튀어나와서)
+  if(first){ const f=$("#mbg .sheet"); f.tabIndex=-1; f.style.outline="none"; setTimeout(()=>{ if(f.isConnected&&!f.contains(document.activeElement)) f.focus({preventScroll:true}); },0); } }
+function closeSheet(){ $("#modal").innerHTML=""; const r=_mBack; _mBack=null; if(r&&r.isConnected) r.focus({preventScroll:true}); }
+function whyPlan(T){
+  sheet(`<h2 style="margin-top:0">하루 목표 계산</h2>
+  <p>기초대사량 ${T.bmr.toLocaleString()}kcal × 활동계수(주 ${esc(S.profile.weeklySessions)}회) = 유지 열량 ${T.tdee.toLocaleString()}kcal${T.adj?` → 목표 조정 ${T.adj>0?"+":""}${T.adj}kcal`:""}</p>
+  <p>단백질: 체중 ${r1(T.w)}kg × ${T.pk}g = ${T.p}g<br>탄수화물: 오늘 훈련 ${T.min}분 → 1kg당 ${T.ck}g = ${T.c}g<br>지방: 남은 열량 = ${T.f}g</p>
+  ${T.notes.map(x=>`<p class="mut">${x}</p>`).join("")}
+  <small class="src">기초대사량: Mifflin 등 (1990) Am J Clin Nutr 51(2)<br>탄수화물 1kg당 3~10g, 단백질 1.2~2.0g: Thomas 등 (2016) ACSM·영양사협회·캐나다영양사 공동 입장문, Med Sci Sports Exerc 48(3)<br>단백질 1.4~2.0g, 감량 중 더 높게: Jäger 등 (2017) ISSN 입장문, JISSN 14:20<br>감량 속도 주 0.5~1%: Helms 등 (2014) JISSN 11:20<br>최소 섭취량 1,500/1,200kcal: 일반 임상 기준(저열량 식단 하한)<br>음식 영양값: 식품의약품안전처 식품영양성분 통합DB</small>
+  <button class="btn ghost neutral" id="cl">닫기</button>`); $("#cl").onclick=closeSheet;
+}
+function goalSheet(){
+  const g={...goalOf()}, youth=band(S.profile).youth;
+  const prev=T=>`<div class="card" style="background:var(--chip);border:0;margin-top:12px"><b>하루 ${T.kcal.toLocaleString()}kcal</b><div class="mut">단백질 ${T.p}g · 탄수화물 ${T.c}g · 지방 ${T.f}g</div>${T.notes.map(x=>`<div class="mut">${x}</div>`).join("")}</div>
+    ${T.warn.map(x=>`<div class="banner warn">${x}</div>`).join("")}`;
+  const draw=()=>{
+    const T=plan(g);
+    sheet(`<h2 style="margin-top:0">목표</h2>
+    <div class="chips">${[["maintain","유지"],["lose","감량"],["gain","증량"]].map(([k,n])=>`<button class="chip ${g.type===k?"on":""}" data-gt="${k}" ${k==="lose"&&youth?"disabled":""}>${n}</button>`).join("")}</div>
+    ${youth?`<p class="mut">성장기에는 감량 목표를 세울 수 없어요.</p>`:""}
+    ${g.type!=="maintain"?`<div class="row"><div><label class="f">목표 체중 (kg)</label><input id="gk" type="number" inputmode="decimal" step="0.1" value="${g.targetKg||""}" placeholder="${r1(curWeight())}"></div>
+    <div><label class="f">언제까지 (선택)</label><input id="gd" type="date" value="${g.date||""}" min="${addDays(today(),7)}"></div></div>
+    <p class="mut">지금 ${r1(curWeight())}kg. 기한을 비워 두면 ${g.type==="lose"?"주 0.5%":"주 0.25%"} 속도로 계산해요.</p>`:""}
+    <div id="gprev">${prev(T)}</div>
+    <button class="btn" id="gsave">저장</button><button class="btn ghost neutral" id="cl">취소</button>`);
+    document.querySelectorAll("[data-gt]").forEach(b=>b.onclick=()=>{ g.type=b.dataset.gt; draw(); });
+    const gk=$("#gk"), gd=$("#gd");
+    // 칸을 바꿔도 시트를 다시 그리지 않고 아래 계산만 바꿈 (칸을 벗어나며 누른 '저장'이 사라지지 않게)
+    const upd=()=>{ if(gk) g.targetKg=gk.value?+gk.value:null; if(gd) g.date=gd.value||null; const pv=$("#gprev"); if(pv) pv.innerHTML=prev(plan(g)); };
+    if(gk) gk.oninput=upd; if(gd) gd.onchange=upd;
+    $("#gsave").onclick=()=>{ upd(); S.goal=g.type==="maintain"?{type:"maintain"}:g; save(); closeSheet(); renderFood(); };
+    $("#cl").onclick=closeSheet;
+  };
+  draw();
+}
+function foodSheet(meal){
+  /* 입력칸은 한 번만 만들고, 글자를 칠 때는 결과 목록만 바꿔요.
+     (입력칸을 다시 그리면 한글 조합이 끊겨서 'ㅆㅏㄹ'처럼 풀어져요) */
+  let res=[];
+  sheet(`<h2 style="margin-top:0">${meal}에 추가</h2>
+    <div class="mut" id="fcount" style="margin:6px 0"></div>
+    <div class="fl fixh" id="flist"></div>
+    <input id="fq" type="search" placeholder="음식 이름 (예: 닭가슴살, 김치찌개)" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" style="margin-top:8px">
+    <button class="btn ghost" id="custom">목록에 없어요 · 직접 입력</button><button class="btn ghost neutral" id="cl">닫기</button>`);
+  const fq=$("#fq");
+  const list=()=>{
+    if(!$("#fcount")) return;                                   // 시트가 이미 닫혔으면 아무것도 안 함
+    const q=fq.value; res=searchFoods(q);
+    $("#fcount").textContent = q ? `검색 결과 ${res.length}개${res.length===40?"+":""}` : (res.length?"최근 먹은 음식":"식약처 영양성분 DB 1,015개 + 내가 만든 음식");
+    $("#flist").innerHTML = res.map((f,i)=>`<button class="fr" data-pick="${i}"><span>${esc(shown(f[0]))}${f[9]==="mine"?' <em class="tag2">내 음식</em>':""}</span><span class="mut">${r0(f[2]*f[7]/100)}kcal / ${f[7]}${f[8]?"ml":"g"}</span></button>`).join("");
+    if(!res.length) $("#flist").innerHTML=`<div class="mut" style="padding:14px">${q?"찾는 음식이 없어요. 아래 '직접 입력'으로 추가해 주세요.":"위 칸에 음식 이름을 쳐 보세요. 고른 음식은 여기에 쌓여요."}</div>`;
+  };
+  fq.addEventListener("input", ()=>{ clearTimeout(fq._t); fq._t=setTimeout(list,120); });
+  fq.addEventListener("compositionend", list);
+  $("#flist").onclick=e=>{ const b=e.target.closest("[data-pick]"); if(b) portionSheet(meal,res[+b.dataset.pick]); };
+  $("#custom").onclick=()=>customSheet(meal,fq.value); $("#cl").onclick=closeSheet;
+  list(); fq.focus();
+}
+function portionSheet(meal, f, editIdx){
+  const m=dayMeals(), old= editIdx!=null ? m[meal][editIdx] : null;
+  const base = old ? old.base : { n:f[0], k:f[2], c:f[3], p:f[4], f:f[5], na:f[6], sv:f[7], u:f[8]?"ml":"g" };
+  let g = old ? old.g : base.sv, over = old&&old.over ? {...old.over} : null;
+  const calc=()=> over || { k:base.k*g/100, c:base.c*g/100, p:base.p*g/100, f:base.f*g/100 };
+  const draw=()=>{ const v=calc();
+    sheet(`<h2 style="margin-top:0">${esc(shown(base.n))}</h2>
+    <label class="f">먹은 양 (${base.u})</label><input id="pg" type="number" inputmode="decimal" value="${g}">
+    <div class="chips" style="margin-top:8px">${[0.5,1,1.5,2].map(x=>`<button class="chip" data-sv="${x}">${x===1?"1인분":x+"인분"} (${r0(base.sv*x)}${base.u})</button>`).join("")}</div>
+    <label class="f">영양값 <span class="mut">(포장지 숫자와 다르면 고쳐 주세요)</span></label>
+    <div class="grid4">${[["k","열량 kcal"],["c","탄수화물 g"],["p","단백질 g"],["f","지방 g"]].map(([k,l])=>`<div><div class="mut">${l}</div><input type="number" inputmode="decimal" data-ov="${k}" value="${r1(v[k])}"></div>`).join("")}</div>
+    <p class="mut" id="rsw" ${over?"":"hidden"}>직접 고친 숫자를 쓰고 있어요. <a href="#" id="reset">DB 값으로 되돌리기</a></p>
+    <button class="btn" id="psave">${old?"고치기":"추가"}</button><button class="btn ghost neutral" id="cl">취소</button>`);
+    // 입력 중에는 시트를 다시 그리지 않음 (칸을 벗어나며 누른 '추가'가 사라지지 않게)
+    const fillOv=()=>{ const v=calc(); document.querySelectorAll("[data-ov]").forEach(i=>i.value=r1(v[i.dataset.ov])); $("#rsw").hidden=!over; };
+    $("#pg").oninput=e=>{ g=+e.target.value||0; over=null; fillOv(); };
+    document.querySelectorAll("[data-sv]").forEach(b=>b.onclick=()=>{ g=r0(base.sv*+b.dataset.sv); over=null; draw(); });
+    document.querySelectorAll("[data-ov]").forEach(i=>i.oninput=()=>{ over=over||{...calc()}; over[i.dataset.ov]=+i.value||0; $("#rsw").hidden=false; });
+    const rs=$("#reset"); if(rs) rs.onclick=e=>{ e.preventDefault(); over=null; draw(); };
+    $("#psave").onclick=()=>{ const v=calc(); const item={n:base.n,g,u:base.u,k:v.k,c:v.c,p:v.p,f:v.f,na:base.na*g/100,base,over};
+      if(old) m[meal][editIdx]=item; else m[meal].push(item);
+      S.recent=[base.n,...(S.recent||[]).filter(x=>x!==base.n)].slice(0,20); save(); closeSheet(); renderFood(); };
+    $("#cl").onclick=closeSheet;
+  };
+  draw();
+}
+function customSheet(meal,q){
+  sheet(`<h2 style="margin-top:0">직접 입력</h2><p class="mut">포장지 영양성분표를 보고 1회 먹은 양 기준으로 적어 주세요. 다음부터 검색에 '내 음식'으로 나와요.</p>
+  <label class="f">이름</label><input id="cn" type="text" value="${esc(q||"")}" placeholder="예: 프로틴 쉐이크">
+  <div class="row"><div><label class="f">양</label><input id="cg" type="number" inputmode="decimal" value="100"></div><div><label class="f">단위</label><select id="cu"><option>g</option><option>ml</option></select></div></div>
+  <div class="grid4">${[["k","열량 kcal"],["c","탄수화물 g"],["p","단백질 g"],["f","지방 g"]].map(([k,l])=>`<div><div class="mut">${l}</div><input type="number" inputmode="decimal" id="c${k}"></div>`).join("")}</div>
+  <button class="btn" id="csave">저장하고 추가</button><button class="btn ghost neutral" id="cl">취소</button>`);
+  $("#csave").onclick=()=>{ const nm=$("#cn").value.trim(), gg=+$("#cg").value||100, u=$("#cu").value;
+    const v=k=>+$("#c"+k).value||0; if(!nm||!v("k")){ toast("이름과 열량은 꼭 적어 주세요."); return; }
+    const per=x=>r1(x/gg*100); const f=[nm,0,per(v("k")),per(v("c")),per(v("p")),per(v("f")),0,gg,u==="ml"?1:0];
+    S.myFoods=[f,...(S.myFoods||[]).filter(x=>x[0]!==nm)]; save(); portionSheet(meal,f); };
+  $("#cl").onclick=closeSheet;
+}
+function dietCard(){
+  const t=dayTotal(), T=plan(), n=MEALS.filter(k=>((S.meals||{})[today()]||{})[k]?.length).length;
+  return `<button class="card dietbtn" data-go="food"><div class="row" style="align-items:center"><b style="flex:1">오늘 식단</b><span class="mut" style="flex:none">${n?`${n}끼 기록`:"아직 기록 없음"} ›</span></div>
+  <div class="mut">${r0(t.k).toLocaleString()} / ${T.kcal.toLocaleString()}kcal · 단백질 ${r0(t.p)} / ${T.p}g</div></button>`;
+}
+
+$("#back").onclick=uiBack;
+/* 접근성: 그린 뒤에 선택 상태·라벨 연결·점수 뜻을 붙임 (입력칸은 다시 그리지 않음) */
+let _lid=0;
+function a11y(root){
+  root.querySelectorAll(".chips button,.scale button,.vtools button,[data-scr],.symr").forEach(b=>b.setAttribute("aria-pressed",b.classList.contains("on")?"true":"false"));
+  root.querySelectorAll("label.f").forEach(l=>{
+    let n=l.nextElementSibling; if(!n) return;
+    const txt=[...l.childNodes].filter(n=>!(n.classList&&n.classList.contains("dir"))).map(n=>n.textContent).join("").replace(/\s+/g," ").trim();
+    if(n.classList.contains("scale")){
+      if(!l.id) l.id="lb"+(++_lid); n.setAttribute("role","group"); n.setAttribute("aria-labelledby",l.id);
+      const ends=n.nextElementSibling&&n.nextElementSibling.classList.contains("ends")?[...n.nextElementSibling.children].map(x=>x.textContent):null;
+      const bs=n.querySelectorAll("button");
+      bs.forEach((b,i)=>{ if(b.hasAttribute("aria-label")) return; let t=`${b.textContent}점`;
+        if(ends&&i===0) t+=` (${ends[0]})`; else if(ends&&i===bs.length-1) t+=` (${ends[1]})`; else if(ends) t+=` (1이 ${ends[0].replace(/^1 /,"")}, 5가 ${ends[1].replace(/^5 /,"")})`; b.setAttribute("aria-label",`${txt} ${t}`); });
+      return; }
+    if(n.classList.contains("chips")){ if(!l.id) l.id="lb"+(++_lid); n.setAttribute("role","group"); n.setAttribute("aria-labelledby",l.id); return; }
+    const c=n.matches("input,select,textarea")?n:n.querySelector("select,input");
+    if(c&&c.id&&!l.htmlFor) l.htmlFor=c.id;
+  });
+}
+// 키보드: 파일 고르기·식단 항목은 Enter/Space로, 모달은 Esc로 닫기
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&$("#modal").innerHTML){ e.preventDefault(); goBack(); return; }
+  if(e.key!=="Enter"&&e.key!==" ") return;
+  const t=e.target; if(!t.matches) return;
+  if(t.matches("label.vpick,label.vchg")){ e.preventDefault(); const i=t.querySelector("input[type=file]"); if(i) i.click(); }
+  else if(t.matches(".fi[data-edit]")){ e.preventDefault(); t.click(); }
+});
+// 키보드로 누른 버튼은 화면을 다시 그린 뒤에도 같은 버튼에 초점을 돌려 둠
+document.addEventListener("click",e=>{ if(e.detail!==0) return; const b=e.target.closest&&e.target.closest("button,[role=button]"); if(!b) return;
+  const ds=[...b.attributes].filter(a=>a.name.startsWith("data-")).map(a=>`[${a.name}="${CSS.escape(a.value)}"]`).join("");
+  const sel=ds?b.tagName.toLowerCase()+ds:(b.id?"#"+CSS.escape(b.id):""); if(!sel) return;
+  setTimeout(()=>{ const a=document.activeElement; if(!a||a===document.body||!a.isConnected){ const n=document.querySelector(sel); if(n) n.focus(); } },0); },true);
+new MutationObserver(()=>a11y(document.body)).observe(document.body,{childList:true,subtree:true});
+render(); a11y(document.body);
+</script>
+</body>
+</html>
