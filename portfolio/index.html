@@ -423,7 +423,7 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 .story[data-s="5"] .sb { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
 .loopnote { font-size: 13px; color: #b3ada3; margin: -2px 0 6px; }
 .fab { transition: opacity .25s, transform .25s; }
-.fab.dim { opacity: .2; transform: scale(.85); }
+.fab.dim { opacity: .2; transform: scale(.85); pointer-events: none; }
 @media (max-width: 640px) {
   .kv { grid-template-columns: 1fr; gap: 2px; }
   .kv dd { margin-bottom: 10px; }
@@ -472,6 +472,50 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 }
 .vids canvas { width: min(100%, calc(max(200px, min(40vh, 320px)) * 3 / 4)); }
 
+/* ── v5 (4라운드 지적 반영) ── */
+.load-bars { height: auto; align-items: stretch; }
+.load-bars > div { height: auto; justify-content: flex-start; }
+.load-bars .pl { position: relative; height: 110px; width: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.load-bars i { flex-shrink: 0; }
+.load-bars .now i { background: rgba(201,169,110,.45); }
+.load-bars .pl .avg { position: absolute; left: -6px; right: -6px; border-top: 2px dashed var(--g); pointer-events: none; }
+.load-bars span { white-space: nowrap; }
+.lb-legend { font-size: 13px; color: var(--g); display: flex; align-items: center; gap: 6px; }
+.lb-legend::before { content: ""; width: 22px; border-top: 2px dashed var(--g); }
+.hud .stat .k, .scale .lim, .chip, .vids figcaption { font-size: 13px; }
+.foods button[aria-pressed="true"]::before { content: "✓ "; color: var(--gold); font-weight: 800; }
+.syncrow { display: flex; gap: 6px; align-items: center; }
+.syncrow button { font: inherit; font-size: 14px; min-width: 44px; min-height: 40px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--card2); color: var(--ink); cursor: pointer; }
+.glasses button { position: relative; }
+.glasses button::after { content: ""; position: absolute; inset: -4px -2px; }
+.finish { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; background: var(--g-soft); border: 2px solid var(--g); border-radius: 14px; padding: 14px 18px; font-weight: 800; }
+.finish a { color: #111; background: var(--g); padding: 8px 16px; border-radius: 999px; text-decoration: none; }
+
+/* ── v6 (5라운드 지적 반영) ── */
+.card-player .ava { width: auto !important; min-width: 64px; font-size: 20px !important; padding: 0 12px; letter-spacing: -.02em; }
+@media (max-width: 640px) { .card-player .ava { min-width: 52px; font-size: 16px !important; padding: 0 9px; } }
+.load-bars > div:first-child .avg { left: 0; } .load-bars > div:last-child .avg { right: 0; }
+.speed { display: inline-flex; gap: 6px; align-items: center; }
+.toast { position: fixed; left: 50%; top: calc(124px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); width: max-content; white-space: nowrap; z-index: 30; display: flex; gap: 10px; align-items: center; background: var(--g); color: #111; font-weight: 800; padding: 10px 12px 10px 18px; border-radius: 999px; box-shadow: 0 10px 30px rgba(0,0,0,.6); max-width: calc(100vw - 24px); }
+.toast a { color: #111; background: rgba(255,255,255,.55); padding: 6px 12px; border-radius: 999px; text-decoration: none; white-space: nowrap; }
+.toast button { font: inherit; border: 0; background: none; color: #111; font-size: 18px; cursor: pointer; padding: 4px 8px; }
+@media (max-width: 640px) { .card.ck { padding-bottom: 60px; } }
+@media (max-width: 360px) { .segrow { grid-template-columns: 1fr !important; row-gap: 4px; } }
+@media (max-width: 640px) {
+  .ctl label, .sync { grid-template-columns: minmax(0, 1fr) auto !important; row-gap: 4px; }
+  .ctl label input, .sync .syncrow { grid-column: 1 / -1; grid-row: 2; }
+  .ctl label output, .sync output { grid-column: 2; grid-row: 1; }
+  .foods { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .foods button { padding: 6px 8px; font-size: 13px; }
+  .mission { padding-bottom: 60px; }
+}
+@media (pointer: coarse) {
+  .toggles button, .seg button, .vctl button, .ghost-btn { min-height: 44px; }
+  #e5 .qr-card { display: none; }
+  .fab { width: 46px; height: 46px; padding: 0; font-size: 20px; border-radius: 50%; display: grid; place-items: center; opacity: .85; }
+  .fab .fab-t { display: none; }
+}
+
 
 @media print { .hud, .fab { display: none; } }
 </style>
@@ -485,7 +529,7 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     <div class="stat hide-s" title="라이트급 한계"><span class="k">한계</span><span class="v">70.3</span></div>
     <div class="stat" title="오늘 신호"><span class="k">신호</span><span class="lamp-mini" id="hudL"><i class="r"></i><i class="y"></i><i class="g"></i></span></div>
     <span class="grow"></span>
-    <div class="stat" title="펼쳐 본 '만든 이야기'"><span class="k long">만든 이야기</span><span class="v" id="hudS">0/7</span></div>
+    <div class="stat" title="펼쳐 본 '만든 이야기'"><span class="k long">펼친 이야기</span><span class="v" id="hudS">0/7</span></div>
   </div>
   <nav class="days gutter" id="days" aria-label="날짜"></nav>
 </header>
@@ -523,10 +567,10 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       <h2>눈 뜨자마자 30초 체크인</h2>
       <p class="situ">어젯밤 스파링이 길었습니다. 몸이 어떤지 감으로 말고, 기록으로 판단해 보세요.</p>
       <div class="mission" id="m1">
-        <div class="mh"><b>MISSION 1</b><span>다섯 칸을 채우고 오늘 신호 받기</span></div>
+        <div class="mh"><b>MISSION 1</b><span>칸을 모두 채우고 오늘 신호 받기</span></div>
         <div class="ck">
           <div class="ctl" id="ck1"></div>
-          <div class="result" id="ck1out" aria-live="polite"><div class="placeholder">왼쪽을 채우고 '신호 받기'를 누르면<br>신호와 이유가 여기 나와요</div></div>
+          <div class="result" id="ck1out" aria-live="polite"><div class="placeholder">칸을 모두 채우고 '신호 받기'를 누르면<br>신호와 이유가 여기 나와요</div></div>
         </div>
         <div class="row-btns"><button class="go-btn" id="ck1go"><span>신호 받기</span></button><button class="ghost-btn" data-app="before">실제 앱에서 체크인 →</button></div>
       </div>
@@ -550,12 +594,13 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         <div class="mh"><b>MISSION 2</b><span>훈련을 기록하고, 이번 주 훈련량이 평소의 몇 배인지 보기</span></div>
         <div class="ck">
           <div class="ctl">
-            <label>훈련 시간<input type="range" id="tMin" min="0" max="180" step="10" value="120"><output id="tMinO"></output></label>
+            <label>훈련 시간<input type="range" id="tMin" min="0" max="240" step="10" value="120"><output id="tMinO"></output></label>
             <label>힘든 정도<input type="range" id="tRpe" min="1" max="10" step="1" value="8"><output id="tRpeO"></output></label>
             <p class="src">훈련량 = 시간(분) × 힘든 정도(1~10). Foster 등 (2001) 세션 RPE. 이번 주 월요일은 90분 × 6으로 이미 기록돼 있어요.</p>
           </div>
           <div class="stack">
             <div class="load-bars" id="loadBars"></div>
+            <div class="lb-legend" id="lbLegend"></div>
             <div id="loadOut" class="note"></div>
           </div>
         </div>
@@ -610,7 +655,7 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         <div class="foods" id="foods"></div>
         <div class="ck">
           <div class="stack" id="meters"></div>
-          <div class="stack"><div class="verdict" id="verdict"></div><p class="src" id="foodSrc"></p></div>
+          <div class="stack"><div class="verdict" id="verdict" aria-live="polite"></div><p class="src" id="foodSrc"></p></div>
         </div>
       </div>
       <details class="story" data-s="4"><summary><span class="lock">만든 이야기 4</span>'쌀밥'을 검색하다 찾은 버그<span class="hint2"></span></summary>
@@ -633,7 +678,7 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         <div class="mh"><b>MISSION 5</b><span>증상을 골라 어디로 가야 하는지 보기</span></div>
         <div class="ck">
           <div class="syms" id="syms"></div>
-          <div class="result" id="symOut"><div class="placeholder">증상을 하나 이상 골라 보세요</div></div>
+          <div class="result" id="symOut" aria-live="polite"><div class="placeholder">증상을 하나 이상 골라 보세요</div></div>
         </div>
       </div>
       <details class="story" data-s="5"><summary><span class="lock">만든 이야기 5</span>오류가 많아서 세 번에 걸쳐 자동으로 고쳤습니다<span class="hint2"></span></summary>
@@ -661,7 +706,7 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           <div class="mission" id="m6">
             <div class="mh"><b>MISSION 6</b><span>첫 1시간 목표만큼 잔을 채우기</span></div>
             <div class="glasses" id="glasses" aria-label="한 잔 150mL"></div>
-            <div class="note" id="glassOut"></div>
+            <div class="note" id="glassOut" aria-live="polite"></div>
             <div class="row-btns"><button class="ghost-btn" data-app="cut">실제 앱 회복 계산기 →</button></div>
           </div>
         </div>
@@ -694,10 +739,11 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       <div class="mission" id="m7">
         <div class="mh"><b>MISSION 7</b><span>두 영상의 발차기 최고점을 같은 순간으로 맞추기</span></div>
         <div class="vids"><figure><canvas id="cvA" width="300" height="400"></canvas><figcaption><span>지난주 · <span id="fA">0프레임</span></span></figcaption></figure><figure><canvas id="cvB" width="300" height="400"></canvas><figcaption><span>어제 · <span id="fB">0프레임</span></span></figcaption></figure></div>
-        <div class="vctl" id="vctl"><button type="button" data-v="-1" aria-label="한 프레임 뒤로">◀ 1프레임</button><button type="button" data-v="play">▶ 재생</button><button type="button" data-v="1" aria-label="한 프레임 앞으로">1프레임 ▶</button><span class="note">속도</span><button type="button" data-r="0.25" aria-pressed="false">0.25배</button><button type="button" data-r="0.5" aria-pressed="false">0.5배</button><button type="button" data-r="1" aria-pressed="true">1배</button></div>
-        <div class="sync"><span>오른쪽 밀기</span><input type="range" id="sync" min="-30" max="30" step="1" value="0"><output id="syncO">0프레임</output></div>
+        <div class="vctl" id="vctl"><button type="button" data-v="-1" aria-label="한 프레임 뒤로">◀ 1프레임</button><button type="button" data-v="play">▶ 재생</button><button type="button" data-v="1" aria-label="한 프레임 앞으로">1프레임 ▶</button><span class="speed"><span class="note">속도</span><button type="button" data-r="0.25" aria-pressed="false">0.25배</button><button type="button" data-r="0.5" aria-pressed="false">0.5배</button><button type="button" data-r="1" aria-pressed="true">1배</button></span></div>
+        <div class="sync"><span>오른쪽 밀기</span><div class="syncrow"><button type="button" data-sy="-1" aria-label="오른쪽 영상 한 프레임 왼쪽으로">−1</button><input type="range" id="sync" min="-30" max="30" step="1" value="0" aria-label="오른쪽 영상 밀기" style="flex:1"><button type="button" data-sy="1" aria-label="오른쪽 영상 한 프레임 오른쪽으로">+1</button></div><output id="syncO">0프레임</output></div>
         <div id="vidOut" class="note" aria-live="polite"></div>
       </div>
+      <div class="finish" id="finish" hidden><span>일주일 완주! 미션 7개를 모두 끝냈어요.</span><a href="#e1">현장 이야기로 →</a></div>
       <details class="story" data-s="7"><summary><span class="lock">만든 이야기 7</span>풋살 팀에서 못 했던 '영상으로 짚어 주기'<span class="hint2"></span></summary>
         <div class="sb">
           <div><span class="k">과제정의</span>풋살 팀 코치를 할 때 경기 영상을 되짚어 가며 설명해 주고 싶었는데 마땅한 방법이 없었습니다. 그래서 느리게, 한 프레임씩, 두 영상을 나란히 같은 순간으로 맞추는 기능을 넣었습니다(v0.4.0).</div>
@@ -801,6 +847,7 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   </section>
 </main>
 
+<div class="toast" id="toast" hidden role="status"><span>일주일 완주!</span><a href="#e1" id="toastGo">현장 이야기로 →</a><button type="button" id="toastX" aria-label="알림 닫기">✕</button></div>
 <button class="fab" type="button" id="fab" aria-label="실제 앱 열기">📱<span class="fab-t"> 실제 앱</span></button>
 <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-label="실제 앱 체험">
   <div class="modal-card"><button class="close" type="button" id="mclose">닫기 ✕</button><div id="phoneHost"></div></div>
@@ -840,7 +887,7 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   host.innerHTML = `<div class="scen">${Object.entries(SCENES).map(([k, s]) => `<button type="button" data-s="${k}">${s[0]}</button>`).join("")}</div>
     <div class="device"><div class="screen-area" data-r="screen"></div>
     <div class="navbar"><button type="button" data-a="back"><span class="glyph">◀</span>뒤로</button><button type="button" data-a="reset"><span class="glyph">↺</span>처음부터</button></div></div>
-    <p class="phone-hint">실제 앱 파일 그대로예요. 앱 안 날짜는 오늘 날짜로 보여요. 누른 내용은 이 브라우저에만 남아요.</p>`;
+    <p class="phone-hint">실제 앱 파일 그대로예요. 초록·노랑·빨강은 오늘 컨디션 신호예요. 앱 안 날짜는 오늘로 보여요. 누른 내용은 이 브라우저에만 남아요.</p>`;
   let frame = null, cur = "before";
   function load(kind) {
     cur = kind;
@@ -863,12 +910,13 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   });
   const modal = document.getElementById("modal");
   let lastFocus = null;
-  const bg = () => [document.querySelector("main"), document.querySelector(".hud"), document.getElementById("fab"), document.querySelector(".skip")];
+  const bg = () => [document.querySelector("main"), document.querySelector(".hud"), document.getElementById("fab"), document.querySelector(".skip"), document.getElementById("toast")];
   window.openApp = kind => { lastFocus = document.activeElement; bg().forEach(el => el && (el.inert = true)); modal.hidden = false; modal.scrollTop = 0; load(kind || window.__dayScene || "before"); document.getElementById("mclose").focus(); };
   function close() { bg().forEach(el => el && (el.inert = false)); modal.hidden = true; if (frame) { frame.remove(); frame = null; } if (lastFocus && lastFocus.focus) lastFocus.focus(); }
   const fab = document.getElementById("fab"); let ft = null;
   fab.addEventListener("click", () => window.openApp());
-  addEventListener("scroll", () => { fab.classList.add("dim"); clearTimeout(ft); ft = setTimeout(() => fab.classList.remove("dim"), 900); }, { passive: true });
+  const overControl = () => { const r = fab.getBoundingClientRect(), m = 4; fab.style.visibility = "hidden"; const pts = [[.5, .5], [0, 0], [1, 0], [0, 1], [1, 1], [.5, 0], [.5, 1], [0, .5], [1, .5]]; const hit = pts.some(([x, y]) => { const el = document.elementFromPoint(r.left + m + x * (r.width - 2 * m), r.top + m + y * (r.height - 2 * m)); return el && el.closest("button, input, a, label, summary, select, canvas, .mission"); }); fab.style.visibility = ""; return hit; };
+  addEventListener("scroll", () => { fab.classList.add("dim"); clearTimeout(ft); ft = setTimeout(() => { if (!overControl()) fab.classList.remove("dim"); }, 900); }, { passive: true });
   document.getElementById("mclose").addEventListener("click", close);
   modal.addEventListener("click", e => { if (e.target === modal) close(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !modal.hidden) close(); });
@@ -895,19 +943,26 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     const link = dayLinks.find(a => a.getAttribute("href") === "#d" + n); if (link) link.classList.add("done");
     const st = document.querySelector(`.story[data-s="${n}"]`);
     if (st && !st.open) { st.open = true; st.classList.add("new"); }
+    if (done.size === 7) { $("finish").hidden = false; if (!PRINT) { const fr = $("finish").getBoundingClientRect(); if (fr.top < innerHeight && fr.bottom > 120) return; const t = $("toast"); t.hidden = false; armToast(); } }
   }
   document.querySelectorAll(".story").forEach(st => st.addEventListener("toggle", () => { if (st.open) { seen.add(st.dataset.s); $("hudS").textContent = `${seen.size}/7`; } }));
   function setHudSignal(lv) { const c = ["g", "y", "r"]; $("hudL").querySelectorAll("i").forEach(i => i.classList.toggle("on", lv != null && i.classList.contains(c[lv]))); }
   function markDay(i) {
     dayLinks.forEach((a, k) => a.setAttribute("aria-current", k === i ? "true" : "false"));
     const c = chapters[i]; $("hudW").textContent = c.dataset.w || "—"; window.__dayScene = c.dataset.scene || "before";
-    const sig = { d1: dayResult.d1, d2: 0, d3: dayResult.d3, d4: 0, d5: dayResult.d5, d6: 0, d7: 0 }[c.id]; setHudSignal(sig);
+    const sig = { d1: dayResult.d1, d2: dayResult.d2, d3: dayResult.d3, d4: 0, d5: dayResult.d5, d6: 0, d7: 0 }[c.id]; setHudSignal(sig);
     const a = dayLinks[i], t = $("days");
     t.scrollTo({ left: a.offsetLeft - (t.clientWidth - a.offsetWidth) / 2, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }
-  const dayResult = { d1: null, d3: null, d5: null };
+  const dayResult = { d1: null, d2: null, d3: null, d5: null };
   if ("IntersectionObserver" in window) { const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) markDay(chapters.indexOf(e.target)); }), { rootMargin: "-40% 0px -59% 0px" }); chapters.forEach(c => io.observe(c)); }
 
+  const armToast = () => { const t = $("toast"); clearTimeout(t._h); t._h = setTimeout(() => { if (!t.matches(":hover, :focus-within")) t.hidden = true; else armToast(); }, 9000); };
+  $("toast").addEventListener("mouseleave", armToast); $("toast").addEventListener("focusout", armToast);
+  $("toastX").addEventListener("click", () => $("toast").hidden = true);
+  $("toastGo").addEventListener("click", () => $("toast").hidden = true);
+  /* 결과가 화면 아래 밖에 생기면 보이게 살짝 스크롤 */
+  const reveal = el => { if (PRINT) return; const r = el.getBoundingClientRect(); if (r.top > innerHeight - 90) el.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); };
   /* ── 신호 계산 (앱 signal() 기준) ── */
   function signal(o) {
     let lv = 0; const why = []; const up = (n, t) => { lv = Math.max(lv, n); why.push([n, t]); };
@@ -927,8 +982,8 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   const CK = { sQ: 0, fa: 0, so: 0, st: 0, pa: -1 };
   const segs = [["sQ", "잠의 질"], ["fa", "피로"], ["so", "근육통"], ["st", "스트레스"]];
   $("ck1").innerHTML = `<label>잠잔 시간<input type="range" id="ckH" min="4" max="10" step="0.5" value="6.5"><output id="ckHO"></output></label>` +
-    segs.map(([k, n]) => `<div class="segrow">${n}<div class="seg" data-k="${k}">${[1, 2, 3, 4, 5].map(v => `<button type="button" data-v="${v}">${v}</button>`).join("")}</div></div>`).join("") +
-    `<div class="segrow">통증<div class="seg" data-k="pa">${["없음", "약간", "중간", "심함"].map((t, v) => `<button type="button" data-v="${v}">${t}</button>`).join("")}</div></div>
+    segs.map(([k, n]) => `<div class="segrow">${n}<div class="seg" data-k="${k}" role="group" aria-label="${n} 점수 (1 아주 나쁨 ~ 5 아주 좋음)">${[1, 2, 3, 4, 5].map(v => `<button type="button" data-v="${v}">${v}</button>`).join("")}</div></div>`).join("") +
+    `<div class="segrow">통증<div class="seg" data-k="pa" role="group" aria-label="통증">${["없음", "약간", "중간", "심함"].map((t, v) => `<button type="button" data-v="${v}">${t}</button>`).join("")}</div></div>
      <p class="src">1 = 아주 나쁨, 5 = 아주 좋음. 이 선수의 평소 점수는 지난 4주 평균 14.4점이에요.</p>`;
   const ck1paint = () => { $("ckHO").textContent = fmtSleep(+$("ckH").value); $("ck1").querySelectorAll(".seg").forEach(b => b.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", +x.dataset.v === CK[b.dataset.k] ? "true" : "false")));
     const left = segs.filter(([k]) => !CK[k]).length + (CK.pa < 0 ? 1 : 0); $("ck1go").disabled = left > 0; $("ck1go").firstElementChild.textContent = left ? `${left}칸 남았어요` : "신호 받기"; };
@@ -943,10 +998,11 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     const m = +$("tMin").value, r = +$("tRpe").value; $("tMinO").textContent = m + "분"; $("tRpeO").textContent = r + " / 10";
     const week = 90 * 6 + m * r, avg = PAST.reduce((a, b) => a + b, 0) / 4;
     const proj = week + 90 * 6 * 3, ratio = Math.round(proj / avg * 100) / 100;
-    const max = Math.max(...PAST, proj) * 1.1;
-    $("loadBars").innerHTML = PAST.map((v, i) => `<div><b>${v}</b><i style="height:${v / max * 130}px"></i><span>${4 - i}주 전</span></div>`).join("") +
-      `<div class="now ${ratio > 1.5 ? "bad" : ratio > 1.3 ? "warn" : ""} ${done.has(2) ? "" : "pending"}"><b>${proj}</b><i style="height:${proj / max * 130}px"></i><span>이번 주*</span></div>` +
-      `<div class="avgline" style="bottom:${avg / max * 130 + 25}px"><span>평소 ${Math.round(avg)}</span></div>`;
+    const max = Math.max(...PAST, proj, avg) * 1.05, H = 110, av = `<span class="avg" style="bottom:${avg / max * H}px"></span>`;
+    $("loadBars").innerHTML = PAST.map((v, i) => `<div><b>${v}</b><div class="pl">${av}<i style="height:${v / max * H}px"></i></div><span>${4 - i}주 전</span></div>`).join("") +
+      `<div class="now ${ratio > 1.5 ? "bad" : ratio > 1.3 ? "warn" : ""} ${done.has(2) ? "" : "pending"}"><b>${proj}</b><div class="pl">${av}<i style="height:${proj / max * H}px"></i></div><span>이번 주*</span></div>`;
+    $("lbLegend").textContent = `평소 주평균 ${Math.round(avg)}`;
+    if (done.has(2)) { dayResult.d2 = ratio > 1.5 ? 2 : ratio > 1.3 ? 1 : 0; setHudSignal(dayResult.d2); }
     $("loadOut").innerHTML = `오늘 훈련량 <b>${m * r}</b> · 이번 주 예상 <b>${proj}</b> = 평소 주평균(${Math.round(avg)})의 <b class="${ratio > 1.5 ? "no" : ratio > 1.3 ? "mid" : "yes"}">${ratio.toFixed(2)}배</b>. ${ratio > 1.5 ? "앱은 '급하게 늘었어요'로 빨강 이유를 붙여요." : ratio > 1.3 ? "앱은 '늘었어요'로 노랑 이유를 붙여요." : "평소 범위예요."}<br><span class="src">* 남은 사흘은 월요일과 같은 90분 × 6으로 가정. 기록 21일 이상일 때만 계산하는 참고 지표예요.</span>`;
   }
   ["tMin", "tRpe"].forEach(id => $(id).addEventListener("input", load2)); load2();
@@ -979,8 +1035,8 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     const kc = i => FOODS[i][1] * FOODS[i][4] / 100, not = ids => ids.filter(i => !pick.has(i)).map(i => FOODS[i][0].replace(/\(.*\)/, "").trim());
     const add = c => { const w = orList(c); return ` ${josa(w, "을", "를")} 더해 보세요.`; };
     if (k < KCAL[0]) { const c = not([3, 2, 4, 0]).slice(0, 2); tips.push(`열량이 ${Math.round(KCAL[0] - k)}kcal 더 필요해요.${c.length ? add(c) : ""}`); }
-    if (k > KCAL[1]) { const ok = [...pick].filter(i => k - kc(i) >= KCAL[0]).sort((a, b) => kc(a) - kc(b)); const out = ok.length ? ok[0] : [...pick].sort((a, b) => kc(b) - kc(a))[0];
-      const w = FOODS[out][0].replace(/\(.*\)/, "").trim(); tips.push(`열량이 ${Math.round(k - KCAL[1])}kcal 넘쳐요. ${josa(w, "을", "를")} 빼 보세요.`); }
+    if (k > KCAL[1]) { const ok = [...pick].filter(i => k - kc(i) >= KCAL[0] && k - kc(i) <= KCAL[1]).sort((a, b) => kc(a) - kc(b)); const out = ok.length ? ok[0] : [...pick].sort((a, b) => kc(b) - kc(a))[0];
+      const w = FOODS[out][0].replace(/\(.*\)/, "").trim(); tips.push(`열량이 ${Math.round(k - KCAL[1])}kcal 넘쳐요. ${josa(w, "을", "를")} 빼 보세요.${ok.length ? "" : " 하나 더 빼야 할 수도 있어요."}`); }
     if (!pOk) { const c = not([1, 2, 6]).slice(0, 2); tips.push(`단백질이 ${r1(20 - p)}g 더 필요해요.${c.length ? add(c) : ""}`); }
     $("verdict").innerHTML = !pick.size ? `<span class="muted">음식을 눌러 담아 보세요.</span>` :
       `${kOk ? '<span class="yes">열량 알맞음</span>' : k < KCAL[0] ? '<span class="mid">열량 적음</span>' : '<span class="no">열량 많음</span>'} · ${pOk ? '<span class="yes">단백질 충분</span>' : '<span class="mid">단백질 부족</span>'}` +
@@ -989,7 +1045,7 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     $("foods").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", pick.has(+b.dataset.i) ? "true" : "false"));
     if (kOk && pOk) complete(4);
   }
-  $("foods").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; const i = +b.dataset.i; pick.has(i) ? pick.delete(i) : pick.add(i); food(); });
+  $("foods").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; const i = +b.dataset.i; pick.has(i) ? pick.delete(i) : pick.add(i); food(); reveal($("verdict")); });
   food();
 
   /* MISSION 5: 증상 (앱 SYMPTOMS 일부 그대로) */
@@ -1002,7 +1058,7 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     if (!on.length) { $("symOut").innerHTML = '<div class="placeholder">증상을 하나 이상 골라 보세요</div>'; dayResult.d5 = null; setHudSignal(null); return; }
     const lv = Math.max(...on.map(s => s[1])); dayResult.d5 = lv >= 1 ? 2 : 0; setHudSignal(dayResult.d5);
     $("symOut").innerHTML = `<div class="triage l${lv}"><b>${LV[lv][0]}</b><span>${LV[lv][1]}</span><span class="src">고른 증상 중 가장 급한 단계로 안내해요. ${lv >= 1 ? "이 단계를 기록하면 오늘 신호가 빨강이 돼요." : ""} 진단이 아니에요.</span></div>`;
-    complete(5);
+    complete(5); reveal($("symOut"));
   });
   const LOOP = [["1차 검증", 78, "증상 저장 뒤 화면 이동, 폰 뒤로 가기 버튼 오류 등"], ["2차 검증", 84, "영상 크게 보기의 검은 화면, 회복 계산에 계체 전 몸무게가 들어가던 문제 등"], ["3차 검증", 90, "90점 통과, 남은 문제까지 마저 고침"]];
   $("loopBars").innerHTML = LOOP.map(([l, s, t], i) => `<div class="brow"><span>${l}</span><div class="btrack"><i class="${i === 2 ? "hl" : ""}" style="width:${s}%"></i></div><span class="n">${s}점</span></div><p class="loopnote">${t}</p>`).join("");
@@ -1081,6 +1137,7 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     playing = false; const pb = $("vctl").querySelector('[data-v="play"]'); pb.textContent = "▶ 재생"; fa = (fa + +b.dataset.v + N) % N; vid();
   });
   $("sync").addEventListener("input", () => { offset = +$("sync").value; vid(); });
+  document.querySelectorAll("[data-sy]").forEach(b => b.addEventListener("click", () => { offset = Math.max(-30, Math.min(30, offset + +b.dataset.sy)); $("sync").value = offset; vid(); }));
   fa = PEAK_A; vid();
 
   /* ── 에필로그: 설문 ── */
@@ -1175,6 +1232,7 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     offset = 10; $("sync").value = 10; fa = PEAK_A; vid();
     document.querySelectorAll(".story").forEach(s => { s.open = true; s.classList.remove("new"); });
     document.querySelectorAll("details.qa").forEach(d => d.open = true);
+    scrollTo(0, 0);
   }
 })();
 </script>
