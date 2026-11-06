@@ -293,7 +293,7 @@ function band(p){ const a=ageOf(p);
   return {id:"m50",name:"성인 · 50세 이상",youth:false}; }
 
 /* ───────── 종목 ───────── */
-const APP_VER = "0.1.3";
+const APP_VER = "0.1.4";
 // subs 값: null = 포지션 없음 / [[묶음 이름, [포지션…]], …]
 const SPORTS = {
   "투기": { subs:{ "MMA":null }, weightClass:true }
@@ -595,8 +595,8 @@ function bindOnboard(){
 const wsum = l => (l.sleepQ||0)+(l.fatigue||0)+(l.soreness||0)+(l.stress||0);
 const tload = l => (l.trainMin||0)*(l.rpe||0);          // 세션 RPE = 시간(분) × 힘든 정도 (Foster 2001)
 // 3점 이하인 항목 이름 (점수가 낮을 때 무엇이 떨어졌는지)
-function lowItems(L){ const a=[["잠의 질",L.sleepQ],["피로",L.fatigue],["근육통",L.soreness],["스트레스",L.stress]].filter(x=>x[1]&&x[1]<=3);
-  return a.length?` 낮은 항목: ${a.map(x=>`${x[0]} ${x[1]}/5`).join(", ")} (5에 가까울수록 좋아요)`:""; }
+function lowItems(L){ const a=[["잠의 질","sleepQ"],["피로","fatigue"],["근육통","soreness"],["스트레스","stress"]].filter(x=>L[x[1]]&&L[x[1]]<=3);
+  return a.length?` 안 좋은 항목: ${a.map(x=>`${x[0]} ${shownN(x[1],L[x[1]])}/5`).join(", ")}`:""; }
 function signal(date){
   const p=S.profile, b=band(p), L=S.logs[date]; if(!L||!L.sleepQ) return null;
   const masters = b.id==="masters"||b.id==="m50";
@@ -641,8 +641,8 @@ function signal(date){
   if(pr) up(1,`오늘은 투구 쉬는 날이에요. ${md(pr.from)}에 ${pr.n}개를 던져서 ${pr.rest}일 휴식이 필요해요 (만 ${pr.R.age}세 기준). 던지기 말고 다른 훈련만 하세요.`);
   if(L.pitches&&isPitcher(p)){ const R=psRule(p); if(R&&L.pitches>R.max) up(1,`오늘 투구 수 ${L.pitches}개가 하루 최대 ${R.max}개(만 ${R.age}세)를 넘었어요.`); }
   if(!why.some(a=>a[0])){
-    const sum=`${hasSleep(L.sleepH)?`잠 ${fmtSleep(L.sleepH)} · `:""}잠의 질 ${L.sleepQ}/5, 피로 ${L.fatigue}/5, 근육통 ${L.soreness}/5, 스트레스 ${L.stress}/5 (5에 가까울수록 좋아요) → 컨디션 점수 ${w}/20`;
-    why.unshift([0, past.length>=7 ? `${sum}, 평소(최근 ${past.length}일)와 비슷하거나 좋아요.` : `${sum}. 낮게 나온 항목이 없어요.`]);
+    const sum=`${hasSleep(L.sleepH)?`잠 ${fmtSleep(L.sleepH)} · `:""}잠의 질 ${L.sleepQ}/5, 피로 ${shownN("fatigue",L.fatigue)}/5, 근육통 ${shownN("soreness",L.soreness)}/5, 스트레스 ${shownN("stress",L.stress)}/5 → 컨디션 점수 ${w}/20`;
+    why.unshift([0, past.length>=7 ? `${sum}, 평소(최근 ${past.length}일)와 비슷하거나 좋아요.` : `${sum}. 안 좋게 나온 항목이 없어요.`]);
   }
   const msg=["평소대로 훈련해도 좋아요.","강도를 조금 낮추거나 회복(잠·식사·수분)에 신경 써 주세요.",
     "오늘은 쉬세요. 움직인다면 가벼운 회복 운동(걷기·스트레칭)만 하세요."+(L.pain===3?" 심한 통증이 계속되면 진료를 받아 보세요.":"")][lv]
@@ -699,16 +699,19 @@ function renderToday(){
   }
 }
 function renderTodayEdit(L){ paintSig(); $("#app").innerHTML=`<div class="kick">MORNING CHECK-IN</div><h1>체크인 고치기</h1>${checkinForm(draft,true)}`; bindCheckin(true,L); }
-function scaleHtml(k,v,lo,hi,label){ return `<label class="f">${label}</label><div class="scale">${[1,2,3,4,5].map(n=>`<button data-k="${k}" data-n="${n}" class="${v===n?"on":""}">${n}</button>`).join("")}</div><div class="ends"><span>${lo}</span><span>${hi}</span></div>`; }
+// 피로·근육통·스트레스는 화면에서 1=좋음(없음)~5=나쁨(심함)으로 보여 주고, 저장·계산은 원래대로(5=좋음) 둠
+const REV_K=["fatigue","soreness","stress"];
+const shownN=(k,v)=>REV_K.includes(k)?6-v:v;
+function scaleHtml(k,v,lo,hi,label){ return `<label class="f">${label}</label><div class="scale">${[1,2,3,4,5].map(d=>{ const n=REV_K.includes(k)?6-d:d; return `<button data-k="${k}" data-n="${n}" class="${v===n?"on":""}">${d}</button>`; }).join("")}</div><div class="ends"><span>${lo}</span><span>${hi}</span></div>`; }
 const PARTS=["목","어깨","팔꿈치·손목","허리","엉덩이","무릎","발목·발","허벅지","종아리","기타"];
 function checkinForm(x){
   return `<div class="card">
   <label class="f">잠잔 시간</label>${sleepPicker(x.sleepH)}
   <label class="f">아침 몸무게 <span class="mut">(선택 · 최근 ${curWeight()}kg)</span></label>${picker("mw",x.weight,...wRange(curWeight()),1,"kg")}
-  ${scaleHtml("sleepQ",x.sleepQ,"아주 나쁨","아주 좋음","잠은 어땠나요?")}
-  ${scaleHtml("fatigue",x.fatigue,"아주 피곤","아주 상쾌","피로는?")}
-  ${scaleHtml("soreness",x.soreness,"아주 심함","전혀 없음","근육통은?")}
-  ${scaleHtml("stress",x.stress,"아주 심함","전혀 없음","스트레스는?")}
+  ${scaleHtml("sleepQ",x.sleepQ,"1 아주 나쁨","5 아주 좋음","잠은 어땠나요?")}
+  ${scaleHtml("fatigue",x.fatigue,"1 아주 상쾌","5 아주 피곤","피로는?")}
+  ${scaleHtml("soreness",x.soreness,"1 전혀 없음","5 아주 심함","근육통은?")}
+  ${scaleHtml("stress",x.stress,"1 전혀 없음","5 아주 심함","스트레스는?")}
   <label class="f">아픈 곳이 있나요?</label>
   <div class="chips">${["없음","약간","중간","심함"].map((v,i)=>`<button class="chip ${x.pain===i?"on":""}" data-pain="${i}">${v}</button>`).join("")}</div>
   ${x.pain>0?`<label class="f">어디가 아픈가요?</label><div class="chips">${PARTS.map(v=>`<button class="chip ${x.painPart===v?"on":""}" data-part="${v}">${v}</button>`).join("")}</div>`:""}
@@ -1064,7 +1067,7 @@ function renderSettings(){
   <div class="wipe-row"><button class="btn danger" id="wipe">이 폰의 모든 기록 지우기</button></div></div>
   ${ageTips(p)?`<h2>나이대별 확인 (${band(p).id==="m50"?"50세 이상":"35~49세"})</h2><div class="card" style="font-size:15px"><ul class="why">${ageTips(p).map(([t,k])=>`<li class="lo"><span>${t}<small class="src">${AGE_SRC[k]}</small></span></li>`).join("")}</ul></div>`:""}
   <h2 id="crit" tabindex="-1">판단 기준과 출처</h2><div class="card fold-card" style="font-size:15px"><p class="mut" style="margin-top:0">누르면 펼쳐져요.</p>
-  <details class="fold"><summary>컨디션 점수</summary><div>잠·피로·근육통·스트레스를 1~5로 매겨 더한 값(20점 만점). 7일 이상 쌓이면 내 지난 28일 평균과 비교해요. 운동선수의 주관적 컨디션 설문 방식을 단순하게 옮겼어요.<small class="src">Hooper & Mackinnon (1995) Sports Medicine 20(5); McLean 등 (2010) 웰니스 설문</small></div></details>
+  <details class="fold"><summary>컨디션 점수</summary><div>잠·피로·근육통·스트레스를 1~5로 매겨요. 잠은 5가 좋고, 피로·근육통·스트레스는 1이 좋아요(없음·상쾌). 더할 때는 좋은 쪽이 높게 되도록 맞춰서 20점 만점, 높을수록 좋은 컨디션이에요. 7일 이상 쌓이면 내 지난 28일 평균과 비교해요. 운동선수의 주관적 컨디션 설문 방식을 단순하게 옮겼어요.<small class="src">Hooper & Mackinnon (1995) Sports Medicine 20(5); McLean 등 (2010) 웰니스 설문</small></div></details>
   <details class="fold"><summary>훈련량</summary><div>훈련 시간(분) × 힘든 정도(1~10). '세션 RPE'라고 불리는 방법이에요.<small class="src">Foster 등 (2001) J Strength Cond Res 15(1)</small></div></details>
   <details class="fold"><summary>훈련량 급증</summary><div>최근 7일 합이 최근 4주 주평균의 몇 배인지 봐요. 21일 이상 기록이 있어야 계산해요. 이 비율은 부상 예측력에 논란이 있어서 <b>참고 지표</b>로만 써요.<small class="src">Gabbett (2016) Br J Sports Med 50; 비판: Impellizzeri 등 (2020) IJSPP 15(6)</small></div></details>
   <details class="fold"><summary>잠</summary><div>성인 7시간 이상, 청소년 8~10시간 권장 기준에서 1시간 넘게 모자라면 노랑.<small class="src">미국수면의학회(AASM) 권고</small></div></details>
@@ -1087,9 +1090,9 @@ function renderSettings(){
   $("#wipe").onclick=()=>ask("이 폰의 모든 기록과 설정을 지울까요? 되돌릴 수 없어요. 먼저 내보내기를 권해요.","모두 지우기",()=>{ S=blank(); save(); NAV=[]; tab="today"; draft=null; symSel=null; obPrev=null; ob=null; if(VID){ VID.marks=[]; VID.memo=""; } render(); });
 }
 function toCSV(){
-  const h=["날짜","잔시간","잠","피로","근육통","스트레스","컨디션점수","통증","통증부위","몸무게","훈련분","힘든정도","훈련량","증상","신호"];
+  const h=["날짜","잔시간","잠(5 좋음)","피로(1 상쾌)","근육통(1 없음)","스트레스(1 없음)","컨디션점수","통증","통증부위","몸무게","훈련분","힘든정도","훈련량","증상","신호"];
   const rows=Object.keys(S.logs).sort().map(k=>{ const L=S.logs[k], s=L.sleepQ?signal(k):null;
-    return [k,L.sleepH??"",L.sleepQ??"",L.fatigue??"",L.soreness??"",L.stress??"",L.sleepQ?wsum(L):"",["없음","약간","중간","심함"][L.pain||0],L.painPart||"",L.weight??"",L.trainMin??"",L.rpe??"",tload(L)||"",(L.sym||[]).map(id=>{const x=symById(id);return x?x[3]:id;}).join(" / "),s?s.name:""]; });
+    return [k,L.sleepH??"",L.sleepQ??"",L.fatigue?6-L.fatigue:"",L.soreness?6-L.soreness:"",L.stress?6-L.stress:"",L.sleepQ?wsum(L):"",["없음","약간","중간","심함"][L.pain||0],L.painPart||"",L.weight??"",L.trainMin??"",L.rpe??"",tload(L)||"",(L.sym||[]).map(id=>{const x=symById(id);return x?x[3]:id;}).join(" / "),s?s.name:""]; });
   return "﻿"+[h,...rows].map(r=>r.map(v=>/[",\n]/.test(String(v))?`"${String(v).replace(/"/g,'""')}"`:v).join(",")).join("\n");
 }
 function download(name, text, type){
