@@ -69,8 +69,8 @@ ul.why li.hi{color:var(--ink)}ul.why li.lo{color:#cfccc4}
 .wcard p{font-size:14px;font-weight:700;margin:6px 0 0}.wcard p .over{color:var(--y)}body.sg-r .wcard p .over{color:var(--ink);font-weight:600}
 .stats{display:flex;gap:6px;margin:0 0 12px}.stats div{flex:1;background:var(--card);border-top:2px solid var(--gold);padding:9px 10px 8px}
 .stats b{display:block;font:italic 900 30px/1 var(--cond)}.stats b small{font-size:14px;color:var(--mut)}
-.cap{font:700 11px var(--cond);letter-spacing:.16em;color:var(--mut);text-transform:uppercase}
-.banner{border-radius:0;padding:12px 14px;margin:0 0 12px;font-size:15px;border-left:4px solid var(--gold)}
+.cap{font:700 11px var(--cond);letter-spacing:.16em;color:var(--mut);text-transform:uppercase}.stats .cap{font:600 12px/1.35 Pretendard,sans-serif;letter-spacing:0;text-transform:none}
+.banner a{display:inline-block;padding:12px 4px;margin:-12px -4px}.banner{border-radius:0;padding:12px 14px;margin:0 0 12px;font-size:15px;border-left:4px solid var(--gold)}
 .banner.warn{background:var(--yS);border-color:var(--y)}.banner.bad{background:var(--rS);border-color:var(--r)}.banner.info{background:var(--card)}
 nav{position:fixed;z-index:5;left:0;right:0;bottom:0;background:#080808;border-top:1px solid #222;display:flex;padding:10px max(6px,calc(50% - 280px)) env(safe-area-inset-bottom)}
 nav button{flex:1;border:0;background:none;color:#5d5b56;font:inherit;font-size:12px;font-weight:600;padding:2px 0 12px}
@@ -182,11 +182,11 @@ body.offt nav button.on svg{stroke:var(--ink)}body.offt .unitbox,body.offt .pick
 .btn.back-l{flex-direction:row-reverse;justify-content:flex-end;gap:8px;width:auto;display:inline-flex;box-shadow:none!important;color:var(--mut)!important;background:none!important;font:600 15px Pretendard,sans-serif;transform:none;padding:12px 4px;margin-top:8px}.btn.back-l::after{content:"‹"}
 .chip{min-height:44px}
 .x{width:44px;height:44px}
-.ends{font-size:14px;color:#8f8c84}input::placeholder{font:500 15px Pretendard,sans-serif;color:#6c6a64;font-style:normal}h2[id]{scroll-margin-top:calc(70px + env(safe-area-inset-top))}body[class^="sg-"] .card .chip.on{background:var(--ink)!important;color:#111!important}body[class^="sg-"] .scale button.on{background:var(--ink)!important;color:#111!important}.ends.goodL span:first-child,.ends.goodR span:last-child{color:var(--ink);font-weight:600}
+.ends{font-size:14px;color:#8f8c84}input::placeholder{font:500 15px Pretendard,sans-serif;color:#8a877f;font-style:normal}h2[id],#exj{scroll-margin-top:calc(84px + env(safe-area-inset-top))}body[class^="sg-"] .card .chip.on{background:var(--ink)!important;color:#111!important}body[class^="sg-"] .scale button.on{background:var(--ink)!important;color:#111!important}.ends.goodL span:first-child,.ends.goodR span:last-child{color:var(--ink);font-weight:600}
 .dirnote{margin:20px 0 -4px;color:#cfccc4;font-size:15px;border-left:3px solid var(--gold);padding-left:10px}label.f .dir{font-weight:500;font-size:13px;color:#9a978f;margin-left:6px}
 nav button{color:#8a877f}
 .vchg{padding:8px 12px}
-.hmbox input::placeholder,.unitbox input::placeholder{color:#444!important}
+.hmbox input::placeholder,.unitbox input::placeholder{color:#8a877f!important}
 .pick2 .hmbox input{background:#151515!important;box-shadow:inset 0 0 0 1px #3a3a3a;min-width:64px;width:64px!important;padding:8px 8px!important}
 .symbar{position:fixed;z-index:6;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));display:flex;gap:6px;align-items:center;border:0;border-left:6px solid var(--c);background:var(--card2);color:var(--ink);font:600 15px Pretendard,sans-serif;padding:12px 14px;box-shadow:0 8px 24px rgba(0,0,0,.6);text-align:left}
 .symbar b{color:var(--c)}.symbar span{margin-left:auto;color:var(--mut);font-size:13px}
@@ -296,7 +296,7 @@ function band(p){ const a=ageOf(p);
   return {id:"m50",name:"성인 · 50세 이상",youth:false}; }
 
 /* ───────── 종목 ───────── */
-const APP_VER = "0.1.8";
+const APP_VER = "0.1.10";
 // subs 값: null = 포지션 없음 / [[묶음 이름, [포지션…]], …]
 const SPORTS = {
   "투기": { subs:{ "MMA":null }, weightClass:true }
@@ -382,8 +382,9 @@ const LEVELS = { hobby:"취미 (대회 안 나감)", amateur:"아마추어 대�
 /* ───────── 화면 전환 ───────── */
 let tab = "today", ob = null;
 // 뒤로 가기: 바로 전 화면으로 (안드로이드 뒤로 버튼도 같이 동작)
-let NAV=[], obPrev=null;
-function go(t,back){ if(t!=="symptom") symSel=null; if(t!=="video"&&VID.full) setFull(false);
+let NAV=[], obPrev=null, viaLink=false;   // viaLink: 오늘 화면 안 링크로 설정에 온 경우 ‹ 뒤로를 보임
+function go(t,back){ const tt=$("#toast"); if(tt&&!tt.hidden&&t!==tab){ tt.hidden=true; tt.textContent=""; clearTimeout(toast._t); }
+  if(t!=="symptom") symSel=null; if(t!=="video"&&VID.full) setFull(false);
   if(tab==="edit"&&t!=="edit") draft=null;                       // 고치기 화면을 떠나면 저장 안 한 값은 버림
   // E) 버린 '체크인 고치기' 화면으로는 돌아가지 않고 오늘 화면으로
   if(!back && t!==tab){ const from = tab==="edit" ? "today" : tab; if(from!==t && NAV[NAV.length-1]!==from) NAV.push(from); }
@@ -406,7 +407,7 @@ let _skipPop=false;
 function toRoot(){ NAV=[]; go("today",true); }   // go → arm이 남은 보호 기록을 걷어 냄
 window.addEventListener("popstate",()=>{ if(_skipPop){ _skipPop=false; arm(); return; } if(canBack()){ goBack(); arm(); } });
 const SUB_TABS=["symptom","recovery","edit"];
-function backBtn(){ const show = !S.profile&&ob ? (ob.step>0||!!obPrev) : (NAV.length>0 && SUB_TABS.includes(tab)); $("#back").hidden=!show; document.body.classList.toggle("hasback",show); }
+function backBtn(){ const show = !S.profile&&ob ? (ob.step>0||!!obPrev) : (NAV.length>0 && (SUB_TABS.includes(tab) || (tab==="settings"&&viaLink))); $("#back").hidden=!show; document.body.classList.toggle("hasback",show); }
 function uiBack(){ goBack(); }
 const $ = s => document.querySelector(s);
 const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -430,6 +431,7 @@ function renderNav(){
   $("#nav").innerHTML=T.map(([k,n])=>`<button class="${cur===k?"on":""}" data-go="${k}" ${cur===k?'aria-current="page"':""}>${NAV_IC[k]}${n}</button>`).join("");
 }
 document.addEventListener("click", e=>{ const b=e.target.closest("[data-go]"); if(b){ e.preventDefault(); if($("#modal").innerHTML){ $("#modal").innerHTML=""; _sheetBusy=false; _mBack=null; }
+    viaLink = !b.closest("#nav") && b.dataset.go==="settings";
     if(b.closest("#nav")){ // '오늘'은 맨 처음 화면: 여기서 뒤로 하면 앱을 나감
       if(b.dataset.go==="today"){ toRoot(); return; }
       NAV=NAV.filter(x=>!SUB_TABS.includes(x)); const i=NAV.indexOf(b.dataset.go); if(i>=0) NAV=NAV.slice(0,i); } go(b.dataset.go);
@@ -534,7 +536,7 @@ function renderOnboard(){
       ${sets&&!wl?`<div class="mut">${esc(sets[si].org)}은 ${esc(p.sex)} 체급이 없어요. 아래에 직접 써 주세요.</div>`:""}
       ${wl?`${sets.length===1?`<div class="mut">${esc(sets[0].org)}</div>`:""}<div class="chips" style="margin-top:8px">${wl.map(([n,k],i)=>`<button class="chip ${p.weightClass===n&&String(p.classLimit)===String(k??"")?"on":""}" data-wc="${i}">${esc(n)}${k!=null&&!/kg/.test(n)?` · ${k}kg`:""}</button>`).join("")}</div>`:""}
       ${!sets?`<div class="mut">${p.sub==="기타 투기"?"위 예시 중 삼보·가라데·극진가라데는 체급표가 나와요. ":""}체급표가 없는 종목은 아래에 직접 써 주세요.</div>`:""}
-      ${!p.weightClass?`<div class="mut" style="margin-top:8px">체급을 고르면 오늘 화면에 계체 카드가 생겨요. 나중에 설정에서 골라도 돼요.</div>`:""}
+      ${!p.weightClass?`<div class="mut" style="margin-top:8px">체급을 고르면 오늘 화면에 계체 카드가 생겨요. 나중에 설정 → 처음 설정 다시 하기에서 골라도 돼요.</div>`:""}
       ${(()=>{ const chipOn=wl&&wl.some(([n,k])=>p.weightClass===n&&String(p.classLimit)===String(k??"")); const inner=`<div class="row"><div><label class="f">체급 이름</label><input id="wc" type="text" value="${esc(p.weightClass)}" placeholder="예: 라이트급"></div>
       <div><label class="f">한계 kg</label><input id="wl" type="number" inputmode="decimal" step="0.1" value="${esc(p.classLimit)}" placeholder="비우면 무제한"></div></div>`;
         return wl ? `<details class="fold" ${(p.weightClass||(p.classLimit!==""&&p.classLimit!=null))&&!chipOn?"open":""}><summary>목록에 없거나 대회 규정이 달라요 (직접 쓰기)</summary><div>${inner}</div></details>${b4youth(p)?`<div class="mut" style="margin-top:6px">표는 성인 기준이에요.</div>`:""}` : inner; })()}`:""}`;
@@ -608,6 +610,16 @@ const tload = l => (l.trainMin||0)*(l.rpe||0);          // 세션 RPE = 시간(�
 // 나쁜 쪽(나쁨·피곤·심함 이상)으로 나온 항목 이름 (점수가 낮을 때 무엇이 떨어졌는지)
 function lowItems(L){ const a=[["잠의 질","sleepQ"],["피로","fatigue"],["근육통","soreness"],["스트레스","stress"]].filter(x=>L[x[1]]&&L[x[1]]<=2);
   return a.length?` 안 좋은 항목: ${a.map(x=>`${x[0]} ${scoreTxt(x[1],L[x[1]])}`).join(", ")}.`:""; }
+// 평소(지난 기록 평균)보다 많이 떨어진 항목 1~2개: "잠의 질 4.0→3(보통)"
+function dropItems(date,L){
+  const K=[["잠의 질","sleepQ"],["피로","fatigue"],["근육통","soreness"],["스트레스","stress"]], P=[];
+  for(let i=1;i<=28;i++){ const x=S.logs[addDays(date,-i)]; if(x&&x.sleepQ) P.push(x); }
+  if(P.length<7) return "";
+  const a=K.map(([n,k])=>{ const m=P.reduce((s,x)=>s+(x[k]||0),0)/P.length; return {n,k,m,d:L[k]-m}; }).filter(x=>x.d<=-0.5).sort((x,y)=>x.d-y.d).slice(0,2);
+  if(!a.length) return "";
+  const sh=(k,v)=>REV_K.includes(k)?6-v:v;
+  return `<br>평소보다 나빠진 것: ${a.map(x=>{ const pm=sh(x.k,x.m); return `${x.n} 평소 ${pm.toFixed(1)}(${ENDW[x.k][Math.min(4,Math.max(0,Math.round(pm)-1))]}) → 오늘 ${scoreTxt(x.k,L[x.k])}`; }).join(", ")}.`;
+}
 function signal(date){
   const p=S.profile, b=band(p), L=S.logs[date]; if(!L||!L.sleepQ) return null;
   const masters = b.id==="masters"||b.id==="m50";
@@ -624,8 +636,9 @@ function signal(date){
     const m=past.reduce((a,c)=>a+c,0)/past.length, sd=Math.max(1,Math.sqrt(past.reduce((a,c)=>a+(c-m)**2,0)/past.length));
     const z=(w-m)/sd, yz=masters?-0.75:-1;
     // 빨강은 평소보다 크게 벗어나고(z≤-1.5) 실제로 4점 이상 낮을 때만. 점수가 늘 일정한 사람이 2~3점만 내려도 빨강이 되는 것을 막음
-    if(z<=-1.5 && m-w>=4) up(2,`컨디션 점수(${w}/20)가 평소(${m.toFixed(1)})보다 많이 낮아요.${lowItems(L)}`);
-    else if(z<=yz) up(1,`컨디션 점수(${w}/20)가 평소(${m.toFixed(1)})보다 낮아요.${lowItems(L)}`);
+    const E=1e-9;   // 소수점 오차로 경계값(정확히 -1.5, -1, -0.75)에서 한 단계 낮게 나오지 않게
+    if(z<=-1.5+E && m-w>=4-E) up(2,`컨디션 점수(${w}/20)가 평소(${m.toFixed(1)})보다 많이 낮아요.${dropItems(date,L)||lowItems(L)}`);
+    else if(z<=yz+E) up(1,`컨디션 점수(${w}/20)가 평소(${m.toFixed(1)})보다 낮아요.${dropItems(date,L)||lowItems(L)}`);
   } else {
     if(w<=8) up(2,`컨디션 점수가 매우 낮아요 (${w}/20).${lowItems(L)}`); else if(w<=11) up(1,`컨디션 점수가 낮은 편이에요 (${w}/20).${lowItems(L)}`);
   }
@@ -686,7 +699,7 @@ function renderToday(){
   const d=today(), L=S.logs[d], p=S.profile, b=band(p);
   let top=`<div class="kick">${kicker(p)}</div>`;
   const daysSinceBackup = S.lastBackup ? Math.floor((new Date(d)-new Date(S.lastBackup))/864e5) : Math.floor((new Date(d)-new Date(S.created))/864e5);
-  if(daysSinceBackup>=14) top+=`<div class="banner warn">백업한 지 ${daysSinceBackup}일 지났어요. <a href="#" data-go="settings">설정에서 기록 내보내기</a></div>`;
+  if(daysSinceBackup>=14) top+=`<div class="banner warn">백업한 지 ${daysSinceBackup}일 지났어요. <a href="#" data-go="settings" data-anchor="exj">설정에서 기록 내보내기</a></div>`;
   if(p.screeningFlag) top+=`<div class="banner bad">건강 확인에 '예'가 있었어요. 고강도 운동 전에 진료를 받아 보세요.</div>`;
   if(!L||!L.sleepQ){
     draft = draft || { sleepH:"", sleepQ:0, fatigue:0, soreness:0, stress:0, pain:0, painPart:"", weight:"" };
@@ -706,7 +719,7 @@ function renderToday(){
     ${weighCard(p,L)}${ageTipToday(p)}
     <button class="btn ghost neutral" data-go="symptom">증상 체크하기</button>
     ${canRecover(p)?`<button class="btn ghost neutral" data-go="recovery">계체 후 회복 계산기${cutDday()?` · ${cutDday()}`:""}</button>`:""}
-    <h2>오늘 훈련</h2>${s.lv===2?`<p class="mut" style="margin:-4px 0 8px">쉬는 날이면 비워 두세요.</p>`:""}${trainForm(L)}
+    <h2>오늘 훈련</h2>${trainForm(L,s.lv===2)}
     <h2>식단</h2>${dietCard()}`;
     bindTrain(L);
     $("#editck").onclick=()=>{ draft={...L}; go("edit"); };
@@ -741,7 +754,9 @@ function updSaveCk(){ const b=$("#saveck"); if(!b) return; const m=ckMissing(dra
 }
 function bindCheckin(edit,L){
   const re=()=>{ edit?renderTodayEdit(L):renderToday(); };
-  document.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{ draft[b.dataset.k]=+b.dataset.n; re(); });
+  // 점수는 그 줄만 바꿈 (화면 전체를 다시 그리지 않아 화면 읽기 초점이 유지됨)
+  document.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{ draft[b.dataset.k]=+b.dataset.n;
+    b.parentNode.querySelectorAll("button").forEach(x=>{ const on=x===b; x.classList.toggle("on",on); x.setAttribute("aria-pressed",on?"true":"false"); }); updSaveCk(); });
   document.querySelectorAll("[data-pain]").forEach(b=>b.onclick=()=>{ draft.pain=+b.dataset.pain; if(!draft.pain) draft.painPart=""; re(); });
   document.querySelectorAll("[data-part]").forEach(b=>b.onclick=()=>{ draft.painPart=b.dataset.part; re(); });
   bindSleep(v=>{ draft.sleepH=v; updSaveCk(); });
@@ -755,13 +770,13 @@ function bindCheckin(edit,L){
     window.scrollTo(0,0); const sh=$(".sigh"); if(sh) sh.focus({preventScroll:true});
   };
 }
-function trainForm(L){
-  return `<div class="card"><p class="mut">훈련이 끝나면 적어 주세요. 쉬는 날이면 비워 두면 돼요.</p>
+function trainForm(L,red){
+  return `<div class="card"><p class="mut">${red?"오늘은 쉬는 날이에요. 회복 운동만 했다면 시간과 힘든 정도를 적어 주세요.":"훈련이 끝나면 적어 주세요. 쉬는 날이면 비워 두면 돼요."}</p>
   <label class="f">훈련 시간 (분)</label><input id="tm" type="number" inputmode="numeric" min="0" max="1440" value="${L.trainMin||""}" placeholder="예: 60">
   <label class="f">얼마나 힘들었나요? (1~10)</label>
   <div class="scale" style="grid-template-columns:repeat(5,1fr)">${Array.from({length:10},(_,i)=>`<button data-rpe="${i+1}" class="${L.rpe===i+1?"on":""}" aria-label="힘든 정도 ${i+1}점 (1 아주 쉬움 ~ 10 최대로 힘듦)">${i+1}</button>`).join("")}</div>
   <div class="ends"><span>1 아주 쉬움</span><span>10 최대로 힘듦</span></div>
-  ${L.trainMin&&L.rpe?`<small class="src">오늘 훈련량 ${tload(L)} (시간 × 힘든 정도)</small>`:""}${pitchForm(L)}</div>`;
+  <small class="src tl" ${L.trainMin&&L.rpe?"":"hidden"}>${L.trainMin&&L.rpe?`오늘 훈련량 ${tload(L)} (시간 × 힘든 정도)`:""}</small>${pitchForm(L)}</div>`;
 }
 function pitchForm(L){
   const p=S.profile; if(!isPitcher(p)) return "";
@@ -778,7 +793,10 @@ function bindTrain(L){
   const d=today();
   const done=()=>{ const L=S.logs[d]; save(); renderToday(); toast(L.trainMin&&L.rpe?`훈련 기록했어요 · 훈련량 ${tload(L)}`:"저장했어요"); };
   document.querySelectorAll("[data-rpe]").forEach(b=>b.onclick=()=>{ S.logs[d].rpe=+b.dataset.rpe; done(); });
-  $("#tm").onchange=e=>{ const v=e.target.value; if(v!==""&&!(+v>=0&&+v<=1440)){ toast("훈련 시간을 확인해 주세요 (0~1440분)."); e.target.value=S.logs[d].trainMin||""; return; } S.logs[d].trainMin=v?+v:0; done(); };
+  // 시간 칸에서는 다시 그리지 않음: 칸을 벗어나며 바로 '힘든 정도'를 누를 때 그 누름이 사라지지 않게
+  $("#tm").onchange=e=>{ const v=e.target.value; if(v!==""&&!(+v>=0&&+v<=1440)){ toast("훈련 시간을 확인해 주세요 (0~1440분)."); e.target.value=S.logs[d].trainMin||""; return; } S.logs[d].trainMin=v?+v:0; save();
+    { const L=S.logs[d], sm=e.target.closest(".card").querySelector("small.tl"); if(sm){ const ok=L.trainMin&&L.rpe; sm.hidden=!ok; sm.textContent=ok?`오늘 훈련량 ${tload(L)} (시간 × 힘든 정도)`:""; } }
+    const L=S.logs[d]; toast(L.trainMin&&L.rpe?`훈련 기록했어요 · 훈련량 ${tload(L)}`:L.trainMin?"시간을 저장했어요. 힘든 정도도 눌러 주세요.":"저장했어요"); };
   const pc=$("#pc"); if(pc) pc.onchange=e=>{ S.logs[d].pitches=e.target.value?+e.target.value:0; save(); renderToday(); toast(`투구 수 ${S.logs[d].pitches}개 저장했어요`); };
 }
 
@@ -889,7 +907,7 @@ function recoveryPlan(c){
   if(gap>=12 && pct>8) warn.push(`전날 계체여도 감량은 최대 8%까지가 권장돼요. 지금 ${pct.toFixed(1)}%예요. (GSSI)`);
   if(fl[0]>Math.max(0,gap)*1.5) warn.push(`경기 전까지 시간이 짧아 잃은 수분을 다 채우기 어려워요. 무리해서 한 번에 많이 마시지 마세요.`);
   if(carbFit<carbTot[0]) warn.push(`경기 전까지 시간당 60g씩 먹어도 탄수화물 목표(${carbTot[0]}g)를 다 채우기 어려워요. 가능한 만큼만 나눠 드세요.`);
-  return {gap,lost,pct,fl,cph,big,carb,carbTot,warn,target:c.weighKg*1.10};
+  return {gap,lost,pct,fl,cph,big,carb,carbTot,warn,target:Math.min(c.usualKg,c.weighKg*1.10)};
 }
 function renderRecovery(){
   const p=S.profile; if(!S.cut){ S.cut={weighKg:"",usualKg:curWeight(),weighAt:"",fightAt:"",checks:[]}; } const c=S.cut;
@@ -914,6 +932,7 @@ function renderRecovery(){
   $("#rclr").onclick=()=>ask("계체 후 회복 계산기 내용을 비울까요?","비우기",()=>{ S.cut={weighKg:"",usualKg:"",weighAt:"",fightAt:"",checks:[]}; save(); renderRecovery(); });
   drawRecovery();
 }
+const sgn=x=>(x>=0?"+":"")+r1(x);
 function drawRecovery(){
   const c=S.cut, box=$("#rres"); if(!box) return;
   const ready=c.weighKg>0&&c.usualKg>0&&c.weighAt&&c.fightAt&&hoursBetween(c.weighAt,c.fightAt)>0;
@@ -921,10 +940,10 @@ function drawRecovery(){
   if(ready&&(c.usualKg-c.weighKg)/c.usualKg>0.2){ box.innerHTML=`<p class="mut">평소보다 20% 넘게 가벼워요. 계체 체중이나 평소 체중을 잘못 넣지 않았는지 확인해 주세요.</p>`; return; }
   if(!ready){ box.innerHTML=`<p class="mut">${c.weighAt&&c.fightAt&&hoursBetween(c.weighAt,c.fightAt)<=0?"경기 시각이 계체 시각보다 뒤여야 해요.":"네 칸을 모두 채우면 계획이 나와요."}</p>`; return; }
   const P=recoveryPlan(c), after=c.checks.filter(x=>hoursBetween(c.weighAt,x[0])>=0), last=after.length?after[after.length-1]:null;
-  const gain=last?last[1]-c.weighKg:0, goal=c.weighKg*0.10, prog=last?Math.max(0,Math.min(100,gain/goal*100)):0;
+  const gain=last?last[1]-c.weighKg:0, goal=P.target-c.weighKg, prog=last?Math.max(0,Math.min(100,gain/goal*100)):0;
   box.innerHTML=`<div class="stats"><div><b>${r1(P.lost)}<small>kg</small></b><span class="cap">감량 (${P.pct.toFixed(1)}%)</span></div>
   <div><b>${r1(P.gap)}<small>h</small></b><span class="cap">경기까지</span></div>
-  <div><b>${r1(P.target)}<small>kg</small></b><span class="cap">회복 목표</span></div></div>
+  <div><b>${r1(P.target)}<small>kg</small></b><span class="cap">회복 목표</span></div></div><small class="src" style="display:block;margin-top:-4px">회복 목표 = 평소 체중 (계체 체중 +10%를 넘지 않게)</small>
   ${P.warn.map(w=>`<div class="banner bad">${w}</div>`).join("")}
   <h2>시간대별 계획</h2><div class="card">
   <ul class="why">
@@ -934,9 +953,9 @@ function drawRecovery(){
    <li class="hi"><span><b>경기 전까지 탄수화물 합</b> · <b>${P.carbTot[0]}~${P.carbTot[1]}g</b> (${P.carb[0]}~${P.carb[1]}g/kg, ${P.big?"감량 폭이 큰 편":"감량 폭이 작은 편"})</span></li>
   </ul><small class="src">감량한 무게를 모두 수분으로 보고 계산한 값이에요. 이 앱은 5% 이상을 '감량 폭이 큰 편'으로 봐요.</small></div>
   <h2>회복 확인</h2><div class="card">
-  <p class="mut">중간중간 몸무게를 재서 넣으면 회복 목표(계체 체중 + 10%) 대비 얼마나 올라왔는지 보여 줘요.</p>
-  ${last?`<div class="mlab"><span>지금 ${last[1]}kg · +${r1(gain)}kg</span><span>${Math.round(prog)}%</span></div><div class="track"><i style="width:${prog}%;background:var(--acc)"></i></div>
-   `:""}${c.checks.length?`<ul class="why">${c.checks.map(([t,kg])=>{ const h=hoursBetween(c.weighAt,t); return `<li class="lo">${h>=0?`계체 뒤 ${r1(h)}시간 · ${kg}kg (+${r1(kg-c.weighKg)})`:`계체 전 · ${kg}kg (회복 계산에서 빠져요)`}</li>`; }).join("")}</ul>`:""}
+  <p class="mut">중간중간 몸무게를 재서 넣으면 회복 목표(${r1(P.target)}kg) 대비 얼마나 올라왔는지 보여 줘요.</p>
+  ${last?`<div class="mlab"><span>지금 ${last[1]}kg · ${sgn(gain)}kg</span><span>${Math.round(prog)}%</span></div><div class="track"><i style="width:${prog}%;background:var(--acc)"></i></div>
+   `:""}${c.checks.length?`<ul class="why">${c.checks.map(([t,kg])=>{ const h=hoursBetween(c.weighAt,t); return `<li class="lo">${h>=0?`계체 뒤 ${r1(h)}시간 · ${kg}kg (${sgn(kg-c.weighKg)})`:`계체 전 · ${kg}kg (회복 계산에서 빠져요)`}</li>`; }).join("")}</ul>`:""}
   <label class="f">지금 몸무게</label>${picker("rnow","",...wRange(last?last[1]:c.weighKg),1,"kg")}
   <button class="btn sm" id="radd">기록</button></div>`;
   $("#radd").onclick=()=>{ const v=parseFloat($("#rnow").value); if(!(v>=20&&v<=250)){ toast("몸무게를 확인해 주세요 (20~250kg)."); return; } c.checks.push([nowLocal(),v]); save(); drawRecovery(); };
@@ -1085,7 +1104,7 @@ function renderSettings(){
   <div class="wipe-row"><button class="btn danger" id="wipe">이 폰의 모든 기록 지우기</button></div></div>
   ${ageTips(p)?`<h2>나이대별 확인 (${band(p).id==="m50"?"50세 이상":"35~49세"})</h2><div class="card" style="font-size:15px"><ul class="why">${ageTips(p).map(([t,k])=>`<li class="lo"><span>${t}<small class="src">${AGE_SRC[k]}</small></span></li>`).join("")}</ul></div>`:""}
   <h2 id="crit" tabindex="-1">판단 기준과 출처</h2><div class="card fold-card" style="font-size:15px"><p class="mut" style="margin-top:0">누르면 펼쳐져요.</p>
-  <details class="fold"><summary>컨디션 점수</summary><div>잠·피로·근육통·스트레스를 1~5로 매겨요. 잠은 5가 좋고, 피로·근육통·스트레스는 1이 좋아요(없음·상쾌). 더할 때는 좋은 쪽이 높게 되도록 맞춰서 20점 만점, 높을수록 좋은 컨디션이에요. 7일 이상 쌓이면 내 지난 28일 평균과 비교해요. 평소보다 낮으면 노랑, 평소보다 크게 벗어나면서 4점 이상 낮으면 빨강이에요. 운동선수의 주관적 컨디션 설문 방식을 단순하게 옮겼어요.<small class="src">Hooper & Mackinnon (1995) Sports Medicine 20(5); McLean 등 (2010) 웰니스 설문</small></div></details>
+  <details class="fold"><summary>컨디션 점수</summary><div>잠·피로·근육통·스트레스를 1~5로 매겨요. 잠은 5가 좋고, 피로·근육통·스트레스는 1이 좋아요(없음·상쾌). 더할 때는 좋은 쪽이 높게 되도록 맞춰서 20점 만점, 높을수록 좋은 컨디션이에요. 7일 이상 쌓이면 내 지난 28일 평균과 비교해요. 평소보다 낮으면 노랑, 평소보다 크게 벗어나면서 4점 이상 낮으면 빨강이에요. 기록이 7일보다 적을 때는 8점 이하면 빨강, 11점 이하면 노랑이에요. 운동선수의 주관적 컨디션 설문 방식을 단순하게 옮겼어요.<small class="src">Hooper & Mackinnon (1995) Sports Medicine 20(5); McLean 등 (2010) 웰니스 설문</small></div></details>
   <details class="fold"><summary>훈련량</summary><div>훈련 시간(분) × 힘든 정도(1~10). '세션 RPE'라고 불리는 방법이에요.<small class="src">Foster 등 (2001) J Strength Cond Res 15(1)</small></div></details>
   <details class="fold"><summary>훈련량 급증</summary><div>최근 7일 합이 최근 4주 주평균의 몇 배인지 봐요. 21일 이상 기록이 있어야 계산해요. 이 비율은 부상 예측력에 논란이 있어서 <b>참고 지표</b>로만 써요.<small class="src">Gabbett (2016) Br J Sports Med 50; 비판: Impellizzeri 등 (2020) IJSPP 15(6)</small></div></details>
   <details class="fold"><summary>잠</summary><div>성인 7시간 이상, 청소년 8~10시간 권장 기준에서 1시간 넘게 모자라면 노랑.<small class="src">미국수면의학회(AASM) 권고</small></div></details>
@@ -1364,7 +1383,7 @@ function a11y(root){
   root.querySelectorAll(".chips button,.scale button,.vtools button,[data-scr],.symr").forEach(b=>b.setAttribute("aria-pressed",b.classList.contains("on")?"true":"false"));
   root.querySelectorAll("label.f").forEach(l=>{
     let n=l.nextElementSibling; if(!n) return;
-    const txt=l.textContent.replace(/\s+/g," ").trim();
+    const txt=[...l.childNodes].filter(n=>!(n.classList&&n.classList.contains("dir"))).map(n=>n.textContent).join("").replace(/\s+/g," ").trim();
     if(n.classList.contains("scale")){
       if(!l.id) l.id="lb"+(++_lid); n.setAttribute("role","group"); n.setAttribute("aria-labelledby",l.id);
       const ends=n.nextElementSibling&&n.nextElementSibling.classList.contains("ends")?[...n.nextElementSibling.children].map(x=>x.textContent):null;
