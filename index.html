@@ -247,6 +247,28 @@ label.f .dir{font-size:14px}.stepn{font-size:14px}.symbar span{font-size:14px}bu
 .symbar{min-height:52px;line-height:1.3}
 /* 식단 막대: 0일 때도 빈 막대가 보이게 */
 .track{height:10px;background:#2c2c2c}
+/* ── 루프 v3 (0.1.13): 라운드 2 검증·평가 반영 ── */
+/* Tab으로 옮겨 간 칸이 고정 저장 버튼(56px)·하단 탭 뒤에 숨지 않게 */
+html{scroll-padding-bottom:calc(150px + env(safe-area-inset-bottom))}
+/* 체크인 저장 버튼: 남은 칸 안내도 한 줄(56px). 길면 끝을 말줄임, 전체 글은 버튼 글자 그대로 읽힘 */
+#saveck{height:56px;min-height:56px;padding-top:0;padding-bottom:0;overflow:hidden}
+#saveck .sl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#saveck:disabled{font:700 16px/1.2 Pretendard,-apple-system,sans-serif}
+/* 잠잔 시간·몸무게: 자주 쓰는 값은 한 번에 누르기 (나머지는 아래 목록·직접 입력 그대로) */
+.qv{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin:0 0 8px}
+.qv .chip{min-height:48px;padding:6px 2px;text-align:center;font:italic 800 19px/1.1 var(--cond);color:#cfccc4}
+.qv .chip small{font:600 14px/1.1 Pretendard,sans-serif;font-style:normal;margin-left:1px}
+.qv .chip.on{color:var(--accInk)}
+@media (max-width:374px){ .qv .chip small{display:block;margin:2px 0 0} }
+/* 13px 남은 글자 → 14px 이상 */
+.sig .t,.sym .t{font-size:15px}
+.cap,.stats .cap,.wcard .cap{font-size:14px}
+.vi,.tag2,.vchg{font-size:14px}
+/* 영상 메모: 공백 없는 긴 파일 이름이 ✕ 버튼을 화면 밖으로 밀지 않게 */
+.card .mlab{gap:8px}.card .mlab>b{min-width:0;overflow-wrap:anywhere}
+#vmarks li>span{min-width:0;overflow-wrap:anywhere}
+/* 신호 뒤 '오늘 훈련'은 접기 */
+details.trfold{margin-top:14px}details.trfold summary h2{margin:0}details.trfold>div.card{margin:4px 0 14px;padding:16px;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -325,7 +347,7 @@ function band(p){ const a=ageOf(p);
   return {id:"m50",name:"성인 · 50세 이상",youth:false}; }
 
 /* ───────── 종목 ───────── */
-const APP_VER = "0.1.12";
+const APP_VER = "0.1.13";
 // subs 값: null = 포지션 없음 / [[묶음 이름, [포지션…]], …]
 const SPORTS = {
   "투기": { subs:{ "MMA":null }, weightClass:true }
@@ -477,9 +499,9 @@ function pickOpts(v,lo,hi,step,unit,cus){
     o.map(x=>`<option value="${x}" ${!custom&&x===+v?"selected":""}>${x}${unit}</option>`).join("");
 }
 // 고르기 바로 밑 '직접 입력'을 고르면 아래에 입력칸이 열림
-function picker(id,v,lo,hi,step,unit,ph,open){
+function picker(id,v,lo,hi,step,unit,ph,open,pre=""){
   const custom = open || (v!==""&&v!=null&&!inRange(v,lo,hi,step));
-  return `<div class="pick2"><select id="${id}_s" data-pick="${id}" data-lo="${lo}" data-hi="${hi}" data-st="${step}" data-u="${unit}">${pickOpts(v,lo,hi,step,unit)}</select>
+  return `<div class="pick2">${pre}<select id="${id}_s" data-pick="${id}" data-lo="${lo}" data-hi="${hi}" data-st="${step}" data-u="${unit}">${pickOpts(v,lo,hi,step,unit)}</select>
   <div class="unitbox ${custom?"":"hid"}" id="${id}_box" ${open?'data-open="1"':""}><input id="${id}" type="text" inputmode="decimal" value="${esc(v??"")}" placeholder="${ph||"예: 70.4"}"><span>${unit}</span></div></div>`;
 }
 const wRange = w => { const c=Math.round(+w||70); return [Math.max(25,c-12), Math.min(200,c+12)]; };
@@ -502,9 +524,9 @@ function sleepOpts(v,cus){ const o=[]; for(let x=3;x<=12;x+=0.5) o.push(x);
   const custom = cus || (hasSleep(v)&&!o.some(x=>Math.abs(x-v)<1e-6));
   return `<option value="">고르기</option><option value="__c" ${custom?"selected":""}>직접 입력${custom&&hasSleep(v)?` · ${fmtSleep(v)}`:""}</option>`+
     o.map(x=>`<option value="${x}" ${!custom&&hasSleep(v)&&Math.abs(x-v)<1e-6?"selected":""}>${fmtSleep(x)}</option>`).join(""); }
-function sleepPicker(v){ const [h,m]=hasSleep(v)?hm(v):["",""];
+function sleepPicker(v,pre=""){ const [h,m]=hasSleep(v)?hm(v):["",""];
   const custom = hasSleep(v) && !(v>=3&&v<=12&&Math.abs(v*2-Math.round(v*2))<1e-6);
-  return `<div class="pick2"><select id="sh_s">${sleepOpts(v)}</select>
+  return `<div class="pick2">${pre}<select id="sh_s">${sleepOpts(v)}</select>
   <div class="hmbox ${custom?"":"hid"}" id="sh_box"><input id="sh_h" type="text" inputmode="numeric" maxlength="2" value="${h}" placeholder="0"><span>시간</span>
   <input id="sh_m" type="text" inputmode="numeric" maxlength="2" value="${hasSleep(v)?String(m).padStart(2,"0"):""}" placeholder="00"><span>분</span></div></div>`; }
 function bindSleep(onv){
@@ -728,6 +750,7 @@ function weighCard(p,L){
   return `<div class="wcard"><div class="cap">계체 · ${esc(p.weightClass||"")} ${esc(p.classLimit)}KG</div><b>${esc(w)}<small>kg</small></b>
   <p>${gap>0?`<span class="over">한계보다 ${gap}kg 초과</span>`:`한계까지 여유 ${Math.abs(gap)}kg`}${L&&L.weight?"":" · 최근 기록 기준"}${cutDday()?` · ${cutDday()}`:""}</p></div>`;
 }
+let trOpen=false;   // 신호 뒤 '오늘 훈련' 접기: 한 번 펼치면 다시 그려도 펼친 채로
 function renderToday(){
   paintSig();
   const d=today(), L=S.logs[d], p=S.profile, b=band(p);
@@ -758,9 +781,10 @@ function renderToday(){
     ${bk}${weighCard(p,L)}${ageTipToday(p)}
     <button class="btn ghost neutral" data-go="symptom">증상 체크하기</button>
     ${canRecover(p)?`<button class="btn ghost neutral" data-go="recovery">계체 후 회복 계산기${cutDday()?` · ${cutDday()}`:""}</button>`:""}
-    <h2>오늘 훈련</h2>${trainForm(L,s.lv===2)}
+    <details class="fold trfold" ${trOpen?"open":""}><summary><h2>오늘 훈련</h2></summary>${trainForm(L,s.lv===2)}</details>
     <h2>식단</h2>${dietCard()}`;
     bindTrain(L,d,renderToday,$("#app"));
+    const tf=$(".trfold"); if(tf) tf.ontoggle=()=>{ trOpen=tf.open; };
     $("#editck").onclick=()=>{ draft={...L}; go("edit"); };
     const yf=$("#yfill"); if(yf){ yf.onclick=e=>{ e.preventDefault(); openDay(yd,renderToday); }; $("#yrest").onclick=e=>{ e.preventDefault(); S.logs[yd].rest=true; save(); renderToday(); toast("어제는 쉰 날로 적었어요."); }; }
   }
@@ -774,24 +798,29 @@ const ENDW={sleepQ:["아주 나쁨","나쁨","보통","좋음","아주 좋음"],
 const scoreTxt=(k,v)=>{ if(!(v>=1&&v<=5)) return "-"; const d=shownN(k,v); return `${d}(${ENDW[k][d-1]})`; };
 function scaleHtml(k,v,lo,hi,label){ return `<label class="f">${label} <span class="dir">${REV_K.includes(k)?"1 좋음 → 5 나쁨":"1 나쁨 → 5 좋음"}</span></label><div class="scale">${[1,2,3,4,5].map(d=>{ const n=REV_K.includes(k)?6-d:d; return `<button data-k="${k}" data-n="${n}" class="${v===n?"on":""}">${d}</button>`; }).join("")}</div><div class="ends ${REV_K.includes(k)?"goodL":"goodR"}"><span>${lo}</span><span>${hi}</span></div>`; }
 const PARTS=["목","어깨","팔꿈치·손목","허리","엉덩이","무릎","발목·발","허벅지","종아리","기타"];
+// 자주 쓰는 값 칩: 목록에 있는 값을 한 번에 고르게 함 (고르면 아래 목록도 같은 값으로 바뀜)
+const qvOn=(a,v)=>v!==""&&v!=null&&!isNaN(+v)&&Math.abs(+a-+v)<1e-6;
+function qvHtml(id,vals,v,unit,lab,aria){ return `<div class="qv" data-for="${id}" role="group" aria-label="${lab}">${vals.map(a=>`<button type="button" class="chip ${qvOn(a,v)?"on":""}" data-qv="${a}" aria-pressed="${qvOn(a,v)}" aria-label="${aria(a)}">${a}<small>${unit}</small></button>`).join("")}</div>`; }
+function qvSync(id,v){ document.querySelectorAll(`.qv[data-for="${id}"] [data-qv]`).forEach(b=>{ const on=qvOn(b.dataset.qv,v); b.classList.toggle("on",on); b.setAttribute("aria-pressed",on?"true":"false"); }); }
+function wQuick(){ const [lo,hi]=wRange(curWeight()), c=Math.round(+curWeight()||70); return [c-2,c-1,c,c+1,c+2].filter(a=>a>=lo&&a<=hi); }
 function checkinForm(x){
   return `<div class="card">
-  <label class="f">잠잔 시간</label>${sleepPicker(x.sleepH)}
+  <label class="f">잠잔 시간</label>${sleepPicker(x.sleepH,qvHtml("sh",[6,6.5,7,7.5,8],x.sleepH,"시간","잠잔 시간",fmtSleep))}
   ${scaleHtml("sleepQ",x.sleepQ,"1 아주 나쁨","5 아주 좋음","잠은 어땠나요?")}
   <p class="dirnote">아래 3개는 <b>1이 가장 좋아요</b> (상쾌·없음)</p>
   ${scaleHtml("fatigue",x.fatigue,"1 아주 상쾌","5 아주 피곤","피로는?")}
   ${scaleHtml("soreness",x.soreness,"1 전혀 없음","5 아주 심함","근육통은?")}
   ${scaleHtml("stress",x.stress,"1 전혀 없음","5 아주 심함","스트레스는?")}
   <div class="optsep"></div>
-  <label class="f">아침 몸무게 <span class="mut">(선택 · 최근 ${curWeight()}kg)</span></label>${picker("mw",x.weight,...wRange(curWeight()),1,"kg")}
+  <label class="f">아침 몸무게 <span class="mut">(선택 · 최근 ${curWeight()}kg)</span></label>${picker("mw",x.weight,...wRange(curWeight()),1,"kg",undefined,undefined,qvHtml("mw",wQuick(),x.weight,"kg","아침 몸무게",a=>`${a}kg`))}
   <label class="f">아픈 곳이 있나요?</label>
   <div class="chips">${["없음","약간","중간","심함"].map((v,i)=>`<button class="chip ${x.pain===i?"on":""}" data-pain="${i}">${v}</button>`).join("")}</div>
   ${x.pain>0?`<label class="f">어디가 아픈가요?</label><div class="chips">${PARTS.map(v=>`<button class="chip ${x.painPart===v?"on":""}" data-part="${v}">${v}</button>`).join("")}</div>`:""}
   </div>${saveCkBtn(x)}`;
 }
 function ckMissing(x){ return [[hasSleep(x.sleepH),"잠잔 시간"],[x.sleepQ,"잠의 질"],[x.fatigue,"피로"],[x.soreness,"근육통"],[x.stress,"스트레스"]].filter(a=>!a[0]).map(a=>a[1]); }
-function saveCkBtn(x){ const m=ckMissing(x); return `<button class="btn" id="saveck" ${m.length?"disabled":""}>${m.length?`${m.length}개 남았어요 · ${m.join(", ")}`:"저장하고 신호 보기"}</button>`; }
-function updSaveCk(){ const b=$("#saveck"); if(!b) return; const m=ckMissing(draft); b.disabled=!!m.length; b.textContent=m.length?`${m.length}개 남았어요 · ${m.join(", ")}`:"저장하고 신호 보기";
+function saveCkBtn(x){ const m=ckMissing(x); return `<button class="btn" id="saveck" ${m.length?"disabled":""}><span class="sl">${m.length?`${m.length}개 남았어요 · ${m.join(", ")}`:"저장하고 신호 보기"}</span></button>`; }
+function updSaveCk(){ const b=$("#saveck"); if(!b) return; const m=ckMissing(draft); b.disabled=!!m.length; const t=m.length?`${m.length}개 남았어요 · ${m.join(", ")}`:"저장하고 신호 보기", sp=b.querySelector(".sl"); if(sp) sp.textContent=t; else b.textContent=t;
 }
 function bindCheckin(edit,L){
   const re=()=>{ edit?renderTodayEdit(L):renderToday(); };
@@ -800,8 +829,10 @@ function bindCheckin(edit,L){
     b.parentNode.querySelectorAll("button").forEach(x=>{ const on=x===b; x.classList.toggle("on",on); x.setAttribute("aria-pressed",on?"true":"false"); }); updSaveCk(); });
   document.querySelectorAll("[data-pain]").forEach(b=>b.onclick=()=>{ draft.pain=+b.dataset.pain; if(!draft.pain) draft.painPart=""; re(); });
   document.querySelectorAll("[data-part]").forEach(b=>b.onclick=()=>{ draft.painPart=b.dataset.part; re(); });
-  bindSleep(v=>{ draft.sleepH=v; updSaveCk(); });
-  $("#mw").oninput=e=>{ draft.weight=e.target.value; };
+  bindSleep(v=>{ draft.sleepH=v; updSaveCk(); qvSync("sh",v); });
+  $("#mw").oninput=e=>{ draft.weight=e.target.value; qvSync("mw",draft.weight); };
+  // 칩을 누르면 아래 목록에서 같은 값을 고른 것과 똑같이 처리 (입력칸은 다시 그리지 않음)
+  document.querySelectorAll(".qv [data-qv]").forEach(b=>b.onclick=()=>{ const s=$("#"+b.parentNode.dataset.for+"_s"); if(!s) return; s._kbd=false; s.value=b.dataset.qv; s.dispatchEvent(new Event("change",{bubbles:true})); });
   $("#saveck").onclick=()=>{
     const wv=+draft.weight; if(draft.weight!==""&&draft.weight!=null&&!(wv>=20&&wv<=250)){ const el=$("#mw"); if(el){ const bx=$("#mw_box"); if(bx) bx.classList.remove("hid"); fieldErr(el,"20~250kg 사이로 적어 주세요."); } toast("몸무게를 확인해 주세요 (20~250kg)."); return; }
     if(!(+draft.sleepH>=0&&+draft.sleepH<=24)){ const el=$("#sh_h"); if(el) fieldErr(el,"0~24시간 사이로 적어 주세요."); toast("잠잔 시간을 확인해 주세요 (0~24시간)."); return; }
