@@ -1,0 +1,1183 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="MMA 선수가 되어 계체 주간 7일을 직접 보내 보며 컨디션 신호등을 만든 과정을 보는 포트폴리오. SK AIGEN 지원.">
+<meta name="theme-color" content="#0b0b0b">
+<title>컨디션 신호등 · 선수가 돼 보기</title>
+<link rel="icon" type="image/png" href="__ICON__">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Barlow+Condensed:ital,wght@0,600;0,800;1,800&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>__CSS__</style>
+<style>
+/* ── 선수가 돼 보기 전용 ── */
+html { scroll-padding-top: 118px; }
+.hud { position: fixed; inset: 0 0 auto; z-index: 20; background: #0b0b0b; border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top, 0px); }
+.hud-top { display: flex; align-items: center; gap: 12px; height: 50px; }
+.hud .brand span { font-size: 15px; }
+.hud .stat { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+.hud .stat .k { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+.hud .stat .v { font-family: var(--cond); font-style: italic; font-weight: 800; font-size: 22px; line-height: 1; }
+.hud .lamp-mini { display: inline-flex; gap: 3px; background: #050505; border: 1px solid #333; border-radius: 8px; padding: 3px 5px; }
+.hud .lamp-mini i { width: 10px; height: 10px; border-radius: 50%; background: #262626; }
+.hud .lamp-mini i.on.g { background: var(--g); box-shadow: 0 0 8px var(--g); } .hud .lamp-mini i.on.y { background: var(--y); box-shadow: 0 0 8px var(--y); } .hud .lamp-mini i.on.r { background: var(--r); box-shadow: 0 0 8px var(--r); }
+.hud .grow { flex: 1; }
+.days { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; padding-bottom: 8px; }
+.days::-webkit-scrollbar { display: none; }
+.days a { flex: none; display: flex; flex-direction: column; align-items: center; min-width: 54px; padding: 3px 8px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--card); color: var(--muted); text-decoration: none; font-size: 12px; line-height: 1.25; }
+.days a b { font-family: var(--cond); font-style: italic; font-weight: 800; font-size: 16px; color: var(--ink); }
+.days a.done { border-color: var(--g); } .days a.done b::after { content: " ✓"; color: var(--g); font-style: normal; font-size: 12px; }
+.days a[aria-current="true"] { background: var(--gold); border-color: var(--gold); color: #111; } .days a[aria-current="true"] b { color: #111; }
+.days .sep { flex: none; width: 1px; background: var(--line); margin: 4px 2px; }
+@media (max-width: 640px) { .hud .brand span, .hud .hide-s { display: none; } .hud .stat .v { font-size: 19px; } }
+
+main.play { position: relative; z-index: 1; padding-top: 124px; }
+.ch { min-height: 92vh; display: flex; align-items: center; padding-block: 40px 70px; border-bottom: 1px solid var(--line); }
+.ch-in { width: 100%; max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+.ch h2 { font-size: clamp(30px, 4.4vw, 50px); }
+.dayline { display: flex; flex-wrap: wrap; gap: 10px; align-items: baseline; }
+.dayline .d { font-family: var(--cond); font-style: italic; font-weight: 800; font-size: 44px; line-height: 1; color: var(--gold); }
+.dayline .t { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.situ { font-size: clamp(17px, 1.6vw, 20px); max-width: 62ch; }
+.mission { background: var(--card); border: 1.5px solid var(--gold); border-radius: 16px; padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; position: relative; }
+.mission > .mh { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.mission > .mh b { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; color: var(--gold); }
+.mission > .mh span { font-weight: 700; }
+.mission.ok { border-color: var(--g); }
+.mission.ok > .mh b { color: var(--g); } .mission.ok > .mh b::after { content: " · 완료"; }
+.go-btn { align-self: flex-start; font: inherit; font-weight: 800; font-size: 16px; padding: 11px 22px; border: 0; border-radius: 4px; background: var(--ink); color: #111; cursor: pointer; transform: skewX(-8deg); }
+.go-btn > span { display: inline-block; transform: skewX(8deg); }
+.go-btn:disabled { opacity: .35; cursor: default; }
+.ghost-btn { font: inherit; font-size: 14px; padding: 8px 14px; border: 1.5px solid var(--line); border-radius: 999px; background: none; color: var(--ink); cursor: pointer; }
+.ghost-btn:hover { border-color: var(--gold); }
+.row-btns { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+/* 만든 이야기 */
+.story { border-radius: 16px; background: linear-gradient(180deg, var(--gold-soft), var(--card)); border: 1px solid #3a3224; overflow: hidden; }
+.story > summary { list-style: none; cursor: pointer; padding: 14px 18px; display: flex; gap: 10px; align-items: center; font-weight: 800; }
+.story > summary::-webkit-details-marker { display: none; }
+.story > summary .lock { font-family: var(--mono); font-size: 12px; color: var(--gold); white-space: nowrap; }
+@media (max-width: 640px) { .story > summary { flex-wrap: wrap; gap: 4px 10px; } .story > summary .lock { width: 100%; } .story > summary .hint2 { display: none; } }
+.story > summary .hint2 { margin-left: auto; font-size: 13px; color: var(--muted); font-weight: 500; }
+.story[open] > summary .hint2::after { content: "접기"; } .story:not([open]) > summary .hint2::after { content: "펼치기"; }
+.story .sb { padding: 0 18px 18px; display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.story .sb > div { background: rgba(0,0,0,.3); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
+.story .sb .k { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; color: var(--gold); }
+.story .sb .full { grid-column: 1 / -1; }
+.story.new { animation: pop .8s ease; }
+@keyframes golink { 0%, 60% { outline: 3px solid var(--gold); outline-offset: 6px; } 100% { outline: 3px solid transparent; outline-offset: 6px; } }
+.golink { animation: golink 2.4s ease-out; }
+[id^="go-"] { scroll-margin-top: 140px; }
+@keyframes pop { 0% { transform: scale(.98); box-shadow: 0 0 0 0 rgba(201,169,110,.6); } 60% { box-shadow: 0 0 0 10px rgba(201,169,110,0); } 100% { transform: none; } }
+
+/* 체크인 */
+.ck { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) { .ck { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); } }
+.result { min-height: 180px; }
+.result .placeholder { color: var(--muted); font-size: 15px; display: grid; place-items: center; height: 100%; min-height: 160px; text-align: center; border: 1.5px dashed var(--line); border-radius: 12px; padding: 16px; }
+
+/* 퀴즈 */
+.facts { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.facts > div { background: var(--card2); border-radius: 10px; padding: 10px 12px; }
+.facts .k { font-size: 12px; color: var(--muted); } .facts .v { font-weight: 800; font-size: 18px; }
+.quiz { display: flex; gap: 10px; flex-wrap: wrap; }
+.quiz button { flex: 1; min-width: 100px; font: inherit; font-weight: 800; font-size: 18px; padding: 14px; border-radius: 12px; border: 2px solid var(--line); background: var(--card2); color: var(--ink); cursor: pointer; }
+.quiz button[data-c="g"] { border-color: var(--g); color: var(--g); } .quiz button[data-c="y"] { border-color: var(--y); color: var(--y); } .quiz button[data-c="r"] { border-color: var(--r); color: var(--r); }
+.quiz button.pick { background: currentColor; } .quiz button.pick span { color: #111; }
+
+/* 훈련량 */
+.load-bars { display: flex; gap: 10px; align-items: flex-end; height: 160px; border-bottom: 1px solid var(--line); padding-bottom: 2px; }
+.load-bars > div { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; height: 100%; }
+.load-bars i { display: block; width: 70%; max-width: 70px; background: var(--card2); border: 1.5px solid var(--line); border-radius: 6px 6px 0 0; transition: height .4s; }
+.load-bars .now i { background: var(--gold-soft); border-color: var(--gold); }
+.load-bars .now.warn i { background: var(--y-soft); border-color: var(--y); } .load-bars .now.bad i { background: var(--r-soft); border-color: var(--r); }
+.load-bars span { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.load-bars b { font-family: var(--mono); font-size: 12px; }
+
+/* 식단 */
+.foods { display: flex; flex-wrap: wrap; gap: 8px; }
+.foods button { font: inherit; font-size: 14px; padding: 8px 12px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--card2); color: var(--ink); cursor: pointer; text-align: left; line-height: 1.3; }
+.foods button small { display: block; color: var(--muted); font-size: 12px; }
+.foods button[aria-pressed="true"] { border-color: var(--gold); background: var(--gold-soft); }
+.meter { display: flex; flex-direction: column; gap: 4px; }
+.meter .mt { display: flex; justify-content: space-between; font-size: 14px; }
+.meter .tr { position: relative; height: 14px; background: var(--card2); border-radius: 7px; overflow: hidden; }
+.meter .tr i { position: absolute; inset: 0 auto 0 0; background: var(--gold); border-radius: 7px; transition: width .35s; }
+.meter .tr .band { position: absolute; top: 0; bottom: 0; background: rgba(62,201,126,.18); border-left: 2px solid var(--g); border-right: 2px solid var(--g); }
+.verdict { font-weight: 800; }
+
+/* 증상 */
+.syms { display: flex; flex-direction: column; gap: 6px; }
+.syms label { display: flex; gap: 10px; align-items: flex-start; padding: 9px 12px; border-radius: 10px; background: var(--card2); cursor: pointer; font-size: 15px; }
+.syms label small { color: var(--muted); font-family: var(--mono); font-size: 11px; margin-left: auto; white-space: nowrap; }
+.syms input { margin-top: 4px; accent-color: var(--gold); width: 18px; height: 18px; flex: none; }
+.triage { border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 6px; }
+.triage.l2 { background: var(--r-soft); border: 2px solid var(--r); } .triage.l1 { background: var(--y-soft); border: 2px solid var(--y); } .triage.l0 { background: var(--g-soft); border: 2px solid var(--g); }
+.triage b { font-family: var(--display); font-weight: 400; font-size: 26px; }
+.triage.l2 b { color: var(--r); } .triage.l1 b { color: var(--y); } .triage.l0 b { color: var(--g); }
+
+/* 계체 */
+.scale { display: flex; flex-direction: column; align-items: center; gap: 6px; background: #050505; border: 2px solid #333; border-radius: 22px; padding: 18px 24px; width: 100%; max-width: 300px; }
+.scale .num { font-family: var(--cond); font-style: italic; font-weight: 800; font-size: 64px; line-height: 1; letter-spacing: -1px; }
+.scale .lim { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.scale.pass .num { color: var(--g); }
+.glasses { display: flex; flex-wrap: wrap; gap: 6px; }
+.glasses button { width: 34px; height: 44px; border: 2px solid #4a4a4a; border-top: 0; border-radius: 0 0 8px 8px; background: linear-gradient(to top, #3a86ff var(--f, 0%), transparent var(--f, 0%)); cursor: pointer; padding: 0; }
+.glasses button.full { --f: 85%; border-color: #6fa8ff; }
+
+/* 영상 */
+.vids { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.vids figure { margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.vids canvas { width: 100%; aspect-ratio: 3 / 4; background: #121212; border-radius: 12px; border: 1px solid var(--line); display: block; }
+.vids figcaption { font-family: var(--mono); font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
+.vctl { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.vctl button { font: inherit; font-size: 14px; padding: 7px 12px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--card2); color: var(--ink); cursor: pointer; }
+.vctl button[aria-pressed="true"] { border-color: var(--gold); color: var(--gold); }
+.sync { display: grid; grid-template-columns: 7em minmax(0, 1fr) 5em; gap: 10px; align-items: center; font-size: 15px; }
+.sync input { accent-color: var(--gold); width: 100%; }
+.sync output { font-family: var(--mono); font-size: 14px; text-align: right; }
+
+/* 체험 휴대폰 모달 */
+.fab { position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); z-index: 25; font: inherit; font-weight: 800; padding: 12px 18px; border-radius: 999px; border: 0; background: var(--gold); color: #111; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,.5); }
+.modal { position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.72); display: grid; place-items: center; padding: 12px; }
+.modal-card { display: flex; flex-direction: column; align-items: center; gap: 8px; max-height: 100%; }
+.modal-card .close { align-self: flex-end; font: inherit; border: 0; background: var(--ink); color: #111; border-radius: 999px; padding: 6px 14px; cursor: pointer; font-weight: 700; }
+.modal .screen-area { height: min(640px, calc(100vh - 230px)); min-height: 360px; max-height: none; }
+
+/* 에필로그 */
+.epi .sec-h { display: flex; flex-direction: column; gap: 8px; }
+.tl { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--line); margin-left: 8px; }
+.tl li { position: relative; padding: 2px 0 14px 22px; }
+.tl li::before { content: ""; position: absolute; left: -7px; top: 8px; width: 12px; height: 12px; border-radius: 50%; background: var(--card2); border: 2px solid var(--gold); }
+.tl li.find::before { background: var(--y); border-color: var(--y); } .tl li.field::before { background: var(--g); border-color: var(--g); }
+.tl .when { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.tl .what { font-weight: 700; } .tl .ver { font-family: var(--mono); font-size: 12px; color: var(--gold); margin-left: 6px; }
+.tl p { font-size: 14px; color: var(--muted); }
+details.qa { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 0 18px; }
+details.qa + details.qa { margin-top: 8px; }
+.qa-all { margin: 4px 0 12px; }
+body.print .qa-all { display: none; }
+details.qa summary { cursor: pointer; padding: 13px 0; font-weight: 700; list-style: none; display: flex; gap: 10px; }
+details.qa summary::before { content: "Q"; font-family: var(--mono); color: var(--gold); }
+details.qa[open] summary { border-bottom: 1px solid var(--line); }
+details.qa div { padding: 12px 0 16px; }
+.search { width: 100%; max-width: 320px; font: inherit; font-size: 15px; padding: 8px 12px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); }
+.kv { display: grid; grid-template-columns: minmax(7em, 11em) minmax(0, 1fr); gap: 8px 16px; }
+.kv dt { color: var(--muted); font-size: 14px; } .kv dd { margin: 0; }
+.prolog h1 { font-size: clamp(38px, 5.2vw, 72px); } .prolog h1 em { font-style: normal; color: var(--gold); }
+.card-player { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px 18px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; max-width: 520px; }
+.card-player .ava { width: 64px; height: 64px; border-radius: 14px; background: var(--gold); color: #111; display: grid; place-items: center; font-family: var(--display); font-size: 26px; transform: skewX(-6deg); }
+.card-player dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 14px; }
+.card-player dt { color: var(--muted); } .card-player dd { margin: 0; font-weight: 700; }
+body.print .fab, body.print .modal { display: none !important; }
+body.print .ch { min-height: 0; }
+.printonly { display: none; }
+body.print .printonly { display: block; }
+body.print .navhint, body.print [data-app], body.print .row-btns:has(> [data-app]:only-child) { display: none !important; }
+@media print { .dayline, .ch h2 { break-after: avoid; } .story .sb > div, .mission { break-inside: avoid; } }
+/* ── 루프 v2 ── */
+.skip { position: absolute; left: -9999px; top: 8px; z-index: 60; background: var(--gold); color: #111; padding: 8px 14px; border-radius: 8px; font-weight: 800; }
+.skip:focus { left: 12px; }
+.src { font-size: 13px; color: #b3ada3; }
+.tag, .eyebrow { letter-spacing: .02em; }
+.days { -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); padding-right: 40px; }
+main.play { padding-bottom: 110px; }
+.quiz button.wrong { opacity: .5; }
+.quiz button.wrong span::after { content: " ✕"; }
+.quiz button.right { box-shadow: 0 0 0 3px currentColor; }
+.quiz button.right span::after { content: " · 정답"; }
+.quiz button.pick.right span, .quiz button.pick.right span::after { color: #111; }
+.meter .tr .band { background: rgba(62,201,126,.35); }
+.vids canvas { height: min(46vh, 420px); width: auto; max-width: 100%; margin: 0 auto; }
+.retro ul { margin: 4px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.retro ul + span { display: block; margin-top: 14px; }
+.modal { background: rgba(0,0,0,.92); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); overflow: auto; place-items: start center; padding: max(12px, env(safe-area-inset-top)) 12px 24px; }
+.modal-card { max-height: none; }
+.modal .screen-area { height: min(640px, calc(100dvh - 300px)); min-height: 240px; }
+.ch .sat { align-items: center; }
+@media (max-width: 640px) {
+  .fab { width: 56px; height: 56px; padding: 0; font-size: 24px; border-radius: 50%; display: grid; place-items: center; }
+  .fab .fab-t { display: none; }
+  .brow { grid-template-columns: minmax(0, 1fr) auto; row-gap: 4px; }
+  .brow > span:first-child { grid-column: 1; } .brow .n { grid-column: 2; grid-row: 1; }
+  .brow .btrack { grid-column: 1 / -1; grid-row: 2; }
+  #e4 .table-box table, #e4 .table-box tbody, #e4 .table-box tr, #e4 .table-box td { display: block; min-width: 0; width: 100%; }
+  #e4 .table-box thead { display: none; }
+  #e4 .table-box tr { padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  #e4 .table-box td { border: 0; padding: 2px 0; }
+  #e4 .table-box td:first-child { font-weight: 800; }
+  #e4 .table-box td:last-child { font-size: 13px; }
+  .card-player .ava { width: 52px; height: 52px; font-size: 20px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } html { scroll-behavior: auto !important; } }
+/* ── 루프 v3 ── */
+.vids canvas { height: auto; aspect-ratio: 3 / 4; width: min(100%, calc(min(40vh, 320px) * 3 / 4)); }
+.vids figcaption { justify-content: center; gap: 8px; }
+summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.story > summary:focus-visible { outline-offset: -3px; }
+.hud .stat .k { font-size: 12px; }
+.story .sb .k { font-size: 13px; font-weight: 800; letter-spacing: .02em; }
+.days a { font-size: 13px; }
+.mission > .mh b { font-size: 13px; }
+.load-bars span, .load-bars b { font-size: 13px; }
+.story[data-s="5"] .sb { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.loopnote { font-size: 13px; color: #b3ada3; margin: -2px 0 6px; }
+.fab { transition: opacity .25s, transform .25s; }
+.fab.dim { opacity: .2; transform: scale(.85); pointer-events: none; }
+@media (pointer: coarse) { .fab.dim { visibility: hidden; } }
+.segrow .dir { display: block; font-size: 12px; color: var(--mut); font-weight: 500; white-space: nowrap; }
+@media (max-width: 640px) {
+  .kv { grid-template-columns: 1fr; gap: 2px; }
+  .kv dd { margin-bottom: 10px; }
+  :is(#e2) .table-box table, :is(#e2) .table-box tbody, :is(#e2) .table-box tr, :is(#e2) .table-box td { display: block; min-width: 0; width: 100%; }
+  #e2 .table-box thead { display: none; }
+  #e2 .table-box tr { padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  #e2 .table-box td { border: 0; padding: 2px 0; }
+  #e2 .table-box td:first-child { font-weight: 800; }
+  .glasses button { width: 30px; height: 40px; }
+  .glasses { gap: 5px; }
+  .modal .screen-area { height: calc(100dvh - 210px); min-height: 300px; }
+  .modal .scen { gap: 4px; } .modal .scen button { font-size: 12px; padding: 3px 9px; }
+  .modal .device { padding: 8px 6px 4px; border-radius: 30px; } .modal .screen-area { border-radius: 22px; }
+  .modal .phone-hint { min-height: 0; font-size: 12px; }
+}
+
+/* ── v4 (3라운드 지적 반영) ── */
+.story > summary .lock, .facts .k, .tl .when, .tl .ver, .foods button small { font-size: 13px; }
+.foods button small { color: #b3ada3; }
+.load-bars { position: relative; }
+.load-bars i { background: #3a3a3a; }
+.load-bars .avgline { position: absolute; left: 0; right: 0; height: 0 !important; display: block !important; border-top: 2px dashed var(--g); pointer-events: none; }
+.load-bars .avgline span { position: absolute; right: 0; top: 4px; background: var(--card); padding: 0 4px; font-family: var(--mono); font-size: 12px; color: var(--g); }
+.load-bars .now.pending i { background: transparent; border-style: dashed; }
+.fab { opacity: .9; }
+@media (max-width: 640px) {
+  .story > summary .hint2 { display: inline; margin-left: auto; }
+  .story > summary .lock { width: auto; flex: 1; }
+  .story > summary .hint2::after { content: "▾" !important; }
+  .story[open] > summary .hint2::after { content: "▴" !important; }
+  .fab { width: 46px; height: 46px; font-size: 20px; opacity: .85; }
+  .toggles button, .seg button, .vctl button, .ghost-btn { min-height: 44px; }
+  .brand { padding: 9px 0; }
+  #e5 .qr-card { display: none; }
+}
+@media (max-width: 360px) {
+  .hud-top { gap: 8px; }
+  .hud .stat .k.long { display: none; }
+  .glasses button { width: 26px; height: 36px; } .glasses { gap: 4px; }
+}
+@media (max-height: 500px) {
+  .modal .screen-area { height: calc(100dvh - 175px); min-height: 150px; }
+  .modal .navbar { padding: 2px 6px 0; } .modal .navbar button { flex-direction: row; gap: 6px; padding: 2px 12px; } .modal .device { padding: 6px 6px 2px; } .modal-card { gap: 4px; } .modal .close { padding: 3px 12px; }
+  .modal .scen { flex-wrap: nowrap; overflow-x: auto; max-width: 100%; justify-content: flex-start; }
+  .modal .phone-hint { display: none; }
+}
+.vids canvas { width: min(100%, calc(max(200px, min(40vh, 320px)) * 3 / 4)); }
+
+/* ── v5 (4라운드 지적 반영) ── */
+.load-bars { height: auto; align-items: stretch; }
+.load-bars > div { height: auto; justify-content: flex-start; }
+.load-bars .pl { position: relative; height: 110px; width: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.load-bars i { flex-shrink: 0; }
+.load-bars .now i { background: rgba(201,169,110,.45); }
+.load-bars .pl .avg { position: absolute; left: -6px; right: -6px; border-top: 2px dashed var(--g); pointer-events: none; }
+.load-bars span { white-space: nowrap; }
+.lb-legend { font-size: 13px; color: var(--g); display: flex; align-items: center; gap: 6px; }
+.lb-legend::before { content: ""; width: 22px; border-top: 2px dashed var(--g); }
+.hud .stat .k, .scale .lim, .chip, .vids figcaption { font-size: 13px; }
+.foods button[aria-pressed="true"]::before { content: "✓ "; color: var(--gold); font-weight: 800; }
+.syncrow { display: flex; gap: 6px; align-items: center; }
+.syncrow button { font: inherit; font-size: 14px; min-width: 44px; min-height: 40px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--card2); color: var(--ink); cursor: pointer; }
+.glasses button { position: relative; }
+.glasses button::after { content: ""; position: absolute; inset: -4px -2px; }
+.finish { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; background: var(--g-soft); border: 2px solid var(--g); border-radius: 14px; padding: 14px 18px; font-weight: 800; }
+.finish a { color: #111; background: var(--g); padding: 8px 16px; border-radius: 999px; text-decoration: none; }
+
+/* ── v6 (5라운드 지적 반영) ── */
+.card-player .ava { width: auto !important; min-width: 64px; font-size: 20px !important; padding: 0 12px; letter-spacing: -.02em; }
+@media (max-width: 640px) { .card-player .ava { min-width: 52px; font-size: 16px !important; padding: 0 9px; } }
+.load-bars > div:first-child .avg { left: 0; } .load-bars > div:last-child .avg { right: 0; }
+.speed { display: inline-flex; gap: 6px; align-items: center; }
+.toast { position: fixed; left: 50%; top: calc(124px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); width: max-content; white-space: nowrap; z-index: 30; display: flex; gap: 10px; align-items: center; background: var(--g); color: #111; font-weight: 800; padding: 10px 12px 10px 18px; border-radius: 999px; box-shadow: 0 10px 30px rgba(0,0,0,.6); max-width: calc(100vw - 24px); }
+.toast a { color: #111; background: rgba(255,255,255,.55); padding: 6px 12px; border-radius: 999px; text-decoration: none; white-space: nowrap; }
+.toast button { font: inherit; border: 0; background: none; color: #111; font-size: 18px; cursor: pointer; padding: 4px 8px; }
+@media (max-width: 640px) { .card.ck { padding-bottom: 60px; } }
+@media (max-width: 360px) { .segrow { grid-template-columns: 1fr !important; row-gap: 4px; } }
+@media (max-width: 640px) {
+  .ctl label, .sync { grid-template-columns: minmax(0, 1fr) auto !important; row-gap: 4px; }
+  .ctl label input, .sync .syncrow { grid-column: 1 / -1; grid-row: 2; }
+  .ctl label output, .sync output { grid-column: 2; grid-row: 1; }
+  .foods { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .foods button { padding: 6px 8px; font-size: 13px; }
+  .mission { padding-bottom: 60px; }
+}
+@media (pointer: coarse) {
+  .toggles button, .seg button, .vctl button, .ghost-btn { min-height: 44px; }
+  #e5 .qr-card { display: none; }
+  .fab { width: 46px; height: 46px; padding: 0; font-size: 20px; border-radius: 50%; display: grid; place-items: center; opacity: .85; }
+  .fab .fab-t { display: none; }
+}
+
+/* ── 개선 루프 11-07 v2 (첫 화면·탭 라벨·글자 14px·터치 44px·상단 띠 축소) ── */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+:root { --hud: 96px; }
+html { scroll-padding-top: calc(var(--hud) + 14px); }
+main.play { padding-top: calc(var(--hud) + 18px); }
+.toast { top: calc(var(--hud) + 8px + env(safe-area-inset-top, 0px)); }
+/* 상단 띠: 한국어를 크게, 영어 라벨은 작게 옆에 */
+.hud-top { height: 46px; }
+.brand { min-width: 44px; min-height: 44px; }
+.days { padding-bottom: 5px; }
+.days a { flex-direction: row; align-items: center; gap: 6px; min-height: 44px; padding: 0 11px; font-size: 14px; line-height: 1.2; }
+.days a b { font-family: var(--body); font-style: normal; font-size: 17px; }
+.days a span { font-family: var(--mono); font-size: 14px; letter-spacing: .02em; white-space: nowrap; }
+.days a.done b::after { font-size: 14px; }
+.hud.at-start .stat:not(:last-child) { visibility: hidden; }
+/* 프롤로그: 누가·무엇을·왜가 첫 화면에 */
+.prolog .eyebrow { font-family: var(--body); font-weight: 700; font-size: 15px; color: var(--ink); letter-spacing: .01em; }
+.prolog .ch-in { gap: 18px; }
+.prolog { align-items: flex-start; padding-top: 24px; }
+.prolog .p0-btns { order: 1; } .prolog .p0-map { order: 2; } .prolog .navhint { order: 3; margin-top: -6px; } .prolog .p0-split { order: 4; } .prolog .printonly { order: 5; }
+.p0-map { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+.chiptoc { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.chiptoc a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 999px; background: var(--card); border: 1.5px solid var(--line); color: var(--ink); text-decoration: none; font-size: 15px; font-weight: 700; }
+.chiptoc a:hover { border-color: var(--gold); color: var(--gold); }
+.chiptoc i { font-style: normal; color: var(--muted); font-size: 14px; }
+body.print #storyAll { display: none; }
+/* 글자 14px 이상 (보조 글자·라벨·점수 방향) */
+.eyebrow, .tag, .src, .note, .loopnote, .lb-legend, .dayline .t, .mission > .mh b, .story .sb .k, .story > summary .lock, .story > summary .hint2,
+.facts .k, .load-bars span, .load-bars b, .foods button small, .scale .lim, .chip, .vids figcaption, .tl .when, .tl .ver, .tl p,
+.hud .stat .k, .stats .cap, th, .mock .chips2 span, .load-bars .avgline span, .syms label small, .glasses + .note { font-size: 14px; }
+.segrow .dir { font-size: 14px; color: var(--ink); font-weight: 600; }
+.card-player dl { font-size: 15px; }
+/* 터치 44px: 점수 버튼·토글·슬라이더·체크박스·물잔 */
+.seg button, .toggles button, .vctl button, .ghost-btn, .syncrow button, .search { min-height: 44px; }
+.ghost-btn { display: inline-flex; align-items: center; }
+input[type=range] { height: 44px; margin: 0; }
+.syms label { align-items: center; padding: 4px 12px 4px 4px; }
+.syms input { appearance: none; -webkit-appearance: none; width: 44px; height: 44px; margin: 0; flex: none; border-radius: 0; cursor: pointer;
+  background: transparent; box-shadow: inset 0 0 0 11px var(--card2), inset 0 0 0 13px var(--muted); }
+.syms input:checked { background: var(--gold) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='%23111' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 14px no-repeat; box-shadow: inset 0 0 0 11px var(--card2), inset 0 0 0 13px var(--gold); }
+.syms input:focus-visible { outline: 3px solid var(--gold); outline-offset: -6px; }
+.glasses { gap: 6px; }
+.glasses button { width: 44px; height: 52px; }
+.glasses button::after { inset: 0; }
+.toast button { min-width: 44px; min-height: 44px; }
+.finish a { display: inline-flex; align-items: center; min-height: 44px; }
+@media (pointer: coarse) { .fab { width: 52px; height: 52px; } }
+@media (max-width: 640px) {
+  :root { --hud: 84px; }
+  .hud-top { height: 36px; gap: 10px; }
+  .hud .stat .v { font-size: 18px; }
+  .days { padding-bottom: 3px; }
+  .seg { gap: 2px; }
+  .days a { padding: 0 9px; }
+  .glasses { display: grid; grid-template-columns: repeat(4, 44px); gap: 8px; }
+  .glasses button { width: 44px; height: 52px; }
+  .foods button { font-size: 14px; }
+  #e4 .table-box td:last-child { font-size: 14px; }
+  .modal .phone-hint { font-size: 14px; }
+  .fab { width: 52px; height: 52px; }
+  /* 폰 첫 화면: 제목·소개·버튼 바로 아래에 선수 카드와 계기, 목차는 그 뒤 */
+  .prolog { padding-top: 10px; }
+  .prolog .ch-in { gap: 12px; }
+  .prolog h1 { font-size: 30px; line-height: 1.15; }
+  .prolog .situ { font-size: 16px; line-height: 1.6; }
+  .prolog .p0-btns { order: 1; } .prolog .p0-split { order: 2; } .prolog .p0-map { order: 3; } .prolog .navhint { order: 4; margin-top: 0; } .prolog .printonly { order: 5; }
+  .p0-btns .go-btn { font-size: 15px; padding: 10px 16px; }
+  .p0-split { gap: 12px; }
+  .p0-split .stack { gap: 8px; }
+  .card-player { padding: 10px 12px; gap: 8px 12px; }
+  .card-player dl { line-height: 1.45; }
+}
+@media (max-width: 360px) { .hud-top { gap: 6px; } }
+
+@media print { .hud, .fab { display: none; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#d1">본문(월요일 미션)으로 건너뛰기</a>
+<a class="skip" href="#story1" id="skipStory">만든 이야기로 건너뛰기</a>
+<header class="hud">
+  <div class="hud-top gutter">
+    <a class="brand" href="#p0"><img src="__ICON__" alt="" width="26" height="26"><span>컨디션 신호등</span></a>
+    <div class="stat" title="예시 선수의 오늘 아침 몸무게"><span class="k">몸무게</span><span class="v" id="hudW">—</span></div>
+    <div class="stat hide-s" title="라이트급 한계"><span class="k">한계</span><span class="v">70.3</span></div>
+    <div class="stat" title="오늘 신호"><span class="k">신호</span><span class="lamp-mini" id="hudL"><i class="r"></i><i class="y"></i><i class="g"></i></span></div>
+    <span class="grow"></span>
+    <div class="stat" title="펼쳐 본 '만든 이야기'"><span class="k long">펼친 이야기</span><span class="v" id="hudS">0/7</span></div>
+  </div>
+  <nav class="days gutter" id="days" aria-label="날짜"></nav>
+</header>
+
+<main class="play gutter">
+
+  <section class="ch prolog" id="p0" data-day="시작" data-label="START">
+    <div class="ch-in">
+      <span class="eyebrow">SK AIGEN 지원 포트폴리오 · 유경군 · 컨디션 신호등</span>
+      <h1>이번 주는 당신이<br><em>계체를 앞둔 선수</em>입니다</h1>
+      <p class="situ">선수가 아침마다 몸 상태를 넣으면 오늘 훈련 강도를 초록·노랑·빨강 신호와 그 이유로 보여 주는 웹앱 '컨디션 신호등'을 만들었습니다. 설명을 읽는 대신 일주일을 직접 보내 보세요. 하루를 마칠 때마다 그 기능을 <b>왜, 어떻게 만들었는지</b>가 열립니다.</p>
+      <div class="row-btns p0-btns"><a class="go-btn" href="#d1" style="text-decoration:none"><span>월요일 아침으로 →</span></a><a class="ghost-btn" href="#e5" style="text-decoration:none">결과부터 보기</a><a class="ghost-btn" href="https://rkun231.github.io/condition-light-mma/" target="_blank" rel="noopener" style="text-decoration:none">실제 앱 ↗</a></div>
+      <div class="p0-map">
+        <nav class="chiptoc" aria-label="장면 목차"><a href="#d1">월~일</a><i aria-hidden="true">→</i><a href="#e1">현장</a><i aria-hidden="true">→</i><a href="#e2">결정</a><i aria-hidden="true">→</i><a href="#e3">흐름</a><i aria-hidden="true">→</i><a href="#e4">근거</a><i aria-hidden="true">→</i><a href="#e5">회고</a></nav>
+        <button type="button" class="ghost-btn" id="storyAll" aria-expanded="false">만든 이야기 모두 펼치기</button>
+      </div>
+      <div class="split p0-split">
+        <div class="card-player">
+          <div class="ava">MMA</div>
+          <dl><dt>체급</dt><dd>라이트급 · 한계 70.3kg</dd><dt>평소 체중</dt><dd>75.5kg</dd><dt>일정</dt><dd>토요일 아침 계체 → 일요일 저녁 경기</dd><dt>사용자</dt><dd>예시 선수 (실존 인물 아님)</dd></dl>
+        </div>
+        <div class="stack">
+          <p class="muted">이 앱을 시작한 계기는 세 가지였습니다.</p>
+          <ul class="why">
+            <li class="l0" style="color:var(--ink)">아마추어 풋살 팀을 운영하며 코치를 맡았을 때, 경기 영상을 찍어 장면을 되짚어 가며 설명해 주고 싶었는데 마땅한 방법이 없었습니다.</li>
+            <li class="l0" style="color:var(--ink)">10년 넘게 MMA를 챙겨 보면서 계체 실패와 무리한 수분 감량 이야기를 계속 접했습니다.</li>
+            <li class="l0" style="color:var(--ink)">유소년 선수들이 훈련량과 몸을 스스로 관리하도록 돕는 일도 언젠가 풀어 보고 싶었습니다.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="note navhint">어느 날짜든 위쪽에서 바로 갈 수 있어요. 미션을 하지 않아도 '만든 이야기'는 눌러서 펼칠 수 있어요. 오른쪽 아래 <b>📱 실제 앱</b> 버튼은 진짜 앱을 그날 상황으로 띄웁니다.</p>
+      <p class="note printonly">직접 눌러 보기: rkun231.github.io/condition-light-mma/portfolio/ (QR 코드는 마지막 쪽에 있어요)</p>
+    </div>
+  </section>
+
+  <!-- 월 -->
+  <section class="ch" id="d1" data-day="월" data-label="D-6" data-w="73.8" data-scene="before">
+    <div class="ch-in">
+      <div class="dayline"><span class="d">D-6 · 월</span><span class="t">07:10 · 아침</span></div>
+      <h2>눈 뜨자마자 30초 체크인</h2>
+      <p class="situ">어젯밤 스파링이 길었습니다. 몸이 어떤지 감으로 말고, 기록으로 판단해 보세요.</p>
+      <div class="mission" id="m1">
+        <div class="mh"><b>MISSION 1</b><span>칸을 모두 채우고 오늘 신호 받기</span></div>
+        <div class="ck">
+          <div class="ctl" id="ck1"></div>
+          <div class="result" id="ck1out" aria-live="polite"><div class="placeholder">칸을 모두 채우고 '신호 받기'를 누르면<br>신호와 이유가 여기 나와요</div></div>
+        </div>
+        <div class="row-btns"><button class="go-btn" id="ck1go"><span>신호 받기</span></button><button class="ghost-btn" data-app="before">실제 앱에서 체크인 →</button></div>
+      </div>
+      <details class="story" data-s="1" id="story1"><summary><span class="lock">만든 이야기 1</span>남이 아니라 '어제의 나'와 비교하기<span class="hint2"></span></summary>
+        <div class="sb">
+          <div><span class="k">과제정의</span>만들기 전에 이미 있는 앱부터 찾아보았는데요. 컨디션 기록, 증상, 영상, 감량을 한곳에서 다루는 앱은 찾지 못했습니다. 감량은 Fighter Cut이 가장 가까웠으나 영어만 지원하며, 유료 앱이었습니다. 제가 만든 앱은 계산 공식과 출처를 공개하며 한국어를 지원한다는 점에서 차별화를 두었습니다.</div>
+          <div><span class="k">해결</span>잠·피로·근육통·스트레스 1~5점은 Hooper &amp; Mackinnon(1995) 설문을 따랐는데요. 기록이 7일 이상 쌓이면 지난 28일 '나의 평소' 기록과 비교하고, 그 전에는 절대 점수로 측정됩니다. (사람마다 느끼는 정도가 다르기에 이렇게 설정했습니다.)</div>
+          <div><span class="k">원칙</span>화면에 항상 "참고 신호예요. 진단이 아니에요."를 붙이고 어떤 기준으로 그 신호가 나왔는지 줄마다 적었습니다.</div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- 화 -->
+  <section class="ch" id="d2" data-day="화" data-label="D-5" data-w="73.4" data-scene="good">
+    <div class="ch-in">
+      <div class="dayline"><span class="d">D-5 · 화</span><span class="t">20:30 · 훈련 끝</span></div>
+      <h2>오늘 얼마나 했는지 숫자로 남기기</h2>
+      <p class="situ">계체 주간인데 코치가 마지막으로 강하게 하자고 합니다. 훈련 시간과 힘든 정도를 넣어 이번 주 훈련량이 평소와 비교해 어떤지 보세요.</p>
+      <div class="mission" id="m2">
+        <div class="mh"><b>MISSION 2</b><span>훈련을 기록하고, 이번 주 훈련량이 평소의 몇 배인지 보기</span></div>
+        <div class="ck">
+          <div class="ctl">
+            <label>훈련 시간<input type="range" id="tMin" min="0" max="240" step="10" value="120"><output id="tMinO"></output></label>
+            <label>힘든 정도<input type="range" id="tRpe" min="1" max="10" step="1" value="8"><output id="tRpeO"></output></label>
+            <p class="src">훈련량 = 시간(분) × 힘든 정도(1~10). Foster 등 (2001) 세션 RPE. 이번 주 월요일은 90분 × 6으로 이미 기록돼 있어요.</p>
+          </div>
+          <div class="stack">
+            <div class="load-bars" id="loadBars"></div>
+            <div class="lb-legend" id="lbLegend"></div>
+            <div id="loadOut" class="note"></div>
+          </div>
+        </div>
+        <div class="row-btns"><button class="go-btn" id="t2go"><span>기록하기</span></button></div>
+      </div>
+      <details class="story" data-s="2"><summary><span class="lock">만든 이야기 2</span>갑자기 많이 하면 다칠 가능성이 높아집니다<span class="hint2"></span></summary>
+        <div class="sb">
+          <div><span class="k">근거</span>이번 주 훈련량이 지난 4주 평균보다 갑자기 많이 늘면 부상 위험이 커진다는 연구(Gabbett, 2016)가 있어서, 이 비율을 앱에 넣었습니다.</div>
+          <div><span class="k">판단</span>다만 이 계산 방식에 통계적인 문제가 있다는 반론(Impellizzeri 등, 2020)도 있었는데요. 그래서 신호를 정하는 주된 기준이 아니라 '참고 지표'로만 보여 주고, 기록이 21일 이상 쌓였을 때만 계산하도록 했습니다.</div>
+          <div><span class="k">나이</span>35세 이상은 회복이 느려질 수 있어 1.3배가 아니라 1.2배부터 노란색으로 보여 줍니다. 나이대별 확인 문항도 따로 넣었습니다.</div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- 수 -->
+  <section class="ch" id="d3" data-day="수" data-label="D-4" data-w="72.2" data-scene="bad">
+    <div class="ch-in">
+      <div class="dayline"><span class="d">D-4 · 수</span><span class="t">06:50 · 아침</span></div>
+      <h2>오늘은 몸이 이상합니다</h2>
+      <p class="situ">잠을 설쳤고, 무릎이 욱신거립니다. 체크인을 하기 전에 먼저 맞혀 보세요. 앱은 무슨 색을 보여 줄까요?</p>
+      <div class="mission" id="m3">
+        <div class="mh"><b>MISSION 3</b><span>오늘 신호 맞히기</span></div>
+        <div class="facts">
+          <div><div class="k">잠잔 시간</div><div class="v">5시간</div></div>
+          <div><div class="k">잠의 질 · 피로 · 근육통 · 스트레스</div><div class="v">2 · 4 · 4 · 4</div><div class="k" style="margin-top:4px">잠은 5가 좋고, 나머지 셋은 1이 좋아요</div></div>
+          <div><div class="k">통증</div><div class="v">중간 · 무릎</div></div>
+          <div><div class="k">아침 몸무게</div><div class="v">72.2kg (평소보다 −2.9%)</div></div>
+          <div><div class="k">평소 컨디션 점수</div><div class="v">14.4 / 20</div></div>
+        </div>
+        <div class="quiz" id="quiz"><button data-c="g"><span>초록</span></button><button data-c="y"><span>노랑</span></button><button data-c="r"><span>빨강</span></button></div>
+        <div id="quizOut" aria-live="polite"></div>
+        <div class="row-btns"><button class="ghost-btn" data-app="bad">실제 앱에서 이 아침 보기 →</button></div>
+      </div>
+      <details class="story" data-s="3"><summary><span class="lock">만든 이야기 3</span>신호에 이유를 붙인 까닭<span class="hint2"></span></summary>
+        <div class="sb">
+          <div><span class="k">해결</span>빨간색 한 칸만 보면 선수는 '왜?'라고 물을 수 있습니다. 그래서 통증, 점수, 잠, 몸무게처럼 빨간불이 걸린 기준을 한 줄씩 보여 주는 형태로 만들었습니다.</div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- 목 -->
+  <section class="ch" id="d4" data-day="목" data-label="D-3" data-w="71.6" data-scene="good">
+    <div class="ch-in">
+      <div class="dayline"><span class="d">D-3 · 목</span><span class="t">12:30 · 점심</span></div>
+      <h2>감량 중 점심, 뭘 먹을까</h2>
+      <p class="situ">아직 수분 감량 전입니다. 이 시기에는 굶기보다는 단백질을 챙기며 열량을 맞추는 게 중요해요. 점심을 골라 보세요. 영양값은 식약처 DB 숫자입니다.</p>
+      <div class="mission" id="m4">
+        <div class="mh"><b>MISSION 4</b><span>점심 열량은 목표 범위 안에, 단백질은 20g 이상</span></div>
+        <div class="foods" id="foods"></div>
+        <div class="ck">
+          <div class="stack" id="meters"></div>
+          <div class="stack"><div class="verdict" id="verdict" aria-live="polite"></div><p class="src" id="foodSrc"></p></div>
+        </div>
+      </div>
+      <details class="story" data-s="4"><summary><span class="lock">만든 이야기 4</span>1,015개 음식 데이터와 한글 입력 버그<span class="hint2"></span></summary>
+        <div class="sb">
+          <div><span class="k">데이터</span>식약처 식품영양성분 통합DB에서 가정식·외식·식재료 1,015개를 골라 넣었습니다. 하루 목표는 기초대사량(Mifflin-St Jeor)과 훈련 시간으로 계산합니다.</div>
+          <div><span class="k">발견</span>11월 1일 아이폰에서 '쌀밥'을 치니 'ㅆㅆㅏㄹㅂㅏㅂ'처럼 타이핑이 이상하게 되는 문제를 발견했고, 글자를 칠 때마다 검색창이 통째로 다시 그려져 한글 조합이 끊기는 현상이라는 걸 알게 되었습니다.</div>
+          <div><span class="k">수정</span>입력칸은 한 번만 만들고 결과 목록만 바꾸게 했습니다. 이후로는 '입력 중인 칸은 다시 그리지 않는다'라는 규칙을 잘 지켰습니다.</div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- 금 -->
+  <section class="ch" id="d5" data-day="금" data-label="D-2" data-w="71.0" data-scene="symptom">
+    <div class="ch-in">
+      <div class="dayline"><span class="d">D-2 · 금</span><span class="t">16:00 · 수분 감량 중</span></div>
+      <h2>병원에 가야 할까?</h2>
+      <p class="situ">수분을 빼기 시작했습니다. 지금 겪는 증상을 고르면 앱은 '119 / 오늘 병원 / 쉬면서 관찰' 중 가장 급한 단계를 알려 줍니다.</p>
+      <div class="mission" id="m5">
+        <div class="mh"><b>MISSION 5</b><span>증상을 골라 어디로 가야 하는지 보기</span></div>
+        <div class="ck">
+          <div class="syms" id="syms"></div>
+          <div class="result" id="symOut" aria-live="polite"><div class="placeholder">증상을 하나 이상 골라 보세요</div></div>
+        </div>
+        <div class="row-btns"><button class="ghost-btn" data-app="symptom">실제 앱 증상 체크 →</button></div>
+      </div>
+      <details class="story" data-s="5"><summary><span class="lock">만든 이야기 5</span>증상은 공식 지침으로, 앱 문제는 AI 셋이 스스로 검증<span class="hint2"></span></summary>
+        <div class="sb">
+          <div><span class="k">해결</span>증상은 목록에서 고르게 했습니다. 응급의료 안내 같은 공식 지침에 근거해 단계를 나눴고, 119·병원 단계를 기록하면 그날 신호가 빨간색이 됩니다.</div>
+          <div><span class="k">검증</span>앱 초기 버전을 만들고 나니 오류가 생각보다 많았는데요. 그래서 제가 테스트 기준을 만들어 AI에게 자동 검증을 맡겼습니다. 한 AI는 고치고, 다른 AI는 문제를 찾고, 또 다른 AI는 점수를 매기게 해서 세 번에 걸쳐 고쳤습니다. 고친 부분들을 확인할 수 있게 체크리스트를 만들라고 요청했고, 그 체크리스트를 바탕으로 제 눈으로 다시 확인해 재검증했습니다.</div>
+          <div class="full"><span class="k">검증할 때마다 오른 점수</span><div class="bars" id="loopBars"></div></div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- 토 -->
+  <section class="ch" id="d6" data-day="토" data-label="D-1" data-w="70.2" data-scene="cut">
+    <div class="ch-in">
+      <div class="dayline"><span class="d">D-1 · 토</span><span class="t">08:00 · 계체</span></div>
+      <h2>계체 통과. 이제 내일 저녁까지 채우기</h2>
+      <div class="split sat">
+        <div class="stack" style="align-items:center">
+          <div class="scale" id="scale"><span class="lim">공식 계체 · 라이트급 70.3kg</span><span class="num" id="scaleNum">0.0</span><span class="lim" id="scaleMsg">저울에 올라가세요</span></div>
+          <button class="go-btn" id="weighGo"><span>저울에 올라가기</span></button>
+        </div>
+        <div class="stack">
+          <p class="situ">평소 75.5kg에서 70.2kg까지 뺐습니다. 경기까지 35시간. 무엇을 얼마나 마시고 먹어야 할까요?</p>
+          <div class="mission" id="m6">
+            <div class="mh"><b>MISSION 6</b><span>첫 1시간 목표만큼 잔을 채우기</span></div>
+            <div class="glasses" id="glasses" aria-label="한 잔 150mL"></div>
+            <div class="note" id="glassOut" aria-live="polite"></div>
+            <div class="row-btns"><button class="ghost-btn" data-app="cut">실제 앱 회복 계산기 →</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="card ck">
+        <div class="ctl" aria-label="회복 계산 조절">
+          <label>평소 체중<input type="range" id="rU" min="55" max="100" step="0.5" value="75.5"><output id="oU"></output></label>
+          <label>계체 체중<input type="range" id="rW" min="50" max="100" step="0.1" value="70.2"><output id="oWk"></output></label>
+          <label>경기까지<input type="range" id="rG" min="2" max="40" step="1" value="35"><output id="oG"></output></label>
+          <p class="src">숫자를 바꿔 보세요. 같은 날 계체처럼 시간이 짧거나 감량이 크면 경고가 나와요.</p>
+        </div>
+        <div class="out" id="recOut" aria-live="polite"></div>
+      </div>
+      <details class="story" data-s="6"><summary><span class="lock">만든 이야기 6</span>감량 계획보다 회복부터 만든 이유<span class="hint2"></span></summary>
+        <div class="sb">
+          <div><span class="k">판단</span>감량을 얼마나 할지 정하는 기능은 혼자 만들면 위험하다고 봤습니다. 그래서 이미 끝난 감량에서 경기 전까지 무엇을 얼마나 먹고 마실지를 먼저 만들었습니다.</div>
+          <div><span class="k">근거</span>계체가 끝나면 빠진 수분과 에너지를 다시 채워야 하는데요. 국제스포츠영양학회(ISSN)의 2025년 입장문과 게토레이 스포츠과학연구소(GSSI) 자료를 따랐습니다. 빠진 무게의 1.25~1.5배만큼 물을 나눠 마시고, 처음 1시간에는 경구수액(전해질 음료) 0.6~0.9L부터 마십니다. 탄수화물은 감량 폭에 따라 몸무게 1kg당 4~7g 또는 8~12g을 경기 전까지 나눠 먹습니다. 전날 계체라면 8%, 당일 계체라면 5% 넘게 빼는 건 권하지 않는다는 기준도 경고로 넣었습니다.</div>
+          <div><span class="k">직접 써 보며</span>아이폰에서 계체 시간을 고르는데 날짜가 제멋대로 선택되는 문제가 있었는데요. 알고 보니 날짜를 고르는 도중에 화면이 새로 그려지면서 선택 창이 닫혀 버린 거였습니다. 입력칸은 그대로 두고 아래 결과만 바뀌도록 고쳤습니다.</div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- 일 -->
+  <section class="ch" id="d7" data-day="일" data-label="D-DAY" data-w="74.1" data-scene="video">
+    <div class="ch-in">
+      <div class="dayline"><span class="d">D-DAY · 일</span><span class="t">13:00 · 경기 전 마지막 점검</span></div>
+      <h2>어제 찍은 미트 영상, 같은 순간으로 맞춰 보기</h2>
+      <p class="situ">왼쪽은 지난주, 오른쪽은 어제 찍은 하이킥입니다. 두 영상은 시작 시점이 달라서 그냥 틀면 비교가 안 됩니다. 아래 막대로 오른쪽 영상을 밀어 <b>발이 가장 높은 순간</b>을 맞춰 보세요.</p>
+      <div class="mission" id="m7">
+        <div class="mh"><b>MISSION 7</b><span>두 영상의 발차기 최고점을 같은 순간으로 맞추기</span></div>
+        <div class="vids"><figure><canvas id="cvA" width="300" height="400"></canvas><figcaption><span>지난주 · <span id="fA">0프레임</span></span></figcaption></figure><figure><canvas id="cvB" width="300" height="400"></canvas><figcaption><span>어제 · <span id="fB">0프레임</span></span></figcaption></figure></div>
+        <div class="vctl" id="vctl"><button type="button" data-v="-1" aria-label="한 프레임 뒤로">◀ 1프레임</button><button type="button" data-v="play">▶ 재생</button><button type="button" data-v="1" aria-label="한 프레임 앞으로">1프레임 ▶</button><span class="speed"><span class="note">속도</span><button type="button" data-r="0.25" aria-pressed="false">0.25배</button><button type="button" data-r="0.5" aria-pressed="false">0.5배</button><button type="button" data-r="1" aria-pressed="true">1배</button></span></div>
+        <div class="sync"><span>오른쪽 밀기</span><div class="syncrow"><button type="button" data-sy="-1" aria-label="오른쪽 영상 한 프레임 왼쪽으로">−1</button><input type="range" id="sync" min="-30" max="30" step="1" value="0" aria-label="오른쪽 영상 밀기" style="flex:1"><button type="button" data-sy="1" aria-label="오른쪽 영상 한 프레임 오른쪽으로">+1</button></div><output id="syncO">0프레임</output></div>
+        <div id="vidOut" class="note" aria-live="polite"></div>
+        <div class="row-btns"><button class="ghost-btn" data-app="video">실제 앱 영상 비교 →</button></div>
+      </div>
+      <div class="finish" id="finish" hidden><span>일주일 완주! 미션 7개를 모두 끝냈어요.</span><a href="#e1">현장 이야기로 →</a></div>
+      <details class="story" data-s="7"><summary><span class="lock">만든 이야기 7</span>풋살 팀에서 못 했던 '영상으로 짚어 주기'<span class="hint2"></span></summary>
+        <div class="sb">
+          <div><span class="k">과제정의</span>풋살 팀 코치를 할 때 경기 영상을 되짚어 가며 설명해 주고 싶었는데 마땅한 방법이 없었습니다. 그래서 느리게, 한 프레임씩, 두 영상을 나란히 같은 순간으로 맞추는 기능을 넣었습니다(v0.4.0).</div>
+          <div><span class="k">직접 써 보며</span>써 보니 1·5·10초씩 건너뛰기가 필요했고, 화면을 꽉 채우는 '크게 보기'와 소리 켜기를 넣었습니다. 크게 보기에서 설정을 펼치면 검은 화면이 되던 문제는 2차 자동 검증에서 찾아 고쳤습니다.</div>
+          <div><span class="k">보류</span>AI 자세 분석은 뺐습니다. 격투기는 상대와 상황에 따라 움직임이 달라서 '정답 자세'가 없다고 봤기 때문인데요. 골프처럼 정해진 동작을 반복하는 종목에는 나중에 넣어 볼 생각입니다.</div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- 에필로그 -->
+  <section class="ch epi" id="e1" data-day="현장" data-label="FIELD">
+    <div class="ch-in">
+      <span class="tag">경기가 끝난 뒤 · 검증</span>
+      <h2>혼자 만들어 쓰다 보니<br>궁금한 점이 생겨 현장에 물었습니다</h2>
+      <p class="situ" id="go-survey">11월 4~5일 MMA 코치·관장, 선수, 기자 분들에게 인스타 DM으로 직접 설문을 부탁했습니다. 기자님께는 답 대신 주변 선수·코치에게 전해 달라 부탁했습니다. 4일에는 유명 선수와 코치님들께 먼저 요청 드렸으나 답이 없어서, 5일에는 어린 선수들 위주로 설문 요청을 하였더니 답을 받을 수 있었습니다.</p>
+      <div class="card stack">
+        <div class="toggles" id="roleT" aria-label="설문에서 고른 입장"></div>
+        <div class="route" id="route" aria-live="polite"></div>
+      </div>
+      <div class="card stack">
+        <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center"><b>응답 <span class="mono">3</span>명 · 11월 5일 저녁 기준 · 12일 마감</b><div class="toggles" id="qT"></div></div>
+        <div class="bars" id="bars"></div>
+        <p class="note" id="qNote"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ch epi" id="e2" data-day="결정" data-label="DECIDE">
+    <div class="ch-in">
+      <span class="tag">의사결정</span>
+      <h2>여러 종목 앱은 그대로 두고<br>MMA만 떼어 먼저 완성합니다</h2>
+      <div class="toggles" id="verT"></div>
+      <div class="split"><div class="mock" id="mock"></div><div class="stack" id="verNote"></div></div>
+      <h3 id="go-who" style="font-family:var(--display);font-weight:400;font-size:28px;margin-top:20px">제가 팀장이 되어 AI에게 지시하고, 지시 받은 AI가 일했습니다</h3>
+      <dl class="kv card">
+        <dt>본인</dt><dd>문제 정하기, 넣고 뺄 기능, 디자인 시안 고르기, 아이폰으로 직접 써 보며 문제 찾기, 점검 기준 정하기, 설문 질문·대상, 코치·선수·기자에게 직접 연락, MMA 분리</dd>
+        <dt>AI (Claude)</dt><dd>코드 작성, 근거 논문·공식 기준 찾기, 디자인 시안 제작, 자동 테스트, 문제 찾기·점수 매기기 역할, 설문 미리보기·DM 문구 초안</dd>
+      </dl>
+      <div class="toggles" id="whoT"></div>
+      <div class="table-box"><table><thead><tr><th>무엇</th><th>낸 쪽</th><th>결과와 이유</th></tr></thead><tbody id="whoBody"></tbody></table></div>
+    </div>
+  </section>
+
+  <section class="ch epi" id="e3" data-day="흐름" data-label="5 DAYS">
+    <div class="ch-in">
+      <span class="tag">실제로 만든 5일</span>
+      <h2>11월 1일 첫 버전부터<br>11월 5일 MMA 분리까지</h2>
+      <div class="stats">
+        <div><span class="big-num">19<small>번</small></span><span class="cap">고칠 때마다 남긴 커밋 (여러 종목 18 + MMA 1)</span></div>
+        <div><span class="big-num">78→90</span><span class="cap">자동 검증 3차례 평가 점수</span></div>
+        <div><span class="big-num">1,015<small>개</small></span><span class="cap">식약처 DB에서 고른 음식</span></div>
+        <div><span class="big-num">1<small>명</small></span><span class="cap">매일 쓰는 사용자 (만든 본인)</span></div>
+      </div>
+      <div class="toggles" id="flowT"></div>
+      <ol class="tl" id="tl"></ol>
+      <p class="note">노란 점은 직접 써 보다 문제를 찾은 때, 초록 점은 현장에 물은 때입니다. 이전 버전 파일은 깃허브 저장소의 versions 폴더에 그대로 남겨 두었습니다.</p>
+    </div>
+  </section>
+
+  <section class="ch epi" id="e4" data-day="근거" data-label="RULES">
+    <div class="ch-in">
+      <span class="tag">판단 기준과 출처 · 기록 저장 방식</span>
+      <h2>모든 숫자에는 출처가 있습니다</h2>
+      <input class="search" id="ruleQ" type="search" placeholder="찾기 (예: 잠, 감량, ISSN)" aria-label="판단 기준 찾기">
+      <div class="table-box"><table><thead><tr><th>무엇</th><th>기준</th><th>출처</th></tr></thead><tbody id="ruleBody"></tbody></table></div>
+      <dl class="kv card">
+        <dt id="go-storage">기록은 어디에</dt><dd>폰 브라우저의 <span class="mono">localStorage</span>에만 있습니다. 서버가 없고 휴대폰 안에만 저장됩니다. 여러 종목 앱(<span class="mono">condition-note-v1</span>)과 MMA 앱(<span class="mono">condition-mma-v1</span>)은 저장 이름을 나눠 섞이지 않습니다.</dd>
+        <dt>백업</dt><dd>JSON 내보내기·가져오기, 엑셀용 CSV. 14일이 지나면 백업 안내가 뜹니다.</dd>
+        <dt>이 페이지의 휴대폰</dt><dd>실제 앱 파일을 그대로 띄우되 저장 이름만 <span class="mono">condition-portfolio-demo</span>로 바꿔 예시 기록을 넣었습니다.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="ch epi" id="e5" data-day="회고·Q&amp;A" data-label="NEXT">
+    <div class="ch-in">
+      <span class="tag">회고</span>
+      <h2>배운 것, 놓친 것, 이어갈 것</h2>
+      <div class="retro">
+        <div class="r-g" id="go-learn"><b>배운 것</b><span>먼저 만들면서 배운 것입니다.</span><ul><li>직접 써 봐야 문제가 보였습니다. 아이폰에서 '쌀밥'을 치다 한글이 깨지는 버그를 찾았고, 영상 건너뛰기와 크게 보기도 써 보면서 넣었습니다.</li><li>AI에게 맡기기 전에 무엇으로 점검할지 기준(체크리스트)을 먼저 정해야, 고친 결과를 믿고 확인할 수 있었습니다.</li><li>만드는 사람에게 당연한 것이 쓰는 사람에게는 헷갈릴 수 있었습니다. 피로·근육통·스트레스 점수를 '5가 좋음'으로 받다가, 보통은 낮을수록 없다고 생각한다는 점을 깨닫고 1이 좋은 쪽으로 뒤집었습니다.</li></ul><span>설문으로 현장에 물어보니 몰랐던 것들도 보였습니다.</span><ul><li>선수마다 평소 체중에서 빼는 폭이 꽤 달랐고, 감량법을 배운 곳도 제각각이었습니다.</li><li>반면 계체 후 경기 전까지 다시 채우는 방법(전해질 음료 → 탄수화물)은 대부분 비슷했습니다.</li><li>감량·회복 중에 어지럼이나 경기력 저하 같은 문제를 겪은 경우가 생각보다 많았고, 기록은 주로 휴대폰 메모로 하고 있었습니다.</li><li>격투기 관련 앱을 쓰는 분은 없었지만, 의학 논문과 전문가 자문을 바탕으로 한 앱이라면 쓰겠다는 답이 많았습니다.</li><li>필요한 기능을 고르게 하니 한 분은 7개를 모두, 나머지 분들도 3~4개씩 골라 생각보다 이런 앱이 필요하다는 걸 느꼈고, 자동화했으면 하는 일을 적어 준 분도 있었습니다.</li><li>김채현 선수를 비롯해 연락드린 선수분들이 좋은 이야기를 해 주시며 긍정적으로 반응해 주셨습니다. 김채현 선수는 "설문 완료했습니다!! 격투기 선수에게 정말 좋은 앱을 만드시는 것 같습니다!! 화이팅 하십쇼!!"라는 말까지 남겨 주셔서, 이런 앱에 대한 수요가 있을 수 있겠다고 느꼈습니다.</li></ul></div>
+        <div class="r-y" id="go-miss"><b>놓친 것</b><span>실제 사용자는 아직 저 하나뿐이고 설문 응답도 아직은 3명이라 경향이라 말할 수는 없다는 점입니다. 또 계체 관련해서는 의료진의 검토도 받고 싶은데 어떤 방식으로 접근해야 할지 아직 고민 중입니다. 논문을 더 찾아 근거를 쌓아야 할지, 직접 찾아뵙고 상담을 받아야 할지 정하지 못했습니다.</span></div>
+        <div class="r-gold" id="go-next"><b>이어갈 것</b><span>11월 12일 설문이 마감되면 결과를 반영해 MMA 앱을 고치고, 아이디를 남겨 주신 분들께 직접 써 보시고 후기를 부탁드릴 계획입니다. 감량 계획처럼 혼자 정하면 위험할 수 있는 부분은 전문가와 함께 기준을 세운 뒤에 만들겠습니다. 또 MMA 앱을 완성한 뒤에는 다른 종목과 합칠지, 종목별로 따로 만들지를 그동안 모은 내용을 보고 정하려고 합니다.</span></div>
+      </div>
+      <h3 id="go-qa" style="font-family:var(--display);font-weight:400;font-size:28px;margin-top:10px">나올 만한 질문과 답변</h3>
+      <div class="row-btns qa-all"><button type="button" class="ghost-btn" id="qaAll" aria-controls="qa" aria-expanded="false">모두 펼치기</button></div>
+      <div id="qa">
+        <details class="qa"><summary>의학적으로 안전한가요?</summary><div>진단하지는 않고, 신호를 통해 오늘 훈련 강도를 어떻게 할지 참고로만 보여 줍니다. 참고용이지만 믿을 수 있도록 기준 숫자는 논문과 공식 입장문에서 가져와 출처를 화면에 적었습니다. 아직 의료진의 검토를 받지 못해서 감량 계획처럼 위험할 수 있는 기능은 만들지 않았고, 전문가와 함께 기준을 정한 뒤에 만들 생각입니다.</div></details>
+        <details class="qa"><summary>실제로 쓰는 사람이 있나요?</summary><div>아직은 저만 사용하고 있습니다. 대신 설문으로 코치·선수분들이 지금 어떻게 하고 있는지 묻고 있고, 앱을 써 보겠다고 남겨 주신 분들께 설문 내용을 반영한 뒤 사용 후기를 부탁드릴 예정입니다.</div></details>
+        <details class="qa" id="go-qa-mma"><summary>왜 여러 종목에서 MMA로 좁혔나요?</summary><div>제가 알고 있는 스포츠 안에서는 MMA가 가장 배고프고 힘들며 몸이 상하는 운동이라고 생각했습니다. 벌이에 비해 훈련이 고되고, 운동 특성상 많이 다칩니다. 여기에 계체 전 감량과 계체 후 회복도 몸에 큰 무리를 줍니다. 국내에 정보가 적을 뿐 앱으로 충분히 도움을 줄 수 있겠다고 판단해 MMA로 정하고 바로 설문을 보냈습니다.</div></details>
+        <details class="qa" id="go-qa-ai"><summary>AI가 다 만든 것 아닌가요?</summary><div>마치 제가 팀장이 되어 여러 부하 직원에게 일을 맡기고 결과를 검토받듯 작업했습니다. 코드는 Claude가 썼지만, 어떤 기능을 넣고 뺄지, 어떤 기준으로 점검할지, 누구에게 물어볼지는 제가 정했고, 올라온 결과를 직접 써 보며 확인했습니다. AI 의견을 받아들인 것과 바꾼 것은 위의 표에 그대로 적었습니다.</div></details>
+        <details class="qa"><summary>설문 3명으로 무엇을 알 수 있나요?</summary><div>표본이 적어 아직 경향을 말할 정도는 아니지만, 제가 생각하지 못했던 것과 격투기 관련 앱을 써 본 사람이 없다는 것을 확인했습니다. 11월 12일 설문 마감 뒤 다시 정리할 예정입니다.</div></details>
+        <details class="qa"><summary>비슷한 앱과 무엇이 다른가요?</summary><div>컨디션 기록, 증상, 영상, 감량 회복을 한곳에서 다루는 앱은 찾지 못했습니다. 감량은 Fighter Cut이 가장 가까웠지만 영어만 지원하는 유료 앱이었습니다. 이 앱은 계산 공식과 출처를 공개하고, 매일 신호의 이유를 줄마다 보여 주며, 한국어와 한국 음식 DB를 쓰고, 무료입니다.</div></details>
+      </div>
+      <div class="cover-grid" style="margin-top:12px">
+        <div class="stack">
+          <div class="pills"><a class="pill solid" href="https://rkun231.github.io/condition-light-mma/" target="_blank" rel="noopener">MMA 앱 ↗</a><a class="pill" href="https://rkun231.github.io/condition-light/" target="_blank" rel="noopener">여러 종목 앱 ↗</a><a class="pill" href="https://github.com/rkun231/condition-light-mma" target="_blank" rel="noopener">앱 코드 ↗</a><a class="pill" href="#p0">처음으로</a></div>
+          <p class="note">만든 사람: 유경군 · 이 페이지는 휴대폰에서도 그대로 눌러 볼 수 있어요.</p>
+        </div>
+        <figure class="qr-card" style="max-width:220px"><img src="__QR__" alt="이 포트폴리오로 연결되는 QR 코드" width="200" height="200" loading="lazy"><figcaption><b>휴대폰으로 열기</b></figcaption></figure>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast" hidden role="status"><span>일주일 완주!</span><a href="#e1" id="toastGo">현장 이야기로 →</a><button type="button" id="toastX" aria-label="알림 닫기">✕</button></div>
+<button class="fab" type="button" id="fab" aria-label="실제 앱 열기">📱<span class="fab-t"> 실제 앱</span></button>
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-label="실제 앱 체험">
+  <div class="modal-card"><button class="close" type="button" id="mclose">닫기 ✕</button><div id="phoneHost"></div></div>
+</div>
+
+<script>
+/* ── 실제 앱 체험 휴대폰 (MMA 앱 파일을 그대로, 저장 이름만 바꿔 예시 기록으로) ── */
+(() => {
+  const APP_B64 = "__APP_B64__";
+  const DEMO_KEY = "condition-portfolio-demo";
+  let APP_HTML = null;
+  const appHtml = () => APP_HTML || (APP_HTML = new TextDecoder().decode(Uint8Array.from(atob(APP_B64), c => c.charCodeAt(0))));
+  const z = n => String(n).padStart(2, "0");
+  const ymd = d => d.getFullYear() + "-" + z(d.getMonth() + 1) + "-" + z(d.getDate());
+  const addD = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+  const loc = d => ymd(d) + "T" + z(d.getHours()) + ":" + z(d.getMinutes());
+  function demoState(kind) {
+    const now = new Date(); now.setHours(12, 0, 0, 0);
+    const logs = {}; let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    for (let i = 27; i >= 1; i--) {
+      const d = addD(now, -i), rest = d.getDay() === 0, q = () => 3 + (rnd() < 0.55 ? 1 : 0);
+      logs[ymd(d)] = { sleepH: rnd() < 0.5 ? 7.5 : 8, sleepQ: q(), fatigue: q(), soreness: q(), stress: q(), pain: 0, painPart: "",
+        weight: Math.round((75.6 - (27 - i) * 0.055 + (rnd() - 0.5) * 0.3) * 10) / 10, trainMin: rest ? 0 : 90, rpe: rest ? 0 : 6 + (rnd() < 0.4 ? 1 : 0), ...(rest ? { rest: true } : {}) };
+      // 점수만 고정 배치로 덮어씀(몸무게·훈련은 위 난수 그대로 → 수요일 −2.9% 유지).
+      // 27일 합: 잠의 질 100(평균 3.7) · 피로 96 · 근육통 97(화면 평소 2.4) · 스트레스 96 → 컨디션 점수 평소 389/27 = 14.4 (페이지 글과 같게)
+      const j = 27 - i, L = logs[ymd(d)];
+      L.sleepQ = (j * 7) % 27 < 19 ? 4 : 3; L.fatigue = (j * 5 + 1) % 27 < 15 ? 4 : 3; L.soreness = (j * 11 + 3) % 27 < 16 ? 4 : 3; L.stress = (j * 13 + 2) % 27 < 15 ? 4 : 3;
+    }
+    const t = ymd(now);
+    if (kind === "good") logs[t] = { sleepH: 8, sleepQ: 4, fatigue: 4, soreness: 4, stress: 4, pain: 0, painPart: "", weight: 74.0, trainMin: "", rpe: "" };
+    if (kind === "bad") logs[t] = { sleepH: 5, sleepQ: 2, fatigue: 2, soreness: 2, stress: 2, pain: 2, painPart: "무릎", weight: 72.2, trainMin: "", rpe: "" };
+    const w = new Date(); w.setHours(8, 0, 0, 0); const f = addD(w, 1); f.setHours(19, 0, 0, 0); const c1 = new Date(w); c1.setHours(11, 30);
+    return { profile: { birthYear: 1998, birthMonth: 5, sex: "남성", height: 175, weight: 75, weeklySessions: "4~5", level: "pro", cat: "투기", sub: "MMA", pos: "",
+        weightClass: "라이트급", classLimit: 70.3, classOrg: "통합 규정 (UFC 등)", screening: { heart: "아니요", chest: "아니요", faint: "아니요" }, screeningFlag: false },
+      logs, lastBackup: t, created: ymd(addD(now, -28)),
+      cut: kind === "cut" ? { usualKg: 75.5, weighKg: 70.2, weighAt: loc(w), fightAt: loc(f), checks: [[loc(c1), 72.1]] } : undefined };
+  }
+  const SCENES = { before: ["체크인 전", "today"], good: ["좋은 날", "today"], bad: ["나쁜 날", "today"], cut: ["회복 계산기", "recovery"], symptom: ["증상 체크", "symptom"], video: ["영상 비교", "video"] };
+  const host = document.getElementById("phoneHost");
+  host.className = "phone-wrap";
+  host.innerHTML = `<div class="scen">${Object.entries(SCENES).map(([k, s]) => `<button type="button" data-s="${k}">${s[0]}</button>`).join("")}</div>
+    <div class="device"><div class="screen-area" data-r="screen"></div>
+    <div class="navbar"><button type="button" data-a="back"><span class="glyph">◀</span>뒤로</button><button type="button" data-a="reset"><span class="glyph">↺</span>처음부터</button></div></div>
+    <p class="phone-hint">실제 앱 파일(MMA v${(appHtml().match(/const APP_VER = "([^"]+)"/) || [, "?"])[1]}) 그대로예요. 피로·근육통·스트레스는 1이 좋은 쪽이에요. 초록·노랑·빨강은 오늘 컨디션 신호예요. 앱 안 날짜는 오늘로 보여요. 누른 내용은 이 브라우저에만 남아요.</p>`;
+  let frame = null, cur = "before";
+  function load(kind) {
+    cur = kind;
+    try { localStorage.setItem(DEMO_KEY, JSON.stringify(demoState(kind))); } catch (e) {}
+    host.querySelectorAll("[data-s]").forEach(b => b.setAttribute("aria-pressed", b.dataset.s === kind ? "true" : "false"));
+    const tab = SCENES[kind][1];
+    const html = appHtml().replace("<head>", '<head><base href="https://rkun231.github.io/condition-light-mma/" target="_blank">')
+      .replace('const KEY = "condition-mma-v1";', `const KEY = "${DEMO_KEY}";`).replace("function arm(){", "function arm(){ return; ")
+      .replace("</body>", `<script>try{ ${tab !== "today" ? `NAV=["today"]; go("${tab}");` : ""} }catch(e){}<\/script></body>`);
+    if (frame) frame.remove();
+    frame = document.createElement("iframe"); frame.title = "컨디션 신호등 MMA 체험 화면"; frame.srcdoc = html;
+    frame.addEventListener("load", function () { try { this.contentDocument.addEventListener("keydown", e => { if (e.key === "Escape") close(); }); } catch (_) {} });
+    host.querySelector('[data-r="screen"]').appendChild(frame);
+  }
+  host.addEventListener("click", e => {
+    const s = e.target.closest("[data-s]"); if (s) { load(s.dataset.s); return; }
+    const a = e.target.closest("[data-a]"); if (!a) return;
+    if (a.dataset.a === "reset") load(cur);
+    if (a.dataset.a === "back") { try { frame.contentWindow.uiBack(); } catch (_) {} }
+  });
+  const modal = document.getElementById("modal");
+  let lastFocus = null;
+  const bg = () => [document.querySelector("main"), document.querySelector(".hud"), document.getElementById("fab"), ...document.querySelectorAll(".skip"), document.getElementById("toast")];
+  window.openApp = kind => { lastFocus = document.activeElement; bg().forEach(el => el && (el.inert = true)); modal.hidden = false; modal.scrollTop = 0; load(kind || window.__dayScene || "before"); document.getElementById("mclose").focus(); };
+  function close() { bg().forEach(el => el && (el.inert = false)); modal.hidden = true; if (frame) { frame.remove(); frame = null; } if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+  const fab = document.getElementById("fab"); let ft = null;
+  fab.addEventListener("click", () => window.openApp());
+  const overControl = () => { const r = fab.getBoundingClientRect(), m = 4; fab.style.visibility = "hidden"; const pts = [[.5, .5], [0, 0], [1, 0], [0, 1], [1, 1], [.5, 0], [.5, 1], [0, .5], [1, .5]]; const hit = pts.some(([x, y]) => { const el = document.elementFromPoint(r.left + m + x * (r.width - 2 * m), r.top + m + y * (r.height - 2 * m)); return el && el.closest("button, input, a, label, summary, select, canvas, .mission"); }); fab.style.visibility = ""; return hit; };
+  addEventListener("scroll", () => { fab.classList.add("dim"); clearTimeout(ft); ft = setTimeout(() => { if (!overControl()) fab.classList.remove("dim"); }, 900); }, { passive: true });
+  document.getElementById("mclose").addEventListener("click", close);
+  modal.addEventListener("click", e => { if (e.target === modal) close(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !modal.hidden) close(); });
+  document.addEventListener("click", e => { const b = e.target.closest("[data-app]"); if (b) window.openApp(b.dataset.app); });
+})();
+</script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const r1 = x => Math.round(x * 10) / 10;
+  const fmtSleep = h => { const H = Math.floor(h), M = Math.round((h - H) * 60); return M ? `${H}시간 ${M}분` : `${H}시간`; };
+  const PRINT = new URLSearchParams(location.search).get("print") === "1";
+  if (PRINT) document.body.classList.add("print");
+
+  /* ── 진행 상태: 미션 완료·이야기 열람 ── */
+  const done = new Set(), seen = new Set();
+  const chapters = [...document.querySelectorAll(".ch")];
+  $("days").innerHTML = chapters.map((c, i) => `${c.id === "e1" ? '<span class="sep"></span>' : ""}<a href="#${c.id}" data-i="${i}"><b>${esc(c.dataset.day)}</b><span>${esc(c.dataset.label)}</span></a>`).join("");
+  const dayLinks = [...$("days").querySelectorAll("a")];
+  function complete(n) {
+    if (done.has(n)) return; done.add(n);
+    const m = $("m" + n); if (m) m.classList.add("ok");
+    const link = dayLinks.find(a => a.getAttribute("href") === "#d" + n); if (link) link.classList.add("done");
+    const st = document.querySelector(`.story[data-s="${n}"]`);
+    if (st && !st.open) { st.open = true; st.classList.add("new"); }
+    if (done.size === 7) { $("finish").hidden = false; if (!PRINT) { const fr = $("finish").getBoundingClientRect(); if (fr.top < innerHeight && fr.bottom > 120) return; const t = $("toast"); t.hidden = false; armToast(); } }
+  }
+  document.querySelectorAll(".story").forEach(st => st.addEventListener("toggle", () => { if (st.open) { seen.add(st.dataset.s); $("hudS").textContent = `${seen.size}/7`; } }));
+  function setHudSignal(lv) { const c = ["g", "y", "r"]; $("hudL").querySelectorAll("i").forEach(i => i.classList.toggle("on", lv != null && i.classList.contains(c[lv]))); }
+  function markDay(i) {
+    dayLinks.forEach((a, k) => a.setAttribute("aria-current", k === i ? "true" : "false"));
+    const c = chapters[i]; $("hudW").textContent = c.dataset.w || "—"; window.__dayScene = c.dataset.scene || "before";
+    document.querySelector(".hud").classList.toggle("at-start", c.id === "p0");   // 프롤로그에서는 빈 몸무게·꺼진 신호를 감춤
+    const sig = { d1: dayResult.d1, d2: dayResult.d2, d3: dayResult.d3, d4: null, d5: dayResult.d5, d6: null, d7: null }[c.id]; setHudSignal(sig);
+    const a = dayLinks[i], t = $("days");
+    t.scrollTo({ left: a.offsetLeft - (t.clientWidth - a.offsetWidth) / 2, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }
+  const dayResult = { d1: null, d2: null, d3: null, d5: null };
+  if ("IntersectionObserver" in window) { const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) markDay(chapters.indexOf(e.target)); }), { rootMargin: "-40% 0px -59% 0px" }); chapters.forEach(c => io.observe(c)); }
+
+  const armToast = () => { const t = $("toast"); clearTimeout(t._h); t._h = setTimeout(() => { if (!t.matches(":hover, :focus-within")) t.hidden = true; else armToast(); }, 9000); };
+  $("toast").addEventListener("mouseleave", armToast); $("toast").addEventListener("focusout", armToast);
+  $("toastX").addEventListener("click", () => $("toast").hidden = true);
+  $("toastGo").addEventListener("click", () => $("toast").hidden = true);
+  /* 결과가 화면 아래 밖에 생기면 보이게 살짝 스크롤 */
+  const reveal = el => { if (PRINT) return; const r = el.getBoundingClientRect(); if (r.top > innerHeight - 90) el.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); };
+  /* ── 신호 계산 (앱 signal() 기준) ── */
+  /* 예시 선수의 지난 27일 평균(저장값, 5=좋음). 시연 폰 demoState와 같은 기록에서 나온 값 */
+  const PAST_AVG = { sQ: 100 / 27, fa: 96 / 27, so: 97 / 27, st: 96 / 27 };
+  const ENDW = { sQ: ["아주 나쁨", "나쁨", "보통", "좋음", "아주 좋음"], fa: ["아주 상쾌", "상쾌", "보통", "피곤", "아주 피곤"], so: ["전혀 없음", "조금", "보통", "심함", "아주 심함"], st: ["전혀 없음", "조금", "보통", "심함", "아주 심함"] };
+  const ITEM = { sQ: "잠의 질", fa: "피로", so: "근육통", st: "스트레스" };
+  const shownN = (k, v) => k === "sQ" ? v : 6 - v;
+  function dropItems(o) {
+    const a = ["sQ", "fa", "so", "st"].map(k => ({ k, m: PAST_AVG[k], d: o[k] - PAST_AVG[k] })).filter(x => x.d <= -0.5).sort((x, y) => x.d - y.d).slice(0, 2);
+    if (!a.length) return "";
+    return `평소보다 나빠진 것: ${a.map(x => { const pm = shownN(x.k, x.m), d = shownN(x.k, o[x.k]); return `${ITEM[x.k]} 평소 ${pm.toFixed(1)}(${ENDW[x.k][Math.min(4, Math.max(0, Math.round(pm) - 1))]}) → 오늘 ${d}(${ENDW[x.k][d - 1]})`; }).join(", ")}.`;
+  }
+  function signal(o) {
+    let lv = 0; const why = []; const up = (n, t, more) => { lv = Math.max(lv, n); why.push([n, t, more || ""]); };
+    const pp = o.part ? o.part + "에 " : "";
+    if (o.pa === 3) up(2, pp + "심한 통증이 있어요."); else if (o.pa === 2) up(1, pp + "중간 정도 통증이 있어요.");
+    const w = o.sQ + o.fa + o.so + o.st, m = o.base, sd = o.sd, z = (w - m) / sd;
+    // 앱 v0.1.8~: 빨강은 평소보다 크게 벗어나면서(z ≤ −1.5) 4점 이상 낮을 때만
+    // 앱처럼 빨강·노랑 모두 '평소보다 나빠진 것' 줄을 붙임 (앱 dropItems: 평소보다 0.5점 이상 나빠진 항목 최대 2개)
+    if (z <= -1.5 && m - w >= 4) up(2, `컨디션 점수(${w}/20)가 평소(${m.toFixed(1)})보다 많이 낮아요.`, dropItems(o)); else if (z <= -1) up(1, `컨디션 점수(${w}/20)가 평소(${m.toFixed(1)})보다 낮아요.`, dropItems(o));
+    if (o.H < 6) up(1, `잠잔 시간 ${fmtSleep(o.H)} · 권장 7시간 이상보다 적어요.`);
+    if (o.W != null && o.W <= -2) up(1, `몸무게가 평소보다 ${Math.abs(o.W).toFixed(1)}% 줄었어요. 덜 먹었거나 물이 부족할 수 있어요.`);
+    if (!why.length) why.push([0, "평소와 비슷하거나 좋아요."]);
+    why.sort((a, b) => b[0] - a[0]);   // 앱처럼 멈춤 → 주의 순
+    return { lv, why };
+  }
+  const NAME = [["초록", "좋아요", "평소대로 훈련해도 좋아요."], ["노랑", "주의", "강도를 조금 낮추거나 회복(잠·식사·수분)에 신경 써 주세요."], ["빨강", "멈추세요", "오늘은 쉬세요. 움직인다면 가벼운 회복 운동(걷기·스트레칭)만 하세요."]];
+  const sigHtml = s => { const c = ["g", "y", "r"][s.lv]; return `<div class="out sg-${c}"><div class="head"><div class="lamp">${["r", "y", "g"].map((k, i) => `<i class="${k} ${2 - i === s.lv ? "on" : ""}"></i>`).join("")}</div>
+    <div class="t">${NAME[s.lv][0]} · ${NAME[s.lv][1]}<small>${NAME[s.lv][2]}</small></div></div><ul class="why">${s.why.map(([n, t, more]) => `<li class="l${n}">${n ? `<span class="sr-only">${n === 2 ? "멈춤 이유: " : "주의 이유: "}</span>` : ""}${esc(t)}${more ? "<br>" + esc(more) : ""}</li>`).join("")}</ul><p class="src">참고 신호예요. 진단이 아니에요.</p></div>`; };
+
+  /* MISSION 1: 체크인 */
+  const CK = { sQ: 0, fa: 0, so: 0, st: 0, pa: -1 };
+  const segs = [["sQ", "잠의 질"], ["fa", "피로"], ["so", "근육통"], ["st", "스트레스"]];
+  /* 앱 v0.1.4~와 같이: 피로·근육통·스트레스는 화면에서 1이 좋음. 저장·계산은 5가 좋음 그대로 */
+  const REV = ["fa", "so", "st"], ENDS = { sQ: ["1 아주 나쁨", "5 아주 좋음"], fa: ["1 아주 상쾌", "5 아주 피곤"], so: ["1 전혀 없음", "5 아주 심함"], st: ["1 전혀 없음", "5 아주 심함"] };
+  $("ck1").innerHTML = `<label>잠잔 시간<input type="range" id="ckH" min="4" max="10" step="0.5" value="6.5"><output id="ckHO"></output></label>` +
+    segs.map(([k, n]) => `<div class="segrow"><span>${n}<small class="dir">${REV.includes(k) ? "1 좋음 → 5 나쁨" : "1 나쁨 → 5 좋음"}</small></span><div class="seg" data-k="${k}" role="group" aria-label="${n} 점수 (${ENDS[k].join(" ~ ")})">${[1, 2, 3, 4, 5].map(d => `<button type="button" data-v="${REV.includes(k) ? 6 - d : d}">${d}</button>`).join("")}</div></div>`).join("") +
+    `<div class="segrow">통증<div class="seg" data-k="pa" role="group" aria-label="통증">${["없음", "약간", "중간", "심함"].map((t, v) => `<button type="button" data-v="${v}">${t}</button>`).join("")}</div></div>
+     <p class="src">잠은 5가 좋고, 피로·근육통·스트레스는 1이 좋아요(앱과 같아요). 더할 때는 좋은 쪽으로 맞춰 20점 만점이에요. 이 선수의 평소 점수는 지난 4주 평균 14.4점이에요.</p>`;
+  const ck1paint = () => { $("ckHO").textContent = fmtSleep(+$("ckH").value); $("ck1").querySelectorAll(".seg").forEach(b => b.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", +x.dataset.v === CK[b.dataset.k] ? "true" : "false")));
+    const left = segs.filter(([k]) => !CK[k]).length + (CK.pa < 0 ? 1 : 0); $("ck1go").disabled = left > 0; $("ck1go").firstElementChild.textContent = left ? `${left}칸 남았어요` : "신호 받기"; };
+  $("ck1").addEventListener("click", e => { const b = e.target.closest(".seg button"); if (!b) return; CK[b.parentNode.dataset.k] = +b.dataset.v; ck1paint(); });
+  $("ckH").addEventListener("input", ck1paint);
+  $("ck1go").addEventListener("click", () => { const s = signal({ ...CK, H: +$("ckH").value, base: 14.4, sd: 2 }); dayResult.d1 = s.lv; setHudSignal(s.lv); $("ck1out").innerHTML = sigHtml(s); complete(1); });
+  ck1paint();
+
+  /* MISSION 2: 훈련량 */
+  const PAST = [2580, 2700, 2640, 2610];
+  function load2() {
+    const m = +$("tMin").value, r = +$("tRpe").value; $("tMinO").textContent = m + "분"; $("tRpeO").textContent = r + " / 10";
+    const week = 90 * 6 + m * r, avg = PAST.reduce((a, b) => a + b, 0) / 4;
+    const proj = week + 90 * 6 * 3, ratio = Math.round(proj / avg * 100) / 100;
+    const max = Math.max(...PAST, proj, avg) * 1.05, H = 110, av = `<span class="avg" style="bottom:${avg / max * H}px"></span>`;
+    $("loadBars").innerHTML = PAST.map((v, i) => `<div><b>${v}</b><div class="pl">${av}<i style="height:${v / max * H}px"></i></div><span>${4 - i}주 전</span></div>`).join("") +
+      `<div class="now ${ratio > 1.5 ? "bad" : ratio > 1.3 ? "warn" : ""} ${done.has(2) ? "" : "pending"}"><b>${proj}</b><div class="pl">${av}<i style="height:${proj / max * H}px"></i></div><span>이번 주*</span></div>`;
+    $("lbLegend").textContent = `평소 주평균 ${Math.round(avg)}`;
+    if (done.has(2)) { dayResult.d2 = ratio > 1.5 ? 2 : ratio > 1.3 ? 1 : 0; setHudSignal(dayResult.d2); }
+    $("loadOut").innerHTML = `오늘 훈련량 <b>${m * r}</b> · 이번 주 예상 <b>${proj}</b> = 평소 주평균(${Math.round(avg)})의 <b class="${ratio > 1.5 ? "no" : ratio > 1.3 ? "mid" : "yes"}">${ratio.toFixed(2)}배</b>. ${ratio > 1.5 ? "앱은 '급하게 늘었어요'로 빨강 이유를 붙여요." : ratio > 1.3 ? "앱은 '늘었어요'로 노랑 이유를 붙여요." : "평소 범위예요."}<br><span class="src">* 남은 사흘은 월요일과 같은 90분 × 6으로 가정. 기록 21일 이상일 때만 계산하는 참고 지표예요.</span>`;
+  }
+  ["tMin", "tRpe"].forEach(id => $(id).addEventListener("input", load2)); load2();
+  $("t2go").addEventListener("click", () => { complete(2); load2(); $("t2go").firstElementChild.textContent = "기록했어요 ✓"; });
+
+  /* MISSION 3: 신호 맞히기 */
+  $("quiz").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    $("quiz").querySelectorAll("button").forEach(x => { x.classList.toggle("pick", x === b); x.classList.toggle("wrong", x === b && x.dataset.c !== "r"); x.classList.toggle("right", x.dataset.c === "r"); });
+    const s = signal({ sQ: 2, fa: 2, so: 2, st: 2, pa: 2, part: "무릎", H: 5, W: -2.9, base: 14.4, sd: 2 }); dayResult.d3 = s.lv; setHudSignal(s.lv);
+    const right = b.dataset.c === "r";
+    $("quizOut").innerHTML = `<p style="font-weight:800;margin-bottom:8px">${right ? "맞혔어요 — 앱도 빨강을 보여 줘요." : "아쉬워요 — 앱은 빨강을 보여 줘요."} 하나라도 빨강 기준에 걸리면 빨강이고, 이유는 걸린 만큼 모두 붙어요.</p>` + sigHtml(s);
+    complete(3);
+  });
+
+  const hasJong = w => { const c = w.charCodeAt(w.length - 1); return c >= 0xac00 && c <= 0xd7a3 && (c - 0xac00) % 28 !== 0; };
+  const josa = (w, a, b) => w + (hasJong(w) ? a : b);
+  const orList = ws => ws.length === 2 ? josa(ws[0], "이나", "나") + " " + ws[1] : ws[0];
+  /* MISSION 4: 식단 (식약처 DB 값, 100g당 → 1회 분량) */
+  const FOODS = [["쌀밥", 166, 37.3, 3.4, 210, "한 공기 210g"], ["닭가슴살(삶은것)", 127, 0, 28.1, 100, "100g"], ["달걀(삶은것)", 145, 1.4, 13.5, 100, "2개 100g"], ["고구마(찐것)", 163, 39.4, 1.1, 150, "1개 150g"], ["바나나", 77, 20, 1.1, 100, "1개 100g"], ["된장찌개", 46, 4.4, 3.4, 200, "1그릇 200g"], ["연어(구운것)", 210, 0, 22.1, 100, "100g"], ["라면", 82, 13.7, 1.7, 550, "1그릇 550g"], ["돼지 삼겹살(생것)", 372, 0, 13.9, 100, "100g"]];
+  const pick = new Set();
+  $("foods").innerHTML = FOODS.map((f, i) => `<button type="button" data-i="${i}" aria-pressed="false">${f[0]}<small>${f[5]} · ${Math.round(f[1] * f[4] / 100)}kcal · 단백질 ${r1(f[3] * f[4] / 100)}g</small></button>`).join("");
+  const KCAL = [600, 900];
+  function food() {
+    let k = 0, p = 0, c = 0; pick.forEach(i => { const f = FOODS[i], g = f[4] / 100; k += f[1] * g; c += f[2] * g; p += f[3] * g; });
+    const mk = (lab, v, max, band, unit) => `<div class="meter"><div class="mt"><span>${lab}</span><b>${Math.round(v)}${unit}</b></div><div class="tr">${band ? `<span class="band" style="left:${band[0] / max * 100}%;width:${(band[1] - band[0]) / max * 100}%"></span>` : ""}<i style="width:${Math.min(100, v / max * 100)}%"></i></div></div>`;
+    $("meters").innerHTML = mk("열량 (초록 칸이 목표)", k, 1400, KCAL, "kcal") + mk("단백질 (초록 칸이 20g 이상)", p, 80, [20, 80], "g") + mk("탄수화물", c, 160, null, "g");
+    const kOk = k >= KCAL[0] && k <= KCAL[1], pOk = p >= 20;
+    const tips = [];
+    const kc = i => FOODS[i][1] * FOODS[i][4] / 100, not = ids => ids.filter(i => !pick.has(i)).map(i => FOODS[i][0].replace(/\(.*\)/, "").trim());
+    const add = c => { const w = orList(c); return ` ${josa(w, "을", "를")} 더해 보세요.`; };
+    if (k < KCAL[0]) { const c = not([3, 2, 4, 0]).slice(0, 2); tips.push(`열량이 ${Math.round(KCAL[0] - k)}kcal 더 필요해요.${c.length ? add(c) : ""}`); }
+    if (k > KCAL[1]) { const ok = [...pick].filter(i => k - kc(i) >= KCAL[0] && k - kc(i) <= KCAL[1]).sort((a, b) => kc(a) - kc(b)); const out = ok.length ? ok[0] : [...pick].sort((a, b) => kc(b) - kc(a))[0];
+      const w = FOODS[out][0].replace(/\(.*\)/, "").trim(); tips.push(`열량이 ${Math.round(k - KCAL[1])}kcal 넘쳐요. ${josa(w, "을", "를")} 빼 보세요.${ok.length ? "" : " 하나 더 빼야 할 수도 있어요."}`); }
+    if (!pOk) { const c = not([1, 2, 6]).slice(0, 2); tips.push(`단백질이 ${r1(20 - p)}g 더 필요해요.${c.length ? add(c) : ""}`); }
+    $("verdict").innerHTML = !pick.size ? `<span class="muted">음식을 눌러 담아 보세요.</span>` :
+      `${kOk ? '<span class="yes">열량 알맞음</span>' : k < KCAL[0] ? '<span class="mid">열량 적음</span>' : '<span class="no">열량 많음</span>'} · ${pOk ? '<span class="yes">단백질 충분</span>' : '<span class="mid">단백질 부족</span>'}` +
+      (tips.length ? `<p class="note" style="font-weight:500;margin-top:6px">${tips.join(" ")}</p>` : `<p class="note" style="font-weight:500;margin-top:6px">좋아요. 목표 안에 들어왔어요.</p>`);
+    $("foodSrc").textContent = "이 장면의 점심 목표(600~900kcal)는 예시예요. 앱은 키·몸무게·주간 훈련·감량 목표로 하루 목표를 계산하고, 점심은 그 30% ±30%로 봐요. 주식 끼니 단백질 20g 이상.";
+    $("foods").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", pick.has(+b.dataset.i) ? "true" : "false"));
+    if (kOk && pOk) complete(4);
+  }
+  $("foods").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; const i = +b.dataset.i; pick.has(i) ? pick.delete(i) : pick.add(i); food(); reveal($("verdict")); });
+  food();
+
+  /* MISSION 5: 증상 (앱 SYMPTOMS 일부 그대로) */
+  const SYMS = [["m1", 0, "운동 다음날 근육이 전체적으로 뻐근해요"], ["m3", 0, "쥐가 났다가 풀렸어요"], ["sf1", 1, "귀가 붓고 말랑하게 부풀었어요 (귀 혈종)"], ["sf3", 1, "감량 중 어지럼이 심하고 소변이 거의 안 나와요"],
+    ["h3", 1, "머리를 부딪친 뒤 두통·어지럼·멍함이 있어요 (뇌진탕 의심)"], ["sf4", 2, "감량 중 정신이 흐리거나 쓰러질 것 같아요"], ["c1", 2, "가슴이 아프거나 조이는 느낌이 있어요 (특히 운동 중)"]];
+  const LV = [["쉬면서 관찰", "쉬고 물을 마시며 지켜보세요. 나아지지 않으면 진료를 받아 보세요."], ["오늘 병원 진료", "오늘 안에 진료를 받아 보세요. 오늘 훈련은 멈추세요."], ["지금 119", "지금 바로 119에 전화하세요. 혼자 있지 마세요."]];
+  $("syms").innerHTML = SYMS.map(([id, lv, t]) => `<label><input type="checkbox" value="${id}"><span>${esc(t)}</span></label>`).join("");
+  $("syms").addEventListener("change", () => {
+    const on = [...$("syms").querySelectorAll("input:checked")].map(i => SYMS.find(s => s[0] === i.value));
+    if (!on.length) { $("symOut").innerHTML = '<div class="placeholder">증상을 하나 이상 골라 보세요</div>'; dayResult.d5 = null; setHudSignal(null); return; }
+    const lv = Math.max(...on.map(s => s[1])); dayResult.d5 = lv >= 1 ? 2 : 0; setHudSignal(dayResult.d5);
+    $("symOut").innerHTML = `<div class="triage l${lv}"><b>${LV[lv][0]}</b><span>${LV[lv][1]}</span><span class="src">고른 증상 중 가장 급한 단계로 안내해요. ${lv >= 1 ? "이 단계를 기록하면 오늘 신호가 빨강이 돼요." : ""} 진단이 아니에요.</span></div>`;
+    complete(5); reveal($("symOut"));
+  });
+  const LOOP = [["1차 검증", 78, "증상 저장 뒤 화면 이동, 폰 뒤로 가기 버튼 오류 등"], ["2차 검증", 84, "영상 크게 보기의 검은 화면, 회복 계산에 계체 전 몸무게가 들어가던 문제 등"], ["3차 검증", 90, "90점 통과, 남은 문제까지 마저 고침"]];
+  $("loopBars").innerHTML = LOOP.map(([l, s, t], i) => `<div class="brow"><span>${l}</span><div class="btrack"><i class="${i === 2 ? "hl" : ""}" style="width:${s}%"></i></div><span class="n">${s}점</span></div><p class="loopnote">${t}</p>`).join("");
+
+  /* MISSION 6: 계체 + 수분 잔 */
+  $("weighGo").addEventListener("click", () => {
+    const el = $("scaleNum"); let t0 = null; $("weighGo").disabled = true;
+    const step = ts => { t0 = t0 || ts; const p = Math.min(1, (ts - t0) / 1400); const v = 70.2 + (1 - p) * (Math.sin(p * 18) * 1.2 * (1 - p));
+      el.textContent = (p < 1 ? v : 70.2).toFixed(1); if (p < 1) requestAnimationFrame(step); else { $("scale").classList.add("pass"); $("scaleMsg").textContent = "통과 · 한계보다 0.1kg 아래"; } };
+    requestAnimationFrame(step);
+  });
+  const GL = 150, GOAL = [600, 900];
+  $("glasses").innerHTML = Array.from({ length: 8 }, (_, i) => `<button type="button" data-i="${i}" aria-label="${(i + 1) * GL}mL까지 채우기"></button>`).join("");
+  let filled = 0;
+  function glass() {
+    $("glasses").querySelectorAll("button").forEach((b, i) => b.classList.toggle("full", i < filled));
+    const ml = filled * GL;
+    $("glassOut").innerHTML = `${ml}mL · 목표 ${GOAL[0]}~${GOAL[1]}mL (경구수액, 계체 직후 ~1시간, GSSI). ${ml < GOAL[0] ? "조금 더." : ml <= GOAL[1] ? '<span class="yes">맞아요. 그다음은 시간당 1~1.5L씩 나눠서.</span>' : '<span class="mid">한 번에 너무 많아요. 나눠 마시세요.</span>'}`;
+    if (ml >= GOAL[0] && ml <= GOAL[1]) complete(6);
+  }
+  $("glasses").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; filled = +b.dataset.i + 1 === filled ? +b.dataset.i : +b.dataset.i + 1; glass(); });
+  glass();
+  ["rU", "rW", "rG"].forEach(id => $(id).addEventListener("input", rec));
+  function rec() {
+    const usual = +$("rU").value; $("rW").max = usual; const weigh = Math.min(+$("rW").value, usual), gap = +$("rG").value; if (+$("rW").value > usual) $("rW").value = usual;
+    $("oU").textContent = usual.toFixed(1) + "kg"; $("oWk").textContent = weigh.toFixed(1) + "kg"; $("oG").textContent = gap + "시간";
+    const lost = usual - weigh, pct = lost / usual * 100, fl = [lost * 1.25, lost * 1.5], cph = Math.min(60, Math.round(weigh));
+    const big = pct >= 5, carb = big ? [8, 12] : [4, 7], carbTot = carb.map(x => Math.round(x * weigh)), carbFit = Math.max(0, Math.floor(gap - 2)) * 60, warn = [];
+    if (gap < 12 && pct >= 5) warn.push(`계체와 경기가 같은 날이면 감량은 5% 미만이 권장돼요. 지금 ${pct.toFixed(1)}%예요. (GSSI)`);
+    if (gap >= 12 && pct > 8) warn.push(`전날 계체여도 감량은 최대 8%까지가 권장돼요. 지금 ${pct.toFixed(1)}%예요. (GSSI)`);
+    if (fl[0] > Math.max(0, gap) * 1.5) warn.push("경기 전까지 시간이 짧아 잃은 수분을 다 채우기 어려워요. 무리해서 한 번에 많이 마시지 마세요.");
+    if (carbFit < carbTot[0]) warn.push(`경기 전까지 시간당 60g씩 먹어도 탄수화물 목표(${carbTot[0]}g)를 다 채우기 어려워요.`);
+    if (lost < 0.05) { $("recOut").innerHTML = `<ul class="why"><li class="l0" style="color:var(--ink)">감량이 없어요. 계체 체중이 평소 체중보다 낮을 때 회복 계산이 나와요.</li></ul>`; return; }
+    $("recOut").innerHTML = `<div class="stats"><div><span class="big-num">${r1(lost)}<small>kg</small></span><span class="cap">감량 ${pct.toFixed(1)}%</span></div><div><span class="big-num">${r1(weigh * 1.1)}<small>kg</small></span><span class="cap">계체 뒤 최대 회복 범위 (계체 체중 +10%)</span></div></div>
+      ${warn.map(w => `<ul class="why"><li class="l2">${esc(w)}</li></ul>`).join("")}
+      <ul class="why"><li class="l1"><b>직후 ~1시간</b> · 경구수액 600~900mL, 나트륨 1L당 50~90mmol</li><li class="l1"><b>1~2시간</b> · 시간당 1~1.5L씩, 총 ${r1(fl[0])}~${r1(fl[1])}L (잃은 무게의 125~150%)</li>
+      <li class="l1"><b>2시간 뒤부터</b> · 탄수화물 시간당 약 ${cph}g (1g/kg, 최대 60g)</li><li class="l1"><b>경기 전까지 합</b> · 탄수화물 ${carbTot[0]}~${carbTot[1]}g (${carb[0]}~${carb[1]}g/kg · ${big ? "감량 폭이 큰 편" : "작은 편"})</li></ul>
+      <p class="src">앱의 회복 계산식과 같아요. 감량한 무게를 모두 수분으로 보고 계산한 값이에요. 대회 규정과 팀 의료진의 안내가 먼저예요.</p>`;
+  }
+  rec();
+
+  /* MISSION 7: 영상 비교 (캔버스로 그린 막대 인형, 30fps 60프레임) */
+  const N = 60, PEAK_A = 34, PEAK_B = 44;
+  let fa = 0, offset = 0, playing = false, rate = 1, last = 0, acc = 0;
+  function pose(f, peak, high) {
+    const t = Math.max(0, Math.min(1, 1 - Math.abs(f - peak) / 16)), e = t * t * (3 - 2 * t);
+    return { leg: -0.15 + e * (high ? 2.15 : 1.75), arm: 0.6 - e * 0.9, lean: e * 0.35 };
+  }
+  function draw(cv, f, peak, high, label) {
+    const g = cv.getContext("2d"), W = cv.width, H = cv.height; g.clearRect(0, 0, W, H);
+    g.strokeStyle = "#2a2a2a"; for (let y = 60; y < H; y += 40) { g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
+    const p = pose(f, peak, high), hip = [W / 2, 250], sh = [hip[0] - Math.sin(p.lean) * 90, hip[1] - Math.cos(p.lean) * 90];
+    g.lineCap = "round"; g.lineWidth = 10; g.strokeStyle = "#f2efe8";
+    const ln = (a, b) => { g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke(); };
+    ln(hip, sh); g.beginPath(); g.arc(sh[0] - Math.sin(p.lean) * 26, sh[1] - Math.cos(p.lean) * 26, 20, 0, 7); g.stroke();
+    ln(hip, [hip[0] - 25, 380]);
+    const kick = [hip[0] + Math.sin(p.leg) * 130, hip[1] + Math.cos(p.leg) * 130]; g.strokeStyle = "#c9a96e"; ln(hip, kick);
+    g.strokeStyle = "#f2efe8"; ln(sh, [sh[0] - 60, sh[1] + 30 + p.arm * 40]); ln(sh, [sh[0] + 40, sh[1] + 20 - p.arm * 20]);
+    g.fillStyle = "#c9a96e"; g.beginPath(); g.arc(kick[0], kick[1], 8, 0, 7); g.fill();
+    g.fillStyle = "#a29d93"; g.font = "14px monospace"; g.fillText(label, 10, 22);
+    if (Math.abs(f - peak) <= 1) { g.fillStyle = "#3ec97e"; g.fillText("최고점", W - 70, 22); }
+  }
+  function vid() {
+    const fb = ((fa + offset) % N + N) % N;
+    draw($("cvA"), fa, PEAK_A, false, "A"); draw($("cvB"), fb, PEAK_B, true, "B");
+    $("fA").textContent = fa + "프레임"; $("fB").textContent = fb + "프레임"; $("syncO").textContent = (offset > 0 ? "+" : "") + offset + "프레임";
+    const diff = PEAK_B - (PEAK_A + offset);
+    $("vidOut").innerHTML = diff === 0 ? '<span class="yes">맞췄어요. 이제 두 영상의 같은 순간을 나란히 비교할 수 있어요. 어제는 발이 더 높이 올라갔네요.</span>' : `최고점이 ${Math.abs(diff)}프레임 어긋나 있어요. 오른쪽 막대를 ${diff > 0 ? "오른쪽(+)" : "왼쪽(−)"}으로 밀어 보세요. 한 프레임씩 넘기며 최고점을 찾아도 돼요.`;
+    if (diff === 0) complete(7);
+  }
+  function tick(ts) { if (!playing) return; const dt = ts - (last || ts); last = ts; acc += dt * rate; while (acc >= 1000 / 30) { acc -= 1000 / 30; fa = (fa + 1) % N; } vid(); requestAnimationFrame(tick); }
+  $("vctl").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.r) { rate = +b.dataset.r; $("vctl").querySelectorAll("[data-r]").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false")); return; }
+    if (b.dataset.v === "play") { playing = !playing; b.textContent = playing ? "❚❚ 멈춤" : "▶ 재생"; last = 0; if (playing) requestAnimationFrame(tick); return; }
+    playing = false; const pb = $("vctl").querySelector('[data-v="play"]'); pb.textContent = "▶ 재생"; fa = (fa + +b.dataset.v + N) % N; vid();
+  });
+  $("sync").addEventListener("input", () => { offset = +$("sync").value; vid(); });
+  document.querySelectorAll("[data-sy]").forEach(b => b.addEventListener("click", () => { offset = Math.max(-30, Math.min(30, offset + +b.dataset.sy)); $("sync").value = offset; vid(); }));
+  fa = PEAK_A; vid();
+
+  /* ── 에필로그: 설문 ── */
+  const ROLES = [["코치·관장", ["시작", "코치 질문 9개", "마지막 질문 6개", "(동의하면) 인스타 아이디"]], ["프로·세미프로·아마추어 선수", ["시작", "선수 질문 10개", "마지막 질문 6개", "(동의하면) 인스타 아이디"]], ["코치이면서 현역 선수", ["시작", "코치 질문 7개", "선수 질문 10개", "마지막 질문 6개", "(동의하면) 인스타 아이디"]]];
+  let roleSel = 2;
+  function roles() {
+    $("roleT").innerHTML = ROLES.map(([n], i) => `<button type="button" data-i="${i}" aria-pressed="${i === roleSel}">${n}</button>`).join("");
+    $("route").innerHTML = ROLES[roleSel][1].map((s, i) => `${i ? "<i>→</i>" : ""}<span class="${i && i < ROLES[roleSel][1].length - 1 ? "on" : ""}">${s}</span>`).join("") + (roleSel === 2 ? `<p class="note" style="width:100%;margin-top:6px">코치이면서 선수인 분은 둘 다 겪어서 양쪽 질문을 모두 받게 했습니다.</p>` : "");
+  }
+  $("roleT").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { roleSel = +b.dataset.i; roles(); } }); roles();
+  const QS = [["겪은 일", "감량·회복 중에 겪은 적이 있는 일 (여러 개)", [["심한 어지럼", 2], ["경기력이 떨어진 느낌", 2], ["잠들기 어려움", 2, 1], ["쥐·경련", 1], ["계체 실패", 1], ["병원에 간 적", 0]], "'잠들기 어려움'은 수분 감량 중에 흔히 겪는다고 알고 있던 문제라 설문 중간에 추가한 항목인데, 3명 중 2명이 골랐습니다."],
+    ["물로 빼는 양", "계체 전 2~3일 동안 물로 빼는 양", [["1kg 미만", 0], ["1~3kg", 1], ["3~5kg", 2], ["5kg 이상", 0], ["하지 않음", 0]], "3명 모두 계체 후에는 전해질 음료부터 마시고 그다음 탄수화물을 먹는다고 적었습니다."],
+    ["필요한 기능", "근거 기반 앱에서 필요한 것 (여러 개)", [["감량 계획", 3], ["식단 기록", 3], ["컨디션에 따른 훈련 강도", 2], ["계체 후 회복 계획", 2], ["코치와 기록 공유", 2], ["부상·증상 체크", 1], ["훈련 영상 비교", 1]], "격투기 관련 앱을 써 본 사람은 0명이었고, 이유는 '아는 앱이 없어서'였습니다. 쓸 생각은 5점 만점에 5·5·3점."]];
+  let qSel = 0;
+  function qs() {
+    $("qT").innerHTML = QS.map(([n], i) => `<button type="button" data-i="${i}" aria-pressed="${i === qSel}">${n}</button>`).join("");
+    const [, title, rows, note] = QS[qSel];
+    $("bars").innerHTML = `<div class="note">${esc(title)}</div>` + rows.map(([lab, n, hl]) => `<div class="brow"><span>${esc(lab)}</span><div class="btrack"><i class="${hl ? "hl" : ""}" data-w="${n / 3 * 100}"></i></div><span class="n">${n}명</span></div>`).join("");
+    requestAnimationFrame(() => $("bars").querySelectorAll("i").forEach(i => i.style.width = i.dataset.w + "%"));
+    $("qNote").textContent = note + " 아직 3명이라 경향이라고 말할 수는 없습니다.";
+  }
+  $("qT").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { qSel = +b.dataset.i; qs(); } }); qs();
+
+  /* 결정 */
+  const VER = [["여러 종목 v0.4.9", `<h4>종목</h4><div class="chips2"><span>구기</span><span>육상</span><span class="on">투기</span><span>기타</span></div><div class="note">세부 종목</div><div class="chips2"><span>복싱</span><span class="on">MMA</span><span>주짓수</span><span>레슬링</span><span>태권도</span><span>유도</span><span>기타 투기</span></div><div class="note">축구·농구·야구는 포지션, 투기는 체급, 야구 투수는 투구 수까지</div>`,
+      ["구기 14종목, 육상 10종목, 투기 7종목, 하계 11종목, 동계 7종목, 기타 4종목을 다 담았습니다.", "종목마다 다른 기능(투구 수, 체급, 계체)이 섞여 화면과 설명이 복잡해졌습니다.", "우선 초기에 생각했던 MMA를 따로 떼어내 다듬고자 하였습니다. 다듬은 뒤 다시 합칠지, 아예 종목별로 따로 만들지는 추후에 정할 생각입니다."]],
+    ["MMA v0.1.0 (분리 시점)", `<h4>체급</h4><div class="note">MMA 전용 앱이에요. 내 체급을 골라 주세요.</div><div class="chips2"><span>스트로급 · 52.2kg</span><span>플라이급 · 56.7kg</span><span>밴텀급 · 61.2kg</span><span>페더급 · 65.8kg</span><span class="on">라이트급 · 70.3kg</span><span>웰터급 · 77.1kg</span><span>미들급 · 83.9kg</span></div><div class="note">통합 규정 (UFC 등) · 목록에 없으면 직접 고쳐요</div>`,
+      ["현재 제가 알고 있는 스포츠 안에서는 MMA가 가장 배고프고 힘들며 몸이 상하는 운동이라고 생각해 MMA로 정했고, 바로 설문을 보냈습니다.", "벌이에 비해 훈련이 고되고, 운동 특성상 몸이 많이 다치고 상하는 일이기 때문입니다.", "국내에 정보가 적어서 그렇지, 앱으로 충분히 도움을 줄 수 있겠다고 판단했습니다."]]];
+  let verSel = 1;
+  function ver() { $("verT").innerHTML = VER.map(([n], i) => `<button type="button" data-i="${i}" aria-pressed="${i === verSel}">${n}</button>`).join(""); $("mock").innerHTML = VER[verSel][1];
+    $("verNote").innerHTML = `<ul class="why">${VER[verSel][2].map(t => `<li class="l${verSel ? 0 : 1}" style="color:var(--ink)">${esc(t)}</li>`).join("")}</ul>`; }
+  $("verT").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { verSel = +b.dataset.i; ver(); } }); ver();
+  const WHO = [["디자인: 검정 바탕·금색 줄·기울인 숫자", "me", "본인", "여러 디자인 시안 중 D안을 골랐습니다."],
+    ["앱 아이콘이 오늘 신호 색으로 바뀌기", "me", "본인", "보류 · 오늘 컨디션에 따라 아이콘 색을 바꾸고 싶었는데요. 지금 같은 웹앱에서는 바꿀 수 없어서, 정식 앱이 되면 시도해 볼 생각입니다."],
+    ["뒤로 버튼은 하위 화면에만", "ai", "AI", "채택 · 처음엔 모든 화면에 두려 했는데, 평가 AI가 낸 안과 비교해 보고 받아들였습니다."],
+    ["감량 '계획' 계산기", "me", "본인", "보류 · 감량 폭을 정하는 건 혼자 만들면 위험하다고 보고 계체 '후' 회복만 먼저 만들었습니다."],
+    ["영상 자세 AI 분석", "me", "본인", "보류 · 격투기는 정답 자세가 없어 뺐습니다. 골프처럼 정해진 동작을 반복하는 종목에는 넣어 볼 생각입니다."],
+    ["설문에 구글 로그인·1회 제한", "me", "본인", "뺌 · 익명 설문이라고 해 놓고 로그인을 받으면 익명이 아니라고 느낄 수 있어서 뺐습니다."],
+    ["'코치이면서 현역 선수'에게 코치·선수 질문 모두 받기", "me", "본인", "채택 · AI는 선수 질문만 받자고 했지만 둘 다 받게 했고, 겹치는 2문항은 제가 뺐습니다."],
+    ["'잠들기 어려움' 항목", "me", "본인", "추가 · 응답 3명 중 2명이 골랐습니다."],
+    ["MMA만 떼어 먼저 완성", "me", "본인", "채택 · 여러 종목 앱은 그대로 두고 새 저장소에 MMA 앱을 만들었습니다."]];
+  let whoSel = "all";
+  function who() { $("whoT").innerHTML = [["all", "전체"], ["me", "본인"], ["ai", "AI 제안"]].map(([k, n]) => `<button type="button" data-k="${k}" aria-pressed="${k === whoSel}">${n} <span class="mono">${k === "all" ? WHO.length : WHO.filter(w => w[1] === k).length}</span></button>`).join("");
+    $("whoBody").innerHTML = WHO.filter(w => whoSel === "all" || w[1] === whoSel).map(([t, k, n, r]) => `<tr><td>${esc(t)}</td><td><span class="chip ${k}">${n}</span></td><td>${esc(r)}</td></tr>`).join(""); }
+  $("whoT").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { whoSel = b.dataset.k; who(); } }); who();
+
+  /* 흐름 */
+  const FLOW = [["11월 1일", "1차 · 처음 설정, 아침 체크인, 신호등과 이유, 기록, 백업", "", "build", "아침에 잠·피로·근육통·스트레스·통증을 넣으면 신호와 이유가 나오는 첫 버전."],
+    ["11월 1일", "2차 · 식단과 하루 목표", "", "build", "식약처 DB 1,015개 검색, 기초대사량과 훈련 시간으로 하루 목표."],
+    ["11월 1일", "발견 · '쌀밥'이 'ㅆㅆㅏㄹㅂㅏㅂ'", "", "find", "아이폰에서 발견 → 입력칸은 두고 결과만 바꾸게 수정."],
+    ["11월 2일", "종목 선택 개편 · 디자인 개편", "v0.2.2~0.2.3", "build", "포지션·체급표. 검정 바탕과 금색 줄(D안)."],
+    ["11월 2일", "3차 · 증상 체크, 투구 수, 계체 후 회복, 35세 이상", "v0.3.0", "build", "감량 '계획'은 보류하고 계체 '후' 회복만."],
+    ["11월 2일", "4차 · 영상 비교", "v0.4.0", "build", "느리게, 한 프레임씩, 두 영상 같은 순간으로."],
+    ["11월 3일", "발견 · 아이폰으로 써 본 피드백", "v0.4.1", "find", "'직접 입력' 위치 재조정, 커서가 숫자를 가림, 날짜가 멋대로 골라짐, 영상 ±1·5·10초 이동 버튼 추가."],
+    ["11월 3일", "자동 검증 3차례", "v0.4.3~0.4.5", "build", "AI가 고치고·찾고·채점. 78 → 84 → 90점."],
+    ["11월 3~4일", "설정 정리, 평가 AI 안 일부 반영", "v0.4.6~0.4.9", "build", "뒤로 버튼은 하위 화면에만, 증상 체크·회복 계산기 버튼은 흰색으로."],
+    ["11월 4일", "현장 설문 설계", "", "field", "입장에 따라 질문이 갈라지는 구글 폼. 로그인 없이."],
+    ["11월 4~5일", "코치·관장, 선수, 기자에게 DM", "", "field", "설문을 돌리던 중 '잠들기 어려움' 추가."],
+    ["11월 5일", "응답 3명", "", "field", "잠들기 어려움 2명, 격투기 관련 앱 써 본 사람 0명."],
+    ["11월 5일", "MMA만 떼어 새 앱으로", "MMA v0.1.0", "build", "종목을 MMA로 고정, 저장 공간 분리. 여러 종목 앱은 그대로."],
+    ["11월 6일", "검증·평가 루프 8라운드, 휴리스틱 점검", "MMA v0.1.11", "test", "피로·근육통·스트레스는 1이 좋음으로 번호를 뒤집고, 빨강은 평소보다 4점 이상 낮을 때만 켜지게 바꿨습니다. 이유에 '평소보다 나빠진 것'을 보여 주고, 닐슨 휴리스틱 10원칙으로 다시 점검했습니다."]];
+  let fSel = "all";
+  function flow() { $("flowT").innerHTML = [["all", "전체"], ["find", "직접 써 보며 찾은 것"], ["field", "현장에 물은 것"], ["build", "만든 것"]].map(([k, n]) => `<button type="button" data-k="${k}" aria-pressed="${k === fSel}">${n}</button>`).join("");
+    $("tl").innerHTML = FLOW.filter(f => fSel === "all" || f[3] === fSel).map(([d, w, v, k, p]) => `<li class="${k}"><div class="when">${d}</div><div class="what">${esc(w)}${v ? `<span class="ver">${v}</span>` : ""}</div><p>${esc(p)}</p></li>`).join(""); }
+  $("flowT").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { fSel = b.dataset.k; flow(); } }); flow();
+
+  /* 근거 */
+  const RULES = [["통증", "심함 → 빨강, 중간 → 노랑", "이 앱의 기준"],
+    ["컨디션 점수 (잠·피로·근육통·스트레스, 각 1~5)", "잠은 5가 좋음, 피로·근육통·스트레스는 1이 좋음(더할 때 좋은 쪽으로 맞춰 20점 만점) · 기록 7일 이상: 지난 28일 평균보다 z ≤ −1.5이면서 4점 이상 낮으면 빨강, z ≤ −1 노랑 (35세 이상 −0.75) · 7일 전: 8점 이하 빨강, 11점 이하 노랑", "Hooper & Mackinnon (1995) Sports Med 20(5); McLean 등 (2010)"],
+    ["잠잔 시간", "성인 6시간 미만, 청소년 7시간 미만이면 노랑", "미국수면의학회(AASM) 권고"],
+    ["훈련량", "시간(분) × 힘든 정도(1~10)", "Foster 등 (2001) J Strength Cond Res 15(1)"],
+    ["훈련량 급증 (참고 지표)", "최근 7일 ÷ 28일 주평균, 기록 21일 이상일 때만. 1.5배 초과 빨강, 1.3배 초과 노랑 (35세 이상 1.2배)", "Gabbett (2016) BJSM 50 · 비판 Impellizzeri 등 (2020) IJSPP 15(6)"],
+    ["몸무게", "지난 7일 평균보다 2% 이상 줄면 노랑", "이 앱의 기준"],
+    ["하루 열량", "기초대사량(Mifflin-St Jeor) × 활동계수 1.4~1.85", "Mifflin 등 (1990) Am J Clin Nutr 51(2)"],
+    ["탄수화물·단백질", "훈련 시간에 따라 탄수화물 3~8 g/kg, 단백질 유지 1.6·감량 2.0·증량 1.8 g/kg", "Thomas 등 (2016) ACSM 공동 입장문; Jäger 등 (2017) ISSN"],
+    ["감량 속도", "기한 없으면 주 0.5%, 주 1%를 넘으면 막음", "Helms 등 (2014) JISSN 11:20"],
+    ["계체 후 수분", "직후 600~900mL, 시간당 1~1.5L, 잃은 무게의 125~150%, 나트륨 1L당 50~90mmol", "ISSN 2025 입장문; GSSI (Reale)"],
+    ["계체 후 탄수화물", "2시간 뒤부터 시간당 약 1 g/kg (최대 60g), 감량 5% 이상이면 8~12 g/kg, 아니면 4~7 g/kg", "ISSN 2025; Lewis James 발표"],
+    ["급속 감량 범위 (경고용)", "계체 72시간 전 6.7%, 48시간 5.7%, 24시간 4.4% · 전날 계체 최대 8%, 당일 5% 미만", "ISSN 2025; GSSI"],
+    ["35세 이상 확인", "운동 중 가슴 불편감·숨참·어지럼, 준비·정리운동, 주 2일 근력 운동", "Riebe 등 (2015) MSSE 47(11); ACSM 지침 11판; WHO (2020)"],
+    ["음식 영양값", "식약처 식품영양성분 통합DB에서 1,015개", "식품의약품안전처 (공공데이터포털)"]];
+  function rules() { const q = $("ruleQ").value.trim().toLowerCase();
+    $("ruleBody").innerHTML = RULES.filter(r => !q || r.join(" ").toLowerCase().includes(q)).map(([a, b, c]) => `<tr><td>${esc(a)}</td><td>${esc(b)}</td><td class="muted">${esc(c)}</td></tr>`).join("") || `<tr><td colspan="3" class="muted">찾는 내용이 없어요.</td></tr>`; }
+  $("ruleQ").addEventListener("input", rules); rules();
+
+  /* PDF용: 모든 미션을 예시 값으로 끝내고 이야기를 펼침 */
+  if (PRINT) {
+    Object.assign(CK, { sQ: 3, fa: 3, so: 2, st: 4, pa: 1 }); ck1paint(); $("ck1go").click();
+    $("t2go").click(); $("quiz").querySelector('[data-c="r"]').click();
+    [0, 1, 2].forEach(i => pick.add(i)); food();
+    $("syms").querySelector('input[value="sf3"]').checked = true; $("syms").dispatchEvent(new Event("change"));
+    filled = 5; glass(); $("weighGo").disabled = true; $("scaleNum").textContent = "70.2"; $("scale").classList.add("pass"); $("scaleMsg").textContent = "통과 · 한계보다 0.1kg 아래";
+    offset = 10; $("sync").value = 10; fa = PEAK_A; vid();
+    document.querySelectorAll(".story").forEach(s => { s.open = true; s.classList.remove("new"); });
+    document.querySelectorAll("details.qa").forEach(d => d.open = true);
+    scrollTo(0, 0);
+  }
+})();
+/* 예상 질문 모두 펼치기·접기 */
+/* 버튼 하나로: 하나라도 접혀 있으면 '모두 펼치기', 다 펼쳐져 있으면 '모두 접기'. 질문을 하나씩 열고 닫아도 글자가 따라 바뀜 */
+(() => { const btn = document.getElementById("qaAll"); if (!btn) return;
+  const qs = () => [...document.querySelectorAll("#qa details.qa")];
+  const sync = () => { const allOpen = qs().every(d => d.open); btn.textContent = allOpen ? "모두 접기" : "모두 펼치기"; btn.setAttribute("aria-expanded", String(allOpen)); };
+  btn.addEventListener("click", () => { const open = !qs().every(d => d.open); qs().forEach(d => d.open = open); sync(); });
+  qs().forEach(d => d.addEventListener("toggle", sync)); sync(); })();
+/* 만든 이야기 7개 모두 펼치기·접기 (위 예상 질문 버튼과 같은 방식) */
+(() => { const btn = document.getElementById("storyAll"); if (!btn) return;
+  const ss = () => [...document.querySelectorAll("details.story")];
+  const sync = () => { const allOpen = ss().every(d => d.open); btn.textContent = allOpen ? "만든 이야기 모두 접기" : "만든 이야기 모두 펼치기"; btn.setAttribute("aria-expanded", String(allOpen)); };
+  btn.addEventListener("click", () => { const open = !ss().every(d => d.open); ss().forEach(d => { d.open = open; d.classList.remove("new"); }); sync(); });
+  ss().forEach(d => d.addEventListener("toggle", sync)); sync(); })();
+/* '만든 이야기로 건너뛰기': 이동 뒤 첫 이야기 제목에 포커스 */
+(() => { const a = document.getElementById("skipStory"); if (!a) return;
+  a.addEventListener("click", () => setTimeout(() => { const s = document.querySelector("#story1 > summary"); if (s) s.focus(); }, 0)); })();
+/* 바로가기: 주소 끝 #go-… 로 그 자리에 가서 펼치고 잠깐 금색 테두리 (체크리스트 링크용)
+   #go-story-3 = 만든 이야기 3, #go-ver-0 = 결정 장면 첫 탭, #go-role-2 = 설문 입장 세 번째 탭 */
+(() => {
+  const go = (want) => {
+    const h = typeof want === "string" ? want : decodeURIComponent(location.hash.slice(1)); if (!h.startsWith("go-")) return;
+    let el = null, m;
+    if ((m = h.match(/^go-story-(\d)$/))) el = document.querySelector(`details.story[data-s="${m[1]}"]`);
+    else if ((m = h.match(/^go-ver-(\d)$/))) { const b = document.querySelector(`#verT button[data-i="${m[1]}"]`); if (b) b.click(); el = document.getElementById("verNote"); }
+    else if ((m = h.match(/^go-role-(\d)$/))) { const b = document.querySelector(`#roleT button[data-i="${m[1]}"]`); if (b) b.click(); el = document.getElementById("route"); }
+    else el = document.getElementById(h);
+    if (!el) return;
+    const d = el.tagName === "DETAILS" ? el : el.closest("details"); if (d) d.open = true;
+    setTimeout(() => { el.scrollIntoView({ block: el.offsetHeight > innerHeight * 0.6 ? "start" : "center" }); el.classList.remove("golink"); void el.offsetWidth; el.classList.add("golink"); }, 60);
+  };
+  addEventListener("hashchange", () => go());
+  // 체크리스트 페이지가 이 페이지를 안에 띄워 놓고 보내는 바로가기 요청
+  addEventListener("message", e => { if (e.data && typeof e.data.pfGo === "string") go(e.data.pfGo); }); if (document.readyState === "complete") setTimeout(() => go(), 300); else addEventListener("load", () => setTimeout(() => go(), 300));
+})();
+</script>
+</body>
+</html>
