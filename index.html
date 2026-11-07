@@ -610,7 +610,7 @@ function renderOnboard(){
     ${b.youth?`<div class="banner info">유소년은 <b>감량·수분 감량 기능이 열리지 않아요.</b> 성장기에는 잘 먹고 잘 쉬는 게 우선이에요.${b.id==="u14"?" 만 14세 미만은 보호자와 함께 써 주세요.":""}</div>`:""}
     ${!b.youth&&prof.cat==="투기"&&prof.level!=="hobby"?`<div class="banner info">MMA 대회 출전으로 설정돼서, 오늘 화면에서 <b>계체 후 회복 계산기</b>를 쓸 수 있어요.</div>`:""}
     ${prof.screeningFlag?`<div class="banner bad">건강 확인에 '예'가 있어요. <b>고강도 운동 전에 진료를 받아 보세요.</b></div>`:""}
-    <p class="mut">이 앱은 의학적 진단을 하지 않아요. 기록을 바탕으로 참고할 신호를 보여 줘요.</p>`;
+    <p class="mut">이 앱은 의학적 진단을 하지 않아요. 적은 기록으로 참고 신호만 보여 줘요.</p>`;
     ok=true;
   }
   $("#app").innerHTML=bar+h+`<button class="btn" id="next" ${ok?"":"disabled"}>${nextLabel(p,st,ok)}</button>${st>0&&!ob.only?`<button class="btn sm ghost neutral back-l" id="prev">이전 단계</button>`:""}`;
@@ -1217,7 +1217,7 @@ function renderSettings(){
   <details class="fold"><summary>훈련량</summary><div>훈련 시간(분) × 힘든 정도(1~10). '세션 RPE'라고 불리는 방법이에요.<small class="src">Foster 등 (2001) J Strength Cond Res 15(1)</small></div></details>
   <details class="fold"><summary>훈련량 급증</summary><div>최근 7일 합이 최근 4주 주평균의 몇 배인지 봐요. 21일 이상 기록이 있어야 계산해요. 이 비율은 부상 예측력에 논란이 있어서 <b>참고 지표</b>로만 써요.<small class="src">Gabbett (2016) Br J Sports Med 50; 비판: Impellizzeri 등 (2020) IJSPP 15(6)</small></div></details>
   <details class="fold"><summary>잠</summary><div>성인 7시간 이상, 청소년 8~10시간 권장 기준에서 1시간 넘게 모자라면 노랑.<small class="src">미국수면의학회(AASM) 권고</small></div></details>
-  <details class="fold"><summary>나이</summary><div>35세 이상은 회복이 느려지는 점을 반영해 노랑 기준을 조금 더 일찍 잡아요.</div></details>
+  <details class="fold"><summary>나이</summary><div>35세 이상은 회복이 느려져서 노랑 기준을 조금 더 일찍 잡아요.</div></details>
   
   <details class="fold"><summary>체급표</summary><div>MMA 통합 규정(Unified Rules) 체급이에요. 대회마다 체급 한계가 다르면 처음 설정에서 직접 고쳐 쓰세요.</div></details>
   <details class="fold"><summary>증상 체크</summary><div>고른 증상 중 가장 급한 단계(119 / 오늘 병원 / 쉬면서 관찰)로 안내하고, 119·병원 단계를 기록하면 그날 신호가 빨강이 돼요.<small class="src">${Object.values(SYM_SRC).join(" / ")}</small></div></details>
