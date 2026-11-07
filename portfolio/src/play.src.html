@@ -227,6 +227,7 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 .story[data-s="5"] .sb { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
 .loopnote { font-size: 13px; color: #b3ada3; margin: -2px 0 6px; }
 .fab { transition: opacity .25s, transform .25s; }
+.fab.at-p0 { display: none !important; }   /* 첫 화면(프롤로그)에서는 숨김: 계기 카드 모서리를 가리지 않게. 월요일부터 보임 */
 .fab.dim { opacity: .2; transform: scale(.85); pointer-events: none; }
 @media (pointer: coarse) { .fab.dim { visibility: hidden; } }
 .segrow .dir { display: block; font-size: 12px; color: var(--mut); font-weight: 500; white-space: nowrap; }
@@ -399,7 +400,6 @@ input[type=range] { height: 44px; margin: 0; }
 /* ── 개선 루프 11-07 v3 (폰 첫 화면에 목차·안내·펼치기, 터치 건너뛰기, 폰 미션 압축, 닫기 44px) ── */
 .p0-acts { display: flex; flex-wrap: wrap; gap: 8px; }
 body.print #skipStoryTouch { display: none; }
-.why li.lead { font-size: 17px; font-weight: 700; }
 .segrow .dir .nw { white-space: nowrap; }
 .ch.prolog { padding-top: 8px; }
 .prolog .ch-in { gap: 16px; }
@@ -468,8 +468,8 @@ body.print #skipStoryTouch { display: none; }
         <div class="stack">
           <p class="muted">이 앱을 시작한 계기는 세 가지였습니다.</p>
           <ul class="why">
-            <li class="l0 lead" style="color:var(--ink)">10년 넘게 MMA를 챙겨 보면서 계체 실패와 무리한 수분 감량 이야기를 계속 접했습니다.</li>
             <li class="l0" style="color:var(--ink)">아마추어 풋살 팀을 운영하며 코치를 맡았을 때, 경기 영상을 찍어 장면을 되짚어 가며 설명해 주고 싶었는데 마땅한 방법이 없었습니다.</li>
+            <li class="l0" style="color:var(--ink)">10년 넘게 MMA를 챙겨 보면서 계체 실패와 무리한 수분 감량 이야기를 계속 접했습니다.</li>
             <li class="l0" style="color:var(--ink)">유소년 선수들이 훈련량과 몸을 스스로 관리하도록 돕는 일도 언젠가 풀어 보고 싶었습니다.</li>
           </ul>
         </div>
@@ -769,7 +769,7 @@ body.print #skipStoryTouch { display: none; }
 </main>
 
 <div class="toast" id="toast" hidden role="status"><span>일주일 완주!</span><a href="#e1" id="toastGo">현장 이야기로 →</a><button type="button" id="toastX" aria-label="알림 닫기">✕</button></div>
-<button class="fab" type="button" id="fab" aria-label="실제 앱 열기">📱<span class="fab-t"> 실제 앱</span></button>
+<button class="fab at-p0" type="button" id="fab" aria-label="실제 앱 열기">📱<span class="fab-t"> 실제 앱</span></button>
 <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-label="실제 앱 체험">
   <div class="modal-card"><button class="close" type="button" id="mclose">닫기 ✕</button><div id="phoneHost"></div></div>
 </div>
@@ -876,13 +876,14 @@ body.print #skipStoryTouch { display: none; }
   function markDay(i) {
     dayLinks.forEach((a, k) => a.setAttribute("aria-current", k === i ? "true" : "false"));
     const c = chapters[i]; $("hudW").textContent = c.dataset.w || "—"; window.__dayScene = c.dataset.scene || "before";
-    document.querySelector(".hud").classList.toggle("at-start", !c.dataset.w);   // 프롤로그·에필로그(몸무게 없는 장면)에서는 빈 몸무게·꺼진 신호를 감춤
+    document.querySelector(".hud").classList.toggle("at-start", !c.dataset.w);
+    const fb = document.getElementById("fab"); if (fb) fb.classList.toggle("at-p0", c.id === "p0");   // 프롤로그·에필로그(몸무게 없는 장면)에서는 빈 몸무게·꺼진 신호를 감춤
     const sig = { d1: dayResult.d1, d2: dayResult.d2, d3: dayResult.d3, d4: null, d5: dayResult.d5, d6: null, d7: null }[c.id]; setHudSignal(sig);
     const a = dayLinks[i], t = $("days");
     t.scrollTo({ left: a.offsetLeft - (t.clientWidth - a.offsetWidth) / 2, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }
   const dayResult = { d1: null, d2: null, d3: null, d5: null };
-  if ("IntersectionObserver" in window) { const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) markDay(chapters.indexOf(e.target)); }), { rootMargin: "-40% 0px -59% 0px" }); chapters.forEach(c => io.observe(c)); }
+  if ("IntersectionObserver" in window) { const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) markDay(chapters.indexOf(e.target)); }), { rootMargin: "-40% 0px -59% 0px" }); chapters.forEach(c => io.observe(c)); } else { const fb = document.getElementById("fab"); if (fb) fb.classList.remove("at-p0"); }
 
   const armToast = () => { const t = $("toast"); clearTimeout(t._h); t._h = setTimeout(() => { if (!t.matches(":hover, :focus-within")) t.hidden = true; else armToast(); }, 9000); };
   $("toast").addEventListener("mouseleave", armToast); $("toast").addEventListener("focusout", armToast);
