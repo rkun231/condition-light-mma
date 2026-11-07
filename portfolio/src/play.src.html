@@ -820,7 +820,7 @@ body.print #skipStoryTouch { display: none; }
     try { localStorage.setItem(DEMO_KEY, JSON.stringify(demoState(kind))); } catch (e) {}
     host.querySelectorAll("[data-s]").forEach(b => b.setAttribute("aria-pressed", b.dataset.s === kind ? "true" : "false"));
     const tab = SCENES[kind][1];
-    const html = appHtml().replace("<head>", '<head><base href="https://rkun231.github.io/condition-light-mma/" target="_blank">')
+    const html = appHtml().replace("<head>", '<head><base href="https://rkun231.github.io/condition-light-mma/" target="_blank"><script>window.__THEME_LOCK="dark"<\/script>')
       .replace('const KEY = "condition-mma-v1";', `const KEY = "${DEMO_KEY}";`).replace("function arm(){", "function arm(){ return; ")
       .replace("</body>", `<script>try{ ${tab !== "today" ? `NAV=["today"]; go("${tab}");` : ""} }catch(e){}<\/script></body>`);
     if (frame) frame.remove();
