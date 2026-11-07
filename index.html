@@ -258,6 +258,17 @@ html{scroll-padding-bottom:calc(150px + env(safe-area-inset-bottom))}
 #saveck .sl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #saveck:disabled{font:700 16px/1.2 Pretendard,-apple-system,sans-serif}
 /* 잠잔 시간·몸무게: 자주 쓰는 값은 한 번에 누르기 (나머지는 아래 목록·직접 입력 그대로) */
+/* ── 루프 v6 (0.1.16) ── */
+/* 저장 바 위 그라데이션: 바 뒤에 줄이 더 있다는 단서 (누르기는 통과) */
+#saveck{overflow:visible}
+#saveck::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:28px;pointer-events:none;background:linear-gradient(to bottom,rgba(14,14,14,0),var(--bg));}
+/* 식단 끼니 카드 접기 */
+.mfold{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:8px;width:100%;min-height:44px;cursor:pointer}
+.mfold:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
+.mfold .ar{color:var(--gold);font-size:14px}
+.mbody.hid{display:none}
+/* 처음 설정 건강 확인: 하나로 묻고 '예'면 세부 3개 */
+.scrl{margin:6px 0 0;padding-left:0;list-style:none;color:var(--mut)}
 .qv{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin:0 0 8px}
 .qv .chip{min-height:48px;padding:6px 2px;text-align:center;font:italic 800 19px/1.1 var(--cond);color:#cfccc4}
 .qv .chip small{font:600 14px/1.1 Pretendard,sans-serif;font-style:normal;margin-left:1px}
@@ -350,7 +361,7 @@ function band(p){ const a=ageOf(p);
   return {id:"m50",name:"성인 · 50세 이상",youth:false}; }
 
 /* ───────── 종목 ───────── */
-const APP_VER = "0.1.15";
+const APP_VER = "0.1.16";
 // subs 값: null = 포지션 없음 / [[묶음 이름, [포지션…]], …]
 const SPORTS = {
   "투기": { subs:{ "MMA":null }, weightClass:true }
@@ -602,8 +613,10 @@ function renderOnboard(){
   } else if(st===4){
     const Q=[["heart","의사에게 심장 질환이나 고혈압 진단을 받은 적이 있나요?"],["chest","운동하거나 쉴 때 가슴 통증·답답함을 느낀 적이 있나요?"],["faint","어지러워서 균형을 잃거나 정신을 잃은 적이 있나요?"]];
     h=`<h1>운동 전 건강 확인</h1><p class="mut">하나라도 '예'면 고강도 운동 전에 진료를 받아 보라고 안내해요. 진단이 아니에요.</p>
-    ${Q.map(([k,q])=>`<div class="card"><div>${q}</div><div class="yn">${["예","아니요"].map(v=>`<button class="chip ${p.screening[k]===v?"on":""}" data-scr="${k}" data-v="${v}">${v}</button>`).join("")}</div></div>`).join("")}`;
-    ok=Q.every(([k])=>p.screening[k]);
+    ${(()=>{ const all=scrAll(p); return `<div class="card"><div>다음 중 <b>하나라도</b> 해당되나요?</div><ul class="scrl"><li>· 심장 질환·고혈압 진단</li><li>· 운동·휴식 중 가슴 통증</li><li>· 어지러워 균형·정신을 잃음</li></ul>
+    <div class="yn">${["예","아니요"].map(v=>`<button class="chip ${all===v?"on":""}" data-scrall="${v}"${v==="예"?` aria-expanded="${all==="예"}" aria-controls="scrdet"`:""}>${v}</button>`).join("")}</div></div>
+    <div id="scrdet"${all==="예"?"":" hidden"}>${Q.map(([k,q])=>`<div class="card"><div>${q}</div><div class="yn">${["예","아니요"].map(v=>`<button class="chip ${p.screening[k]===v?"on":""}" data-scr="${k}" data-v="${v}">${v}</button>`).join("")}</div></div>`).join("")}</div>`; })()}`;
+    ok=!!scrAll(p)&&Q.every(([k])=>p.screening[k]);
   } else {
     const prof=finalProfile(p), b=band(prof);
     h=`<h1>준비됐어요</h1>
@@ -618,12 +631,14 @@ function renderOnboard(){
   $("#app").innerHTML=bar+h+`<button class="btn" id="next" ${ok?"":"disabled"}>${nextLabel(p,st,ok)}</button>${st>0&&!ob.only?`<button class="btn sm ghost neutral back-l" id="prev">이전 단계</button>`:""}`;
   bindOnboard(); backBtn(); arm();
 }
+// 건강 확인 합친 질문의 답: 직접 고른 값(ob.scrAll)이 먼저, 없으면 저장된 세부 3개에서 읽음 (저장 모양은 그대로 heart·chest·faint)
+function scrAll(p){ if(ob&&ob.scrAll) return ob.scrAll; const v=["heart","chest","faint"].map(k=>p.screening[k]); if(v.includes("예")) return "예"; return v.every(x=>x==="아니요")?"아니요":""; }
 function obMissing(p,st){
   if(st===0) return [[p.birthYear&&p.birthMonth,"태어난 해·달"],[p.sex,"성별"]].filter(a=>!a[0]).map(a=>a[1]);
   if(st===1) return [[+p.height>=80&&+p.height<=250,"키"],[+p.weight>=20&&+p.weight<=250,"몸무게"],[p.weeklySessions,"훈련 횟수"]].filter(a=>!a[0]).map(a=>a[1]);
   if(st===2) return p.level?[]:["대회 출전 여부"];
   if(st===3){ const pl=p.cat&&p.sub?posList(p.cat,p.sub):null; return [[p.cat,"종목"],[p.sub,"세부 종목"],[!pl||pl.includes(p.pos),"포지션"]].filter(a=>!a[0]).map(a=>a[1]); }
-  if(st===4){ const n=["heart","chest","faint"].filter(k=>!p.screening[k]).length; return n?[`건강 질문 ${n}개`]:[]; }
+  if(st===4){ if(!scrAll(p)) return ["건강 질문 1개"]; const n=["heart","chest","faint"].filter(k=>!p.screening[k]).length; return n?[`건강 질문 ${n}개`]:[]; }
   return [];
 }
 function nextLabel(p,st,ok){ if(ok) return ob&&ob.only?"저장":st<5?"다음":"시작하기"; const m=obMissing(p,st); return m.length?`채워 주세요 · ${m.join(", ")}`:"다음"; }
@@ -653,6 +668,10 @@ function bindOnboard(){
   on("[data-wc]",b=>{ const sets=wcSets(p), L=wcList(sets[Math.max(0,Math.min(+p.wcSet||0,sets.length-1))],p.sex), x=L[+b.dataset.wc];
     p.weightClass=x[0]; p.classLimit=x[1]==null?"":String(x[1]); });
   on("[data-scr]",b=>p.screening[b.dataset.scr]=b.dataset.v);
+  document.querySelectorAll("[data-scrall]").forEach(b=>b.onclick=()=>{ const v=b.dataset.scrall, was=scrAll(p);
+    if(v==="아니요") p.screening={heart:"아니요",chest:"아니요",faint:"아니요"};
+    else if(was!=="예") p.screening={};
+    ob.scrAll=v; re(); const n=document.querySelector(`[data-scrall="${v}"]`); if(n) n.focus({preventScroll:true}); });
   inp("ht","height"); inp("wt","weight"); inp("wc","weightClass"); inp("wl","classLimit"); inp("subname","subName");
   $("#next").onclick=()=>{ if(ob.step===3&&p.classLimit!==""&&p.classLimit!=null&&!(+p.classLimit>=20&&+p.classLimit<=250)){ const fd=$("details.fold"); if(fd) fd.open=true; const wlI=$("#wl"); if(wlI) wlI.focus(); toast("한계 kg를 확인해 주세요 (20~250kg, 비우면 무제한)."); return; }
     if(ob.only){ S.profile=finalProfile(p); ob=null; obPrev=null; save(); tab="settings"; render(); window.scrollTo(0,0); toast("체급을 바꿨어요."); return; }
@@ -831,8 +850,8 @@ function checkinForm(x){
   </div>${saveCkBtn(x)}`;
 }
 function ckMissing(x){ return [[hasSleep(x.sleepH),"잠잔 시간"],[x.sleepQ,"잠의 질"],[x.fatigue,"피로"],[x.soreness,"근육통"],[x.stress,"스트레스"]].filter(a=>!a[0]).map(a=>a[1]); }
-function saveCkBtn(x){ const m=ckMissing(x); return `<button class="btn" id="saveck" ${m.length?"disabled":""}><span class="sl">${m.length?`${m.length}개 남았어요 · ${m.join(", ")}`:"저장하고 신호 보기"}</span></button>`; }
-function updSaveCk(){ const b=$("#saveck"); if(!b) return; const m=ckMissing(draft); b.disabled=!!m.length; const t=m.length?`${m.length}개 남았어요 · ${m.join(", ")}`:"저장하고 신호 보기", sp=b.querySelector(".sl"); if(sp) sp.textContent=t; else b.textContent=t;
+function saveCkBtn(x){ const m=ckMissing(x); return `<button class="btn" id="saveck" ${m.length?"disabled":""}><span class="sl">${m.length?`${m.length}개 남았어요`:"저장하고 신호 보기"}</span></button>`; }
+function updSaveCk(){ const b=$("#saveck"); if(!b) return; const m=ckMissing(draft); b.disabled=!!m.length; const t=m.length?`${m.length}개 남았어요`:"저장하고 신호 보기", sp=b.querySelector(".sl"); if(sp) sp.textContent=t; else b.textContent=t;
 }
 function bindCheckin(edit,L){
   const re=()=>{ edit?renderTodayEdit(L):renderToday(); };
@@ -844,7 +863,16 @@ function bindCheckin(edit,L){
   bindSleep(v=>{ draft.sleepH=v; updSaveCk(); qvSync("sh",v); }); bindQvMore();
   $("#mw").oninput=e=>{ draft.weight=e.target.value; qvSync("mw",draft.weight); };
   // 칩을 누르면 아래 목록에서 같은 값을 고른 것과 똑같이 처리 (입력칸은 다시 그리지 않음)
-  document.querySelectorAll(".qv [data-qv]").forEach(b=>b.onclick=()=>{ const s=$("#"+b.parentNode.dataset.for+"_s"); if(!s) return; s._kbd=false; s.value=b.dataset.qv; s.dispatchEvent(new Event("change",{bubbles:true})); });
+  // 몸무게 칩: 켜진 칩을 다시 누르면 꺼짐. 그 칩이 넣은 값이면 값도 비움, 직접 적은 값이면 값은 그대로 (잠잔 시간 칩은 꼭 골라야 해서 그대로)
+  let mwChip=null;
+  $("#mw").addEventListener("input",e=>{ if(e.isTrusted) mwChip=null; });
+  { const ms=$("#mw_s"); if(ms) ms.addEventListener("change",e=>{ if(e.isTrusted) mwChip=null; }); }
+  document.querySelectorAll(".qv [data-qv]").forEach(b=>b.onclick=()=>{ const id=b.parentNode.dataset.for, s=$("#"+id+"_s"); if(!s) return;
+    if(id==="mw"&&b.getAttribute("aria-pressed")==="true"){
+      if(mwChip===b.dataset.qv){ const inp=$("#mw"); inp.value=""; draft.weight=""; s.innerHTML=pickOpts("",+s.dataset.lo,+s.dataset.hi,+s.dataset.st,s.dataset.u); s.value=""; qvSync("mw",""); }
+      else { b.classList.remove("on"); b.setAttribute("aria-pressed","false"); }
+      mwChip=null; return; }
+    s._kbd=false; s.value=b.dataset.qv; s.dispatchEvent(new Event("change",{bubbles:true})); if(id==="mw") mwChip=b.dataset.qv; });
   $("#saveck").onclick=()=>{
     const wv=+draft.weight; if(draft.weight!==""&&draft.weight!=null&&!(wv>=20&&wv<=250)){ const el=$("#mw"); if(el){ const bx=$("#mw_box"); if(bx) bx.classList.remove("hid"); const mm=$("#mw_more"); if(mm&&mm.classList.contains("hid")) $("#mw_mb").click(); fieldErr(el,"20~250kg 사이로 적어 주세요."); } toast("몸무게를 확인해 주세요 (20~250kg)."); return; }
     if(!(+draft.sleepH>=0&&+draft.sleepH<=24)){ const el=$("#sh_h"); if(el) fieldErr(el,"0~24시간 사이로 적어 주세요."); toast("잠잔 시간을 확인해 주세요 (0~24시간)."); return; }
@@ -1382,6 +1410,9 @@ function dayVerdict(d, T){
 const vIcon=s=>({"✓":"g","↓":"y","↑":"y","!":"r"}[s]);
 function verdictList(v){ return `<ul class="vl">${v.map(([s,t])=>`<li><span class="vi ${vIcon(s)}">${s}</span>${t}</li>`).join("")}</ul>`; }
 
+// 식단 끼니 카드 접힘 상태 (기록 데이터와 따로, 작은 키에만)
+const FOLD_KEY="condition-mma-mealfold";
+function mealFold(){ try{ const o=JSON.parse(localStorage.getItem(FOLD_KEY)); return o&&typeof o==="object"?o:{}; }catch(e){ return {}; } }
 function renderFood(){
   if(!FOODLIST){ $("#app").innerHTML=`<div class="kick">NUTRITION</div><h1>식단</h1><p class="mut">음식 목록 불러오는 중…</p>`; return loadFoods(renderFood); }
   const d=today(), T=plan(), m=dayMeals(d), t=dayTotal(d), g=goalOf();
@@ -1394,10 +1425,11 @@ function renderFood(){
   <small class="src"><a href="#" id="whyplan">이 숫자는 어떻게 나왔나요?</a></small></div>`;
   for(const k of MEALS){
     const items=m[k], v=mealVerdict(k,items,T), s=sum(items);
-    h+=`<div class="card"><div class="row" style="align-items:center"><b style="flex:1">${k}</b><span class="mut" style="flex:none">${items.length?r0(s.k)+"kcal":""}</span></div>
-    ${items.map((x,i)=>`<div class="fi" data-edit="${k}|${i}" tabindex="0" role="button" aria-label="${esc(shown(x.n))} 양 고치기"><div style="flex:1"><div>${esc(shown(x.n))}</div><div class="mut">${x.g}${x.u||"g"} · ${r0(x.k)}kcal · 탄${r0(x.c)} 단${r0(x.p)} 지${r0(x.f)}</div></div><button class="x" data-del="${k}|${i}" aria-label="삭제">✕</button></div>`).join("")}
+    const shut=!!mealFold()[k], bid="mb_"+MEALS.indexOf(k);
+    h+=`<div class="card"><button type="button" class="mfold" data-mfold="${k}" aria-expanded="${!shut}" aria-controls="${bid}"><b style="flex:1">${k} <span class="ar" aria-hidden="true">${shut?"▸":"▾"}</span></b><span class="mut" style="flex:none">${items.length?r0(s.k)+"kcal · "+items.length+"개":"아직 없음"}</span></button>
+    <div class="mbody${shut?" hid":""}" id="${bid}">${items.map((x,i)=>`<div class="fi" data-edit="${k}|${i}" tabindex="0" role="button" aria-label="${esc(shown(x.n))} 양 고치기"><div style="flex:1"><div>${esc(shown(x.n))}</div><div class="mut">${x.g}${x.u||"g"} · ${r0(x.k)}kcal · 탄${r0(x.c)} 단${r0(x.p)} 지${r0(x.f)}</div></div><button class="x" data-del="${k}|${i}" aria-label="삭제">✕</button></div>`).join("")}
     <button class="btn ghost sm" data-add="${k}">＋ ${k} 추가</button>
-    ${v?verdictList(v):""}</div>`;
+    ${v?verdictList(v):""}</div></div>`;
   }
   const tip=nextMealTip(d,T);
   if(tip) h+=`<div class="card"><b>다음 끼니(${tip.meal}) 제안</b><p style="margin:6px 0">${tip.text}</p>${tip.ideas&&tip.ideas.length?`<div class="mut">예: ${tip.ideas.join(" · ")}</div>`:""}</div>`;
@@ -1406,6 +1438,9 @@ function renderFood(){
   $("#goalbtn").onclick=goalSheet;
   $("#whyplan").onclick=e=>{ e.preventDefault(); whyPlan(T); };
   document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>foodSheet(b.dataset.add));
+  document.querySelectorAll("[data-mfold]").forEach(b=>b.onclick=()=>{ const k=b.dataset.mfold, f=mealFold(), w=document.getElementById(b.getAttribute("aria-controls"));
+    const shut=!f[k]; if(shut) f[k]=1; else delete f[k]; try{ localStorage.setItem(FOLD_KEY,JSON.stringify(f)); }catch(e){}
+    if(w) w.classList.toggle("hid",shut); b.setAttribute("aria-expanded",shut?"false":"true"); const a=b.querySelector(".ar"); if(a) a.textContent=shut?"▸":"▾"; });
   document.querySelectorAll("[data-del]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); const [k,i]=b.dataset.del.split("|"); const [it]=m[k].splice(+i,1); save(); renderFood();
     undoBar(`지웠어요 · ${shown(it.n)}`,()=>{ m[k].splice(+i,0,it); save(); renderFood(); }); });
   document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{ const [k,i]=b.dataset.edit.split("|"); portionSheet(k,null,+i); });
@@ -1519,7 +1554,7 @@ $("#back").onclick=uiBack;
 /* 접근성: 그린 뒤에 선택 상태·라벨 연결·점수 뜻을 붙임 (입력칸은 다시 그리지 않음) */
 let _lid=0;
 function a11y(root){
-  root.querySelectorAll(".chips button,.scale button,.vtools button,[data-scr],.symr").forEach(b=>b.setAttribute("aria-pressed",b.classList.contains("on")?"true":"false"));
+  root.querySelectorAll(".chips button,.scale button,.vtools button,[data-scr],[data-scrall],.symr").forEach(b=>b.setAttribute("aria-pressed",b.classList.contains("on")?"true":"false"));
   root.querySelectorAll("label.f").forEach(l=>{
     let n=l.nextElementSibling; if(!n) return;
     const txt=[...l.childNodes].filter(n=>!(n.classList&&n.classList.contains("dir"))).map(n=>n.textContent).join("").replace(/\s+/g," ").trim();
