@@ -283,6 +283,14 @@ html{scroll-padding-bottom:calc(150px + env(safe-area-inset-bottom))}
 #vmarks li>span{min-width:0;overflow-wrap:anywhere}
 /* 신호 뒤 '오늘 훈련'은 접기 */
 details.trfold{margin-top:14px}details.trfold summary h2{margin:0}details.trfold>div.card{margin:4px 0 14px;padding:16px;color:var(--ink)}
+/* 말로 넣기 (0.1.17) */
+.vtop{display:flex;gap:8px;align-items:stretch;margin:4px 0 2px}.vtop .btn{flex:1;margin-top:0;min-height:48px}.vtop .chip{flex:none;min-height:48px}
+.btn.ghost.vmic.on{background:var(--acc);color:var(--accInk)}
+.vbox{display:flex;gap:8px;margin-top:6px}.vbox[hidden]{display:none}.vbox input{flex:1;min-width:0}.vbox .chip{flex:none;min-height:48px}
+.vrw{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+.vrw input.vq{width:76px;flex:none;padding:8px;font-size:20px}
+.lnk{background:none;border:0;color:var(--acc);font:inherit;font-size:14px;text-decoration:underline;padding:10px 6px;min-height:44px;cursor:pointer}
+.vnote{color:var(--y);margin-top:2px}
 </style>
 </head>
 <body>
@@ -361,7 +369,7 @@ function band(p){ const a=ageOf(p);
   return {id:"m50",name:"성인 · 50세 이상",youth:false}; }
 
 /* ───────── 종목 ───────── */
-const APP_VER = "0.1.16";
+const APP_VER = "0.1.17";
 // subs 값: null = 포지션 없음 / [[묶음 이름, [포지션…]], …]
 const SPORTS = {
   "투기": { subs:{ "MMA":null }, weightClass:true }
@@ -1450,7 +1458,7 @@ function sheet(html){ if(_sheetBusy) return; { const u=$("#undo"); if(u) u.hidde
   $("#mbg").setAttribute("role","dialog"); $("#mbg").setAttribute("aria-modal","true");
   // 처음 열 때 시트 자체에 초점 (입력칸에 주면 폰 키보드가 튀어나와서)
   if(first){ const f=$("#mbg .sheet"); f.tabIndex=-1; f.style.outline="none"; setTimeout(()=>{ if(f.isConnected&&!f.contains(document.activeElement)) f.focus({preventScroll:true}); },0); } }
-function closeSheet(){ $("#modal").innerHTML=""; const r=_mBack; _mBack=null; if(r&&r.isConnected) r.focus({preventScroll:true}); }
+function closeSheet(){ voiceStop(); $("#modal").innerHTML=""; const r=_mBack; _mBack=null; if(r&&r.isConnected) r.focus({preventScroll:true}); }
 function whyPlan(T){
   sheet(`<h2 style="margin-top:0">하루 목표 계산</h2>
   <p>기초대사량 ${T.bmr.toLocaleString()}kcal × 활동계수(주 ${esc(S.profile.weeklySessions)}회) = 유지 열량 ${T.tdee.toLocaleString()}kcal${T.adj?` → 목표 조정 ${T.adj>0?"+":""}${T.adj}kcal`:""}</p>
@@ -1483,16 +1491,20 @@ function goalSheet(){
   };
   draw();
 }
-function foodSheet(meal){
+function foodSheet(meal,opt){
   /* 입력칸은 한 번만 만들고, 글자를 칠 때는 결과 목록만 바꿔요.
-     (입력칸을 다시 그리면 한글 조합이 끊겨서 'ㅆㅏㄹ'처럼 풀어져요) */
-  let res=[];
+     (입력칸을 다시 그리면 한글 조합이 끊겨서 'ㅆㅏㄹ'처럼 풀어져요)
+     opt.onPick이 있으면 '말로 넣기' 확인 화면에서 음식을 바꾸는 용도 */
+  opt=opt||{}; let res=[];
   sheet(`<h2 style="margin-top:0">${meal}에 추가</h2>
+    ${opt.onPick?"":`<div class="vtop"><button class="btn ghost sm vmic" id="vmic" aria-label="말로 넣기">🎤 말로 넣기</button><button class="chip" id="vtype">말하는 대신 적기</button></div>
+    <div class="mut" id="vstat" role="status" aria-live="polite"></div>
+    <div class="vbox" id="vbox" hidden><input id="vtx" type="text" placeholder="예: 라면 1개반, 바나나 반 개" aria-label="먹은 것 적기" autocomplete="off" enterkeyhint="done"><button class="chip" id="vgo">찾아보기</button></div>`}
     <div class="mut" id="fcount" style="margin:6px 0"></div>
     <div class="fl fixh" id="flist"></div>
     <input id="fq" type="search" placeholder="음식 이름 (예: 닭가슴살, 김치찌개)" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" style="margin-top:8px">
-    <button class="btn ghost" id="custom">목록에 없어요 · 직접 입력</button><button class="btn ghost neutral" id="cl">닫기</button>`);
-  const fq=$("#fq");
+    ${opt.onPick?"":`<button class="btn ghost" id="custom">목록에 없어요 · 직접 입력</button>`}<button class="btn ghost neutral" id="cl">닫기</button>`);
+  const fq=$("#fq"); if(opt.q) fq.value=opt.q;
   const list=()=>{
     if(!$("#fcount")) return;                                   // 시트가 이미 닫혔으면 아무것도 안 함
     const q=fq.value; res=searchFoods(q);
@@ -1502,13 +1514,148 @@ function foodSheet(meal){
   };
   fq.addEventListener("input", ()=>{ clearTimeout(fq._t); fq._t=setTimeout(list,120); });
   fq.addEventListener("compositionend", list);
-  $("#flist").onclick=e=>{ const b=e.target.closest("[data-pick]"); if(b) portionSheet(meal,res[+b.dataset.pick]); };
+  $("#flist").onclick=e=>{ const b=e.target.closest("[data-pick]"); if(!b) return; const f=res[+b.dataset.pick]; if(opt.onPick) opt.onPick(f); else portionSheet(meal,f); };
+  if(opt.onPick){ $("#cl").onclick=opt.onBack; list(); fq.focus(); return; }
   $("#custom").onclick=()=>customSheet(meal,fq.value); $("#cl").onclick=closeSheet;
+  voiceWire(meal);
   list(); fq.focus();
 }
+/* ── 말로 넣기 (0.1.17) ──
+   ① 폰 브라우저의 음성 인식으로 말 → 글자 (앱은 서버·AI를 부르지 않음)
+   ② 아래 규칙으로 음식·양 쪼개기  ③ 식약처 DB 검색(searchFoods)  ④ 확인 화면에서 고친 뒤 한 번에 추가
+   음성 인식이 없거나(아이폰 홈 화면 앱 등) 마이크가 막히면 같은 문장을 칸에 적어도 똑같이 동작 */
+let _vrec=null;
+function voiceStop(){ if(_vrec){ const r=_vrec; _vrec=null; r._stop=true; try{ r.abort(); }catch(e){} } }
+function voiceWire(meal){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const mic=$("#vmic"), st=$("#vstat"), box=$("#vbox"), tx=$("#vtx");
+  const NO="이 화면에서는 마이크를 쓸 수 없어요. 아래 칸에 적어 주세요.", AGAIN="잘 못 들었어요. 다시 누르거나 아래 칸에 적어 주세요.";
+  const idle=()=>{ mic.classList.remove("on"); mic.setAttribute("aria-pressed","false"); };
+  const showBox=msg=>{ idle(); box.hidden=false; st.textContent=msg||""; tx.focus(); };
+  $("#vtype").onclick=()=>showBox("");
+  $("#vgo").onclick=()=>{ const t=tx.value.trim(); if(t) voiceConfirm(meal,t); else tx.focus(); };
+  tx.addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.isComposing){ e.preventDefault(); $("#vgo").click(); } });
+  mic.setAttribute("aria-pressed","false");
+  mic.onclick=()=>{
+    if(_vrec){ voiceStop(); idle(); st.textContent=""; return; }        // 듣는 중에 다시 누르면 멈춤
+    if(!SR) return showBox(NO);
+    let r; try{ r=new SR(); r.lang="ko-KR"; r.interimResults=false; r.continuous=false; r.maxAlternatives=1; }catch(e){ return showBox(NO); }
+    let done=false; const alive=()=>!r._stop&&mic.isConnected;
+    r.addEventListener("result",e=>{ if(done) return; done=true; if(_vrec===r) _vrec=null; if(!alive()) return;
+      const t=String((((e.results||[])[0]||[])[0]||{}).transcript||"").trim(); if(t) voiceConfirm(meal,t); else showBox(AGAIN); });
+    r.addEventListener("error",e=>{ if(done) return; done=true; if(_vrec===r) _vrec=null; if(!alive()) return;
+      showBox(/not-allowed|service-not-allowed|audio-capture|language-not-supported/.test(e.error||"")?NO:AGAIN); });
+    r.addEventListener("end",()=>{ if(_vrec===r) _vrec=null; if(done||!alive()) return; done=true; showBox(AGAIN); });
+    _vrec=r; mic.classList.add("on"); mic.setAttribute("aria-pressed","true"); st.textContent="듣는 중… 말해 주세요";
+    try{ r.start(); }catch(e){ _vrec=null; done=true; showBox(NO); }
+  };
+}
+// 문장 → [{said:들린 이름, f:찾은 음식, q:몇 인분, note:못 알아들은 조건}]
+const V_N={"하나":1,"한":1,"둘":2,"두":2,"셋":3,"세":3,"석":3,"넷":4,"네":4,"다섯":5,"여섯":6,"일곱":7,"여덟":8,"아홉":9,"열":10};
+const V_U="개|공기|그릇|봉지|조각|줄|잔|컵|인분|병|캔|팩|접시|그램|g|밀리리터|ml";
+const V_Q=new RegExp(`^(\\d+(?:\\.\\d+)?|${Object.keys(V_N).join("|")}|반)(${V_U})?(반)?$`,"i");
+function vQty(t){ const m=V_Q.exec(t); if(!m) return null; const n=m[1], u=m[2], h=m[3], dig=/\d/.test(n);
+  if(n==="반") return h?null:{q:0.5};
+  if(!dig&&!u&&!/^(하나|둘|셋|넷|다섯|여섯|일곱|여덟|아홉)$/.test(n)) return null;   // '한·두·세·네·열'은 단위가 붙어야 양
+  const v=(dig?parseFloat(n):V_N[n])+(h?0.5:0);
+  if(u&&/^(g|그램|ml|밀리리터)$/i.test(u)) return {g:v};
+  if(!u&&dig&&v>20) return {g:v};                                      // 단위 없는 큰 숫자는 g으로
+  return {q:v}; }
+const V_ALIAS={"밥":"쌀밥","흰밥":"쌀밥","공깃밥":"쌀밥","공기밥":"쌀밥","계란":"달걀"};     // 흔히 말하는 이름 → DB 이름
+const vName=s=>s.split(" ").map(w=>V_ALIAS[w]||w).join(" ");
+// 같은 이름 > 그 이름으로 시작 > 검색 1등 순으로 고름
+function vFind(said){ const q=vName(said), n=norm(q), r=searchFoods(q); return r.find(f=>norm(f[0])===n)||r.find(f=>norm(f[0]).startsWith(n))||r[0]||null; }
+let _vnames=null;
+function vHas(q){ const n=norm(V_ALIAS[q]||q); if(!n) return false;
+  if(!_vnames||_vnames.src!==FOODLIST||_vnames.mine!==S.myFoods) _vnames=Object.assign([...(S.myFoods||[]),...(FOODLIST||[])].map(f=>norm(f[0])),{src:FOODLIST,mine:S.myFoods});
+  return _vnames.some(k=>k.startsWith(n)); }
+function parseMeal(text){
+  const notes=[];
+  let s=String(text).replace(/[(（\[]([^)）\]]*)[)）\]]/g,(_,x)=>{ notes.push(x.trim()); return ` \u0001${notes.length-1} `; });
+  s=s.replace(new RegExp(`([가-힣a-zA-Z])(\\d+(?:\\.\\d+)?\\s*(?:${V_U}))`,"g"),"$1 $2");   // 라면1개 → 라면 1개
+  const QEND=new RegExp(`(?:${V_U}|반|\\d|하나|둘|셋|넷)$`,"i"), out=[];
+  for(const seg of s.split(/\s*(?:[,，、;\n]|\.(?!\d))\s*|\s+그리고\s+/)){
+    const W=seg.split(/\s+/).filter(w=>w&&w!=="그리고"), parts=[[]];
+    W.forEach((w,i)=>{ const m=/^(.+?)(이랑|랑|와|과|하고)$/.exec(w);       // '바나나랑 우유'처럼 이어 말한 것 나누기
+      if(m&&i<W.length-1&&w[0]!=="\u0001"&&(QEND.test(m[1])||(vHas(m[1])&&!vHas(w)))){ parts[parts.length-1].push(m[1]); parts.push([]); }
+      else parts[parts.length-1].push(w); });
+    parts.forEach(P=>{ if(P.length) out.push(...vSeg(P,notes)); });
+  }
+  return out;
+}
+function vSeg(W,notes){
+  const isP=w=>w[0]==="\u0001", qs=[];
+  for(let i=0;i<W.length;){ let hit=null;
+    for(let L=Math.min(3,W.length-i);L>=1&&!hit;L--){ const ws=W.slice(i,i+L); if(ws.some(isP)) continue; const q=vQty(ws.join("")); if(q) hit={i,e:i+L,...q}; }
+    if(hit){ qs.push(hit); i=hit.e; } else i++; }
+  const best=(idx,fromEnd)=>{ for(let k=Math.min(3,idx.length);k>=1;k--){ const c=fromEnd?idx.slice(-k):idx.slice(0,k); if(vHas(c.map(i=>W[i]).join(""))) return k; } return 0; };
+  const items=[], owner=new Array(W.length).fill(-1), role=new Array(W.length).fill("note");
+  const give=(i,it)=>{ if(owner[i]<0) owner[i]=it; };
+  if(!qs.length){ const c=W.map((w,i)=>i).filter(i=>!isP(W[i])); if(!c.length) return [];
+    const k=best(c,false)||c.length; c.slice(0,k).forEach(i=>{ owner[i]=0; role[i]="name"; }); items.push({q:1});
+  } else {
+    let pos=0;
+    qs.forEach((q,j)=>{
+      for(let i=q.i;i<q.e;i++){ owner[i]=j; role[i]="qty"; }
+      const pre=[]; for(let i=pos;i<q.i;i++) pre.push(i);
+      const c=pre.filter(i=>!isP(W[i])); let name;
+      if(c.length){ const k=best(c,true)||(j===0?c.length:1); name=c.slice(-k); }
+      else { const nx=qs[j+1]?qs[j+1].i:W.length, post=[]; for(let i=q.e;i<nx;i++) if(!isP(W[i])) post.push(i);
+        name=post.slice(0,best(post,false)||Math.min(1,post.length)); }
+      name.forEach(i=>{ owner[i]=j; role[i]="name"; });
+      const first=name.length?name[0]:q.i;
+      pre.forEach(i=>give(i, i<first&&j>0?j-1:j));                  // 이름 앞에 남은 말은 앞 음식의 조건
+      pos=Math.max(q.e, name.length?name[name.length-1]+1:0);
+      items.push(q.g!=null?{g:q.g}:{q:q.q});
+    });
+  }
+  W.forEach((w,i)=>give(i,items.length-1));
+  const FILL=/^(먹|정도|쯤|약|대략|요$|했)/;
+  return items.map((it,j)=>{
+    const said=W.filter((w,i)=>owner[i]===j&&role[i]==="name").join(" ");
+    const nw=W.filter((w,i)=>owner[i]===j&&role[i]==="note").map(w=>isP(w)?notes[+w.slice(1)]:w).filter(Boolean);
+    const note=nw.every(w=>FILL.test(w))?"":nw.join(" ");
+    const f=said?vFind(said):null;
+    const q=it.g!=null?(f?it.g/f[7]:1):it.q;
+    return {said, f, q:Math.round(q*100)/100, note};
+  }).filter(x=>x.said);
+}
+function voiceConfirm(meal,said,items){
+  voiceStop(); items=items||parseMeal(said);
+  const nm=x=>esc(shown(x.f?x.f[0]:x.said));
+  const info=x=>`${r0(x.f[7]*x.q)}${x.f[8]?"ml":"g"} · ${r0(x.f[2]*x.f[7]*x.q/100)}kcal`;
+  const ok=()=>items.filter(x=>x.f&&x.q>0);
+  const row=(x,i)=>`<div class="vrw"><div style="flex:1;min-width:0">
+      ${x.f?`<div><b>${nm(x)}</b> <button class="lnk" data-vpick="${i}" aria-label="${nm(x)} 바꾸기">바꾸기</button></div><div class="mut" id="vk${i}">${info(x)}</div>`
+           :`<div><b>${nm(x)}</b> <span class="mut">못 찾음</span> <button class="lnk" data-vpick="${i}" aria-label="${nm(x)} 찾기">찾기</button></div>`}
+      ${x.note?`<div class="mut vnote">“${esc(x.note)}” 반영 안 됐어요. 양을 직접 고쳐 주세요.</div>`:""}</div>
+    ${x.f?`<input class="vq" type="number" inputmode="decimal" step="0.5" min="0" data-vq="${i}" value="${x.q}" aria-label="${nm(x)} 양 (인분)"><span class="mut">인분</span>`:""}
+    <button class="x" data-vdel="${i}" aria-label="${nm(x)} 삭제">✕</button></div>`;
+  const addLabel=()=>{ const n=ok().length, b=$("#vadd"); if(!b) return; b.textContent=`${n}개 추가`; b.disabled=!n; };
+  const draw=()=>{
+    sheet(`<h2 style="margin-top:0">들린 것</h2><p class="mut">“${esc(said)}”</p>
+    <div id="vlist">${items.length?items.map(row).join(""):`<p class="mut">알아들은 음식이 없어요.</p>`}</div>
+    <button class="btn" id="vadd"></button><button class="btn ghost neutral" id="cl">취소</button>`);
+    addLabel();
+    // 양을 칠 때는 화면을 다시 그리지 않고 그 줄 글자만 바꿈
+    document.querySelectorAll("[data-vq]").forEach(inp=>inp.oninput=()=>{ const x=items[+inp.dataset.vq]; x.q=Math.max(0,+inp.value||0); const k=$("#vk"+inp.dataset.vq); if(k) k.textContent=info(x); addLabel(); });
+    document.querySelectorAll("[data-vdel]").forEach(b=>b.onclick=()=>{ items.splice(+b.dataset.vdel,1); draw(); const a=$("#vadd"); if(a&&!a.disabled) a.focus(); });
+    document.querySelectorAll("[data-vpick]").forEach(b=>b.onclick=()=>{ const x=items[+b.dataset.vpick];
+      foodSheet(meal,{q:x.said, onPick:f=>{ x.f=f; draw(); }, onBack:draw}); });
+    $("#vadd").onclick=()=>{ const l=ok(); if(!l.length) return;
+      addMealItems(meal,l.map(x=>{ const base=baseOf(x.f); return mealItem(base,r1(base.sv*x.q),null); })); closeSheet(); renderFood(); };
+    $("#cl").onclick=()=>foodSheet(meal);
+  };
+  draw();
+}
+const baseOf=f=>({ n:f[0], k:f[2], c:f[3], p:f[4], f:f[5], na:f[6], sv:f[7], u:f[8]?"ml":"g" });
+function mealItem(base,g,over){ const v=over||{ k:base.k*g/100, c:base.c*g/100, p:base.p*g/100, f:base.f*g/100 };
+  return {n:base.n,g,u:base.u,k:v.k,c:v.c,p:v.p,f:v.f,na:base.na*g/100,base,over}; }
+// 끼니에 음식 넣기 (양 고르기 화면 · 말로 넣기 확인 화면이 같이 씀)
+function addMealItems(meal,list){ const m=dayMeals(); list.forEach(it=>{ m[meal].push(it); S.recent=[it.n,...(S.recent||[]).filter(x=>x!==it.n)].slice(0,20); }); save(); }
 function portionSheet(meal, f, editIdx){
   const m=dayMeals(), old= editIdx!=null ? m[meal][editIdx] : null;
-  const base = old ? old.base : { n:f[0], k:f[2], c:f[3], p:f[4], f:f[5], na:f[6], sv:f[7], u:f[8]?"ml":"g" };
+  const base = old ? old.base : baseOf(f);
   let g = old ? old.g : base.sv, over = old&&old.over ? {...old.over} : null;
   const calc=()=> over || { k:base.k*g/100, c:base.c*g/100, p:base.p*g/100, f:base.f*g/100 };
   const draw=()=>{ const v=calc();
@@ -1525,9 +1672,9 @@ function portionSheet(meal, f, editIdx){
     document.querySelectorAll("[data-sv]").forEach(b=>b.onclick=()=>{ g=r0(base.sv*+b.dataset.sv); over=null; draw(); });
     document.querySelectorAll("[data-ov]").forEach(i=>i.oninput=()=>{ over=over||{...calc()}; over[i.dataset.ov]=+i.value||0; $("#rsw").hidden=false; });
     const rs=$("#reset"); if(rs) rs.onclick=e=>{ e.preventDefault(); over=null; draw(); };
-    $("#psave").onclick=()=>{ const v=calc(); const item={n:base.n,g,u:base.u,k:v.k,c:v.c,p:v.p,f:v.f,na:base.na*g/100,base,over};
-      if(old) m[meal][editIdx]=item; else m[meal].push(item);
-      S.recent=[base.n,...(S.recent||[]).filter(x=>x!==base.n)].slice(0,20); save(); closeSheet(); renderFood(); };
+    $("#psave").onclick=()=>{ const item=mealItem(base,g,over);
+      if(old){ m[meal][editIdx]=item; S.recent=[base.n,...(S.recent||[]).filter(x=>x!==base.n)].slice(0,20); save(); } else addMealItems(meal,[item]);
+      closeSheet(); renderFood(); };
     $("#cl").onclick=closeSheet;
   };
   draw();
