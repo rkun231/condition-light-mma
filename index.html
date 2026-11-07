@@ -286,8 +286,33 @@ details.trfold{margin-top:14px}details.trfold summary h2{margin:0}details.trfold
 /* 말로 넣기 (0.1.17) */
 .vtop{display:flex;gap:8px;align-items:stretch;margin:4px 0 2px}.vtop .btn{flex:1;margin-top:0;min-height:48px}.vtop .chip{flex:none;min-height:48px}
 .btn.ghost.vmic.on{background:var(--acc);color:var(--accInk)}
+/* 0.1.18: 🎤은 채운 주 버튼, 듣는 중은 빨간 테두리 + 펄스 */
+#vmic.on{background:var(--rS)!important;color:#fff!important;box-shadow:inset 0 0 0 3px var(--r)!important;animation:vpulse 1.2s ease-out infinite}
+@keyframes vpulse{0%{outline:0 solid rgba(255,59,48,.55);outline-offset:0}100%{outline:10px solid rgba(255,59,48,0);outline-offset:2px}}
+@media (prefers-reduced-motion:reduce){#vmic.on{animation:none}}
+.vstop{display:block;font:600 14px/1.3 Pretendard,sans-serif;margin-top:2px}
+.vhint{color:#cfccc4;font-size:15px;margin:6px 0 0}
+#vstat{font-size:16px;color:var(--ink)}#vstat:empty{display:none}
+.vhelp{color:#cfccc4;font-size:14px;margin:4px 0 0}
+.vrw .lnk{font-size:16px}
+.vrw input.vq{min-height:48px;height:48px;box-sizing:border-box}
+.vrw.vbig input.vq,.vrw input.vq.vbad{box-shadow:inset 0 0 0 2px var(--y)}
+.vwarn{color:var(--y);font-size:15px;margin-top:4px}.vwarn:empty{display:none}
+.vchk{display:flex;align-items:center;gap:10px;min-height:44px;color:var(--y);font-size:16px;font-weight:700;cursor:pointer}.vchk[hidden]{display:none}
+.vchk input{width:24px;height:24px;flex:none;accent-color:var(--y)}
+.vsure{color:var(--y);font-size:14px;font-weight:700;margin-left:2px}
+#vadd:disabled{background:#2a2a2a!important;color:#bdbab2!important}
+#vaddhint{color:var(--y);font-size:15px;margin:6px 0 0}#vaddhint[hidden]{display:none}
+/* 0.1.19: 양 −/+ 버튼, 2단계 양 경고, 짧은 이름 */
+.vqty{display:flex;align-items:center;gap:6px;margin-top:6px}
+.vstep{flex:none;width:48px;height:48px;border:0;background:var(--chip);color:var(--ink);font:700 24px/1 Pretendard,sans-serif;cursor:pointer;border-radius:0}
+.vstep[aria-disabled="true"]{opacity:.45;cursor:default}
+.vhintq{color:var(--y);font-size:15px;margin-top:4px}.vhintq:empty{display:none}
+/* 0.1.20: 첫 사용 흐름 안내 한 줄 */
+.vflow{color:#cfccc4;font-size:15px;margin:2px 0 0}.vflow[hidden],#vadd[hidden]{display:none}
+#fcount:empty{display:none}
 .vbox{display:flex;gap:8px;margin-top:6px}.vbox[hidden]{display:none}.vbox input{flex:1;min-width:0}.vbox .chip{flex:none;min-height:48px}
-.vrw{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+.vrw{display:flex;align-items:flex-start;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
 .vrw input.vq{width:76px;flex:none;padding:8px;font-size:20px}
 .lnk{background:none;border:0;color:var(--acc);font:inherit;font-size:14px;text-decoration:underline;padding:10px 6px;min-height:44px;cursor:pointer}
 .vnote{color:var(--y);margin-top:2px}
@@ -369,7 +394,7 @@ function band(p){ const a=ageOf(p);
   return {id:"m50",name:"성인 · 50세 이상",youth:false}; }
 
 /* ───────── 종목 ───────── */
-const APP_VER = "0.1.17";
+const APP_VER = "0.1.20";
 // subs 값: null = 포지션 없음 / [[묶음 이름, [포지션…]], …]
 const SPORTS = {
   "투기": { subs:{ "MMA":null }, weightClass:true }
@@ -464,7 +489,7 @@ function go(t,back){ if(t!==tab){ const u=$("#undo"); if(u) u.hidden=true; } con
   tab=t; render(); window.scrollTo(0,0); arm(); }
 const canBack=()=>!!$("#modal").innerHTML || !!VID.full || (!S.profile&&ob ? ((ob.step>0&&!ob.only)||!!obPrev) : NAV.length>0);
 function goBack(){
-  if($("#modal").innerHTML){ $("#modal").innerHTML=""; _sheetBusy=false; const r=_mBack; _mBack=null; if(r&&r.isConnected) r.focus({preventScroll:true}); return; }
+  if($("#modal").innerHTML){ voiceStop(); $("#modal").innerHTML=""; _sheetBusy=false; const r=_mBack; _mBack=null; if(r&&r.isConnected) r.focus({preventScroll:true}); return; }
   if(VID.full){ setFull(false); renderVideo(); return; }
   if(!S.profile&&ob){ if(ob.step>0&&!ob.only){ ob.step--; renderOnboard(); window.scrollTo(0,0); }
     else if(obPrev){ S.profile=obPrev; obPrev=null; ob=null; render(); } return; }
@@ -504,7 +529,7 @@ function renderNav(){
   const cur=["symptom","recovery","edit"].includes(tab)?"today":tab;
   $("#nav").innerHTML=T.map(([k,n])=>`<button class="${cur===k?"on":""}" data-go="${k}" ${cur===k?'aria-current="page"':""}>${NAV_IC[k]}${n}</button>`).join("");
 }
-document.addEventListener("click", e=>{ const b=e.target.closest("[data-go]"); if(b){ e.preventDefault(); if($("#modal").innerHTML){ $("#modal").innerHTML=""; _sheetBusy=false; _mBack=null; }
+document.addEventListener("click", e=>{ const b=e.target.closest("[data-go]"); if(b){ e.preventDefault(); if($("#modal").innerHTML){ voiceStop(); $("#modal").innerHTML=""; _sheetBusy=false; _mBack=null; }
     viaLink = !b.closest("#nav") && b.dataset.go==="settings";
     if(b.closest("#nav")){ // '오늘'은 맨 처음 화면: 여기서 뒤로 하면 앱을 나감
       if(b.dataset.go==="today"){ toRoot(); return; }
@@ -1497,20 +1522,24 @@ function foodSheet(meal,opt){
      opt.onPick이 있으면 '말로 넣기' 확인 화면에서 음식을 바꾸는 용도 */
   opt=opt||{}; let res=[];
   sheet(`<h2 style="margin-top:0">${meal}에 추가</h2>
-    ${opt.onPick?"":`<div class="vtop"><button class="btn ghost sm vmic" id="vmic" aria-label="말로 넣기">🎤 말로 넣기</button><button class="chip" id="vtype">말하는 대신 적기</button></div>
+    ${opt.onPick?"":`<div class="vtop"><button class="btn sm vmic" id="vmic" aria-label="말로 넣기">🎤 말로 넣기</button><button class="chip" id="vtype" aria-label="말하는 대신 적기">말하는 대신 적기</button></div>
+    <p class="vhint" id="vhint">${V_EX}</p>${vSeen()?"":`<p class="vflow" id="vflow">${V_FLOW}</p>`}
     <div class="mut" id="vstat" role="status" aria-live="polite"></div>
-    <div class="vbox" id="vbox" hidden><input id="vtx" type="text" placeholder="예: 라면 1개반, 바나나 반 개" aria-label="먹은 것 적기" autocomplete="off" enterkeyhint="done"><button class="chip" id="vgo">찾아보기</button></div>`}
-    <div class="mut" id="fcount" style="margin:6px 0"></div>
+    <p class="vhelp" id="vhelp" hidden>${V_PERM_HOW}</p>
+    <div class="vbox" id="vbox" hidden><input id="vtx" type="text" placeholder="예: 라면 1개반, 바나나 반 개" aria-label="먹은 것 적기" autocomplete="off" enterkeyhint="done"><button class="chip" id="vgo" aria-label="적은 것 찾아보기">찾아보기</button></div>`}
+    <div id="fsrch"><div class="mut" id="fcount" style="margin:6px 0"></div>
     <div class="fl fixh" id="flist"></div>
-    <input id="fq" type="search" placeholder="음식 이름 (예: 닭가슴살, 김치찌개)" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" style="margin-top:8px">
+    <input id="fq" type="search" placeholder="음식 이름 (예: 닭가슴살, 김치찌개)" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" style="margin-top:8px"></div>
     ${opt.onPick?"":`<button class="btn ghost" id="custom">목록에 없어요 · 직접 입력</button>`}<button class="btn ghost neutral" id="cl">닫기</button>`);
+  $("#mbg").setAttribute("aria-label",`${meal}에 추가`);
   const fq=$("#fq"); if(opt.q) fq.value=opt.q;
   const list=()=>{
     if(!$("#fcount")) return;                                   // 시트가 이미 닫혔으면 아무것도 안 함
     const q=fq.value; res=searchFoods(q);
-    $("#fcount").textContent = q ? `검색 결과 ${res.length}개${res.length===40?"+":""}` : (res.length?"최근 먹은 음식":"식약처 영양성분 DB 1,015개 + 내가 만든 음식");
+    $("#fcount").textContent = q ? `검색 결과 ${res.length}개${res.length===40?"+":""}` : (res.length?"최근 먹은 음식":"");
     $("#flist").innerHTML = res.map((f,i)=>`<button class="fr" data-pick="${i}"><span>${esc(shown(f[0]))}${f[9]==="mine"?' <em class="tag2">내 음식</em>':""}</span><span class="mut">${r0(f[2]*f[7]/100)}kcal / ${f[7]}${f[8]?"ml":"g"}</span></button>`).join("");
-    if(!res.length) $("#flist").innerHTML=`<div class="mut" style="padding:14px">${q?"찾는 음식이 없어요. 아래 '직접 입력'으로 추가해 주세요.":"위 칸에 음식 이름을 쳐 보세요. 고른 음식은 여기에 쌓여요."}</div>`;
+    $("#flist").classList.toggle("fixh",!!q||res.length>0);
+    if(!res.length) $("#flist").innerHTML=`<div class="mut" style="padding:14px">${q?"찾는 음식이 없어요. 아래 '직접 입력'으로 추가해 주세요.":"아래 칸에 음식 이름을 쳐 보세요. 고른 음식은 여기에 쌓여요."}</div>`;
   };
   fq.addEventListener("input", ()=>{ clearTimeout(fq._t); fq._t=setTimeout(list,120); });
   fq.addEventListener("compositionend", list);
@@ -1518,7 +1547,11 @@ function foodSheet(meal,opt){
   if(opt.onPick){ $("#cl").onclick=opt.onBack; list(); fq.focus(); return; }
   $("#custom").onclick=()=>customSheet(meal,fq.value); $("#cl").onclick=closeSheet;
   voiceWire(meal);
-  list(); fq.focus();
+  list();
+  // 확인 화면의 '다시 말하기'·'대신 적기'에서 왔으면 바로 듣기 / 적기 칸 열기
+  if(opt.voice==="mic"){ $("#vmic").focus({preventScroll:true}); $("#vmic").click(); }
+  else if(opt.voice==="type"){ $("#vtx").value=opt.text||""; $("#vtype").click(); }
+  else fq.focus();
 }
 /* ── 말로 넣기 (0.1.17) ──
    ① 폰 브라우저의 음성 인식으로 말 → 글자 (앱은 서버·AI를 부르지 않음)
@@ -1529,14 +1562,17 @@ function voiceStop(){ if(_vrec){ const r=_vrec; _vrec=null; r._stop=true; try{ r
 function voiceWire(meal){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   const mic=$("#vmic"), st=$("#vstat"), box=$("#vbox"), tx=$("#vtx");
-  const NO="이 화면에서는 마이크를 쓸 수 없어요. 아래 칸에 적어 주세요.", AGAIN="잘 못 들었어요. 다시 누르거나 아래 칸에 적어 주세요.";
-  const idle=()=>{ mic.classList.remove("on"); mic.setAttribute("aria-pressed","false"); };
-  const showBox=msg=>{ idle(); box.hidden=false; st.textContent=msg||""; tx.focus(); };
+  const NO="이 브라우저에서는 말로 넣기를 쓸 수 없어요. 아래 칸에 적어 주세요. (키보드의 🎤 받아쓰기로 말해도 돼요)", AGAIN="잘 못 들었어요. 다시 누르거나 아래 칸에 적어 주세요.";
+  const help=$("#vhelp"), srch=$("#fsrch");
+  const idle=()=>{ mic.classList.remove("on"); mic.setAttribute("aria-pressed","false"); mic.textContent="🎤 말로 넣기"; mic.setAttribute("aria-label","말로 넣기"); };
+  // 적기 칸이 열리면 아래 이름 검색칸·목록은 접어서 입력칸이 하나만 보이게
+  const showBox=(msg,perm)=>{ idle(); box.hidden=false; if(srch) srch.hidden=true; const hn=$("#vhint"); if(hn) hn.hidden=true; st.textContent=msg||""; help.hidden=!perm; tx.focus(); };
   $("#vtype").onclick=()=>showBox("");
   $("#vgo").onclick=()=>{ const t=tx.value.trim(); if(t) voiceConfirm(meal,t); else tx.focus(); };
   tx.addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.isComposing){ e.preventDefault(); $("#vgo").click(); } });
   mic.setAttribute("aria-pressed","false");
   mic.onclick=()=>{
+    help.hidden=true;
     if(_vrec){ voiceStop(); idle(); st.textContent=""; return; }        // 듣는 중에 다시 누르면 멈춤
     if(!SR) return showBox(NO);
     let r; try{ r=new SR(); r.lang="ko-KR"; r.interimResults=false; r.continuous=false; r.maxAlternatives=1; }catch(e){ return showBox(NO); }
@@ -1544,27 +1580,56 @@ function voiceWire(meal){
     r.addEventListener("result",e=>{ if(done) return; done=true; if(_vrec===r) _vrec=null; if(!alive()) return;
       const t=String((((e.results||[])[0]||[])[0]||{}).transcript||"").trim(); if(t) voiceConfirm(meal,t); else showBox(AGAIN); });
     r.addEventListener("error",e=>{ if(done) return; done=true; if(_vrec===r) _vrec=null; if(!alive()) return;
-      showBox(/not-allowed|service-not-allowed|audio-capture|language-not-supported/.test(e.error||"")?NO:AGAIN); });
+      const er=e.error||"";
+      if(er==="not-allowed") return showBox(V_PERM,true);                 // 마이크 권한 거부: 전용 안내 + 다시 허용하는 방법
+      showBox(/service-not-allowed|audio-capture|language-not-supported/.test(er)?NO:AGAIN); });
     r.addEventListener("end",()=>{ if(_vrec===r) _vrec=null; if(done||!alive()) return; done=true; showBox(AGAIN); });
-    _vrec=r; mic.classList.add("on"); mic.setAttribute("aria-pressed","true"); st.textContent="듣는 중… 말해 주세요";
+    _vrec=r; mic.classList.add("on"); mic.setAttribute("aria-pressed","true"); mic.textContent="■ 누르면 멈춰요"; mic.setAttribute("aria-label","누르면 멈춰요"); st.textContent="듣고 있어요… 다 말하면 잠시 기다리세요";
     try{ r.start(); }catch(e){ _vrec=null; done=true; showBox(NO); }
   };
 }
 // 문장 → [{said:들린 이름, f:찾은 음식, q:몇 인분, note:못 알아들은 조건}]
 const V_N={"하나":1,"한":1,"둘":2,"두":2,"셋":3,"세":3,"석":3,"넷":4,"네":4,"다섯":5,"여섯":6,"일곱":7,"여덟":8,"아홉":9,"열":10,"일":1,"이":2,"삼":3,"사":4,"오":5};
-const V_U="개|공기|그릇|봉지|조각|줄|잔|컵|인분|병|캔|팩|접시|그램|g|밀리리터|ml";
+const V_U="마리분|개|공기|그릇|봉지|조각|줄|잔|컵|인분|병|캔|팩|접시|그램|g|밀리리터|ml";   // 마리분: 치킨 구문(V_PHRASE)에서만 만들어짐
 const V_Q=new RegExp(`^(\\d+(?:\\.\\d+)?|${Object.keys(V_N).join("|")}|반)(${V_U})?(반)?$`,"i");
 function vQty(t){ const m=V_Q.exec(t); if(!m) return null; const n=m[1], u=m[2], h=m[3], dig=/\d/.test(n);
-  if(n==="반") return h?null:{q:0.5};
+  if(n==="반") return h?null:{q:0.5,u};
   if(!dig&&!u&&!/^(하나|둘|셋|넷|다섯|여섯|일곱|여덟|아홉)$/.test(n)) return null;   // '한·두·세·네·열·일·이·삼…'은 단위가 붙어야 양
   const v=(dig?parseFloat(n):V_N[n])+(h?0.5:0);
   if(u&&/^(g|그램|ml|밀리리터)$/i.test(u)) return {g:v};
   if(!u&&dig&&v>20) return {g:v};                                      // 단위 없는 큰 숫자는 g으로
-  return {q:v}; }
-const V_ALIAS={"밥":"쌀밥","흰밥":"쌀밥","공깃밥":"쌀밥","공기밥":"쌀밥","계란":"달걀"};     // 흔히 말하는 이름 → DB 이름
+  return {q:v,u}; }
+const V_ALIAS={"밥":"쌀밥","흰밥":"쌀밥","공깃밥":"쌀밥","공기밥":"쌀밥","계란":"달걀",
+  "치킨":"닭튀김_간편조리세트_후라이드치킨"};     // 흔히 말하는 이름 → DB 이름 (0.1.18: 치킨 추가 — DB 1인분 976g = 한 마리)
+// 0.1.18 사용자가 바꿀 수 있는 기준 (사용자_판단.md 참고)
+const V_MAX_X=10;      // 0.1.19: 1인분의 이 배수를 넘으면 '이 양이 맞아요' 체크해야 추가 (임시 결정)
+const V_MAX_G=2000;    // 0.1.19: 이 g(ml)을 넘으면 노란 경고 한 줄만, 추가는 막지 않음 (임시 결정)
+const V_HINT_G=1500;   // 0.1.19: 이 g(ml)을 넘으면 '양이 꽤 많아요(…)' 힌트 (임시 결정)
+const V_HINT_K=1500;   // 0.1.20: 한 항목 열량이 이 kcal을 넘어도 같은 힌트 (팀장 임시 결정)
+const V_HINT_R=0.5;    // 0.1.20: 한 항목 열량이 하루 목표 열량의 이 비율을 넘어도 같은 힌트 (목표를 못 구하면 건너뜀)
+const V_FLOW="말하면 먼저 확인 화면이 나와요. 거기서 고치고 추가해요.";   // 0.1.20: 첫 추가 전까지 🎤 아래 한 줄
+const V_SEEN_KEY="condition-mma-voiceseen";   // 0.1.20: 흐름 안내를 봤는지(기록 데이터 condition-mma-v1과 따로, 작은 키)
+function vSeen(){ try{ return localStorage.getItem(V_SEEN_KEY)==="1"; }catch(e){ return false; } }
+function vSeenSet(){ try{ localStorage.setItem(V_SEEN_KEY,"1"); }catch(e){} }
+function vDayKcal(){ try{ const k=plan().kcal; return k>0?k:0; }catch(e){ return 0; } }
+const V_SKIP=["물","생수","맹물"];   // 열량 0 → 기록하지 않음(물회 같은 오매칭 방지)
+const V_PHRASE=[[/치킨\s*(한|두|세|네|반|\d+(?:\.\d+)?)\s*마리/g,"치킨 $1마리분"]];   // 치킨 N마리 → N인분(DB 1인분이 한 마리), 화면에는 'N마리'
+const V_EX="예: 라면 1개반, 바나나 반 개";   // 적기 칸 안내와 같은 예시
+const V_PERM="마이크 사용이 막혀 있어요. 아래 칸에 적어 주세요.";
+const V_PERM_HOW="다시 허용하려면: 아이폰은 설정 → Safari → 마이크 → 허용, 크롬은 주소창 왼쪽 아이콘 → 권한 → 마이크 허용.";
 const vName=s=>s.split(" ").map(w=>V_ALIAS[w]||w).join(" ");
+// 0.1.19 확인 화면 표시 이름: '닭튀김_간편조리세트_후라이드치킨' → '후라이드치킨'.
+// 마지막 조각이 음식 이름일 때만 줄임(간편조리세트, 또는 '피자_고구마피자'처럼 앞 이름으로 끝날 때). '갈비구이_소고기' 같은 재료 구분은 그대로
+function vShort(n){ const a=String(n).split("_"); if(a.length<2) return String(n); const last=a[a.length-1], h=a[0].slice(-2);
+  return (a.includes("간편조리세트")||last.endsWith(h))&&last.length>=2?last:shown(n); }
+const vUnit=u=>!u||/^(인분|g|그램|ml|밀리리터)$/i.test(u)?"":(u==="마리분"?"마리":u);   // 말한 단위(1마리, 1.5개). 1단위 = 1인분
+const vNum=x=>r0(x).toLocaleString("en-US");
+const vJosa=t=>{ const c=String(t).trim().slice(-1).charCodeAt(0)-0xAC00; return c>=0&&c<11172&&c%28?"은":"는"; };
 // 같은 이름 > 그 이름으로 시작 > 검색 1등 순으로 고름
 function vFind(said){ const q=vName(said), n=norm(q), r=searchFoods(q); return r.find(f=>norm(f[0])===n)||r.find(f=>norm(f[0]).startsWith(n))||r[0]||null; }
+// 찾은 이름이 말한 이름과 같거나 '말한 이름(…)·말한 이름_…' 꼴이면 확실, 아니면(물→물회, 검색 1등 등) '맞나요?' 표시
+function vSure(said,f){ const a=String(f[0]).replace(/\s/g,""), b=vName(said).replace(/\s/g,"");
+  if(norm(a)===norm(b)) return true; return a.startsWith(b)&&/^[(_·/]/.test(a.slice(b.length)); }
 let _vnames=null;
 function vHas(q){ const n=norm(V_ALIAS[q]||q); if(!n) return false;
   if(!_vnames||_vnames.src!==FOODLIST||_vnames.mine!==S.myFoods) _vnames=Object.assign([...(S.myFoods||[]),...(FOODLIST||[])].map(f=>norm(f[0])),{src:FOODLIST,mine:S.myFoods});
@@ -1572,6 +1637,7 @@ function vHas(q){ const n=norm(V_ALIAS[q]||q); if(!n) return false;
 function parseMeal(text){
   const notes=[];
   let s=String(text).replace(/[(（\[]([^)）\]]*)[)）\]]/g,(_,x)=>{ notes.push(x.trim()); return ` \u0001${notes.length-1} `; });
+  V_PHRASE.forEach(([re,to])=>{ s=s.replace(re,to); });
   s=s.replace(new RegExp(`([가-힣a-zA-Z])(\\d+(?:\\.\\d+)?\\s*(?:${V_U}))`,"g"),"$1 $2");   // 라면1개 → 라면 1개
   const QEND=new RegExp(`(?:${V_U}|반|\\d|하나|둘|셋|넷)$`,"i"), out=[];
   for(const seg of s.split(/\s*(?:[,，、;\n]|\.(?!\d))\s*|\s+그리고\s+/)){
@@ -1592,7 +1658,7 @@ function vSeg(W,notes){
   const items=[], owner=new Array(W.length).fill(-1), role=new Array(W.length).fill("note");
   const give=(i,it)=>{ if(owner[i]<0) owner[i]=it; };
   if(!qs.length){ const c=W.map((w,i)=>i).filter(i=>!isP(W[i])); if(!c.length) return [];
-    const k=best(c,false)||c.length; c.slice(0,k).forEach(i=>{ owner[i]=0; role[i]="name"; }); items.push({q:1});
+    const k=best(c,false)||c.length; c.slice(0,k).forEach(i=>{ owner[i]=0; role[i]="name"; }); items.push({q:1,dflt:1});
   } else {
     let pos=0;
     qs.forEach((q,j)=>{
@@ -1606,7 +1672,7 @@ function vSeg(W,notes){
       const first=name.length?name[0]:q.i;
       pre.forEach(i=>give(i, i<first&&j>0?j-1:j));                  // 이름 앞에 남은 말은 앞 음식의 조건
       pos=Math.max(q.e, name.length?name[name.length-1]+1:0);
-      items.push(q.g!=null?{g:q.g}:{q:q.q});
+      items.push(q.g!=null?{g:q.g}:{q:q.q,u:q.u});
     });
   }
   W.forEach((w,i)=>give(i,items.length-1));
@@ -1615,36 +1681,79 @@ function vSeg(W,notes){
     const said=W.filter((w,i)=>owner[i]===j&&role[i]==="name").join(" ");
     const nw=W.filter((w,i)=>owner[i]===j&&role[i]==="note").map(w=>isP(w)?notes[+w.slice(1)]:w).filter(Boolean);
     const note=nw.every(w=>FILL.test(w))?"":nw.join(" ");
+    if(V_SKIP.includes(said.replace(/\s/g,""))) return {said, f:null, q:0, note:"", skip:1};
     const f=said?vFind(said):null;
-    const q=it.g!=null?(f?it.g/f[7]:1):it.q;
-    return {said, f, q:Math.round(q*100)/100, note};
+    let q=it.g!=null?(f?it.g/f[7]:1):it.q;
+    // 양을 못 읽었는데 숫자가 남아 있으면(-1개, 1.5.5개 등) 1인분으로 두지 않고 양 칸을 비워 직접 적게 함
+    const bad=!!(it.dflt&&/\d/.test(note)); if(bad) q=0;
+    // 0.1.20: g(ml)으로 말했으면 그 g을 그대로 둠(gd). 양 칸은 인분 소수 2자리로 보여 주기만 함
+    return {said, f, q:Math.round(q*100)/100, gd:it.g!=null?it.g:undefined, u:it.u, note, bad, sure:f?vSure(said,f):true};
   }).filter(x=>x.said);
 }
 function voiceConfirm(meal,said,items){
   voiceStop(); items=items||parseMeal(said);
-  const nm=x=>esc(shown(x.f?x.f[0]:x.said));
-  const info=x=>`${r0(x.f[7]*x.q)}${x.f[8]?"ml":"g"} · ${r0(x.f[2]*x.f[7]*x.q/100)}kcal`;
-  const ok=()=>items.filter(x=>x.f&&x.q>0);
-  const row=(x,i)=>`<div class="vrw"><div style="flex:1;min-width:0">
-      ${x.f?`<div><b>${nm(x)}</b> <button class="lnk" data-vpick="${i}" aria-label="${nm(x)} 바꾸기">바꾸기</button></div><div class="mut" id="vk${i}">${info(x)}</div>`
-           :`<div><b>${nm(x)}</b> <span class="mut">못 찾음</span> <button class="lnk" data-vpick="${i}" aria-label="${nm(x)} 찾기">찾기</button></div>`}
-      ${x.note?`<div class="mut vnote">“${esc(x.note)}” 반영 안 됐어요. 양을 직접 고쳐 주세요.</div>`:""}</div>
-    ${x.f?`<input class="vq" type="number" inputmode="decimal" step="0.5" min="0" data-vq="${i}" value="${x.q}" aria-label="${nm(x)} 양 (인분)"><span class="mut">인분</span>`:""}
-    <button class="x" data-vdel="${i}" aria-label="${nm(x)} 삭제">✕</button></div>`;
-  const addLabel=()=>{ const n=ok().length, b=$("#vadd"); if(!b) return; b.textContent=`${n}개 추가`; b.disabled=!n; };
+  // 0.1.19: 화면에는 짧은 이름(vShort), 읽기 프로그램·title·버튼 이름에는 DB 전체 이름
+  const full=x=>esc(shown(x.f?x.f[0]:x.said));
+  const nm=x=>esc(x.f?vShort(x.f[0]):shown(x.said));
+  const nameB=x=>{ const a=nm(x), b=full(x); return a===b?`<b>${a}</b>`:`<b title="${b}"><span aria-hidden="true">${a}</span><span class="sr-only">${b}</span></b>`; };
+  const gOf=x=>x.gd!=null?x.gd:x.f[7]*x.q, uOf=x=>x.f[8]?"ml":"g", kOf=x=>x.f[2]*gOf(x)/100;
+  const qU=x=>vUnit(x.u)||"인분";   // 0.1.20: 양 칸 옆 단위는 말한 단위(개·마리·공기…), 말하지 않았으면 인분
+  const info=x=>{ const u=vUnit(x.u); return `${u&&x.q>0?`${+x.q.toFixed(2)}${u} · `:""}${vNum(gOf(x))}${uOf(x)} · ${vNum(kOf(x))}kcal`; };
+  const ok=()=>items.filter(x=>x.f&&!x.skip&&x.q>0);
+  // 양 경고 2단계(임시 결정): 1인분의 V_MAX_X배 초과 → '이 양이 맞아요' 체크해야 추가 / V_MAX_G g(ml) 초과 → 경고 한 줄만(막지 않음)
+  const big=x=>!!x.f&&!x.skip&&x.q>V_MAX_X;
+  const warn=x=>{ if(!x.f||x.skip) return ""; if(x.q<=0) return "양이 0이면 추가되지 않아요. 양을 적거나 ✕로 빼 주세요.";
+    if(big(x)) return `1인분의 ${V_MAX_X}배가 넘는 양이에요.`;
+    if(gOf(x)>V_MAX_G) return `양이 많아요(${vNum(gOf(x))}${uOf(x)}). 맞는지 확인해 주세요.`; return ""; };
+  // 0.1.20: g 기준(1500g)에 더해 열량 기준(1500kcal, 하루 목표의 절반)으로도 힌트. 2000g 경고가 나오면 힌트는 안 냄
+  const dayK=vDayKcal();
+  const hint=x=>{ if(!x.f||x.skip||x.q<=0||big(x)||gOf(x)>V_MAX_G) return ""; const k=kOf(x);
+    return gOf(x)>V_HINT_G||k>V_HINT_K||(dayK&&k>dayK*V_HINT_R)?`양이 꽤 많아요(${vNum(gOf(x))}${uOf(x)} · ${vNum(k)}kcal). 맞는지 확인해 주세요.`:""; };
+  const noteTxt=x=>`“${esc(x.note)}”${vJosa(x.note)} ${x.bad?"양으로 읽지 못했어요.":"계산에 넣지 않았어요. 적게 먹었다면 양을 줄여 주세요."}`;
+  const row=(x,i)=>`<div class="vrw${big(x)?" vbig":""}" id="vr${i}"><div style="flex:1;min-width:0">
+      ${x.skip?`<div>${nameB(x)} <span class="mut">열량이 없어 기록하지 않아요</span></div>`
+      :x.f?`<div>${nameB(x)}${x.sure===false?` <span class="vsure">이 음식이 맞나요?</span>`:""} <button class="lnk" data-vpick="${i}" aria-label="${full(x)} 바꾸기">바꾸기</button></div><div class="mut" id="vk${i}">${info(x)}</div>`
+           :`<div>${nameB(x)} <span class="mut">못 찾았어요</span> <button class="lnk" data-vpick="${i}" aria-label="${full(x)} 직접 찾기">직접 찾기</button></div>`}
+      ${x.note?`<div class="mut vnote">${noteTxt(x)}</div>`:""}
+      ${x.f?`<div class="vhintq" id="vh${i}">${hint(x)}</div><div class="vwarn" id="vw${i}">${warn(x)}</div>
+      <div class="vqty"><button class="vstep" data-vstep="-1" data-vi="${i}" aria-disabled="${x.q<=0.5}" aria-label="${full(x)} 양 줄이기">−</button><input class="vq${x.bad?" vbad":""}" type="number" inputmode="decimal" step="0.5" min="0" data-vq="${i}" value="${x.bad?"":x.q}" aria-label="${full(x)} 양 (${qU(x)})"><button class="vstep" data-vstep="1" data-vi="${i}" aria-label="${full(x)} 양 늘리기">+</button><span class="mut">${qU(x)}</span></div>
+      <label class="vchk" id="vc${i}" ${big(x)?"":"hidden"}><input type="checkbox" data-vok="${i}" ${x.okBig?"checked":""} aria-label="${full(x)} 이 양이 맞아요">이 양이 맞아요</label>`:""}</div>
+    <button class="x" data-vdel="${i}" aria-label="${full(x)} 삭제">✕</button></div>`;
+  const addLabel=()=>{ const l=ok(), n=l.length, b=$("#vadd"), h=$("#vaddhint"); if(!b) return; const wait=l.some(x=>big(x)&&!x.okBig);
+    b.textContent=`${n}가지 추가`; b.setAttribute("aria-label",`${n}가지 추가`); b.disabled=!n||wait; b.hidden=!items.length; if(h) h.hidden=!wait; };   // 0.1.20: '가지'(항목 수), 빈 결과면 버튼 숨김
+  // 양이 바뀌면(입력·−/+) 화면을 다시 그리지 않고 그 줄 글자만 바꿈 → 한글 조합·포커스 유지
+  const upd=(i,q,fromInput)=>{ const x=items[i], inp=document.querySelector(`[data-vq="${i}"]`); x.q=Math.max(0,q); x.gd=undefined; x.bad=false; x.okBig=false;
+    if(inp){ inp.classList.remove("vbad"); if(!fromInput) inp.value=x.q; }
+    const k=$("#vk"+i); if(k) k.textContent=info(x); const w=$("#vw"+i); if(w) w.textContent=warn(x); const h=$("#vh"+i); if(h) h.textContent=hint(x);
+    const c=$("#vc"+i), r=$("#vr"+i); if(c){ c.hidden=!big(x); c.querySelector("input").checked=false; } if(r) r.classList.toggle("vbig",big(x));
+    const m=document.querySelector(`[data-vstep="-1"][data-vi="${i}"]`); if(m) m.setAttribute("aria-disabled",String(x.q<=0.5));
+    addLabel(); };
   const draw=()=>{
-    sheet(`<h2 style="margin-top:0">들린 것</h2><p class="mut">“${esc(said)}”</p>
-    <div id="vlist">${items.length?items.map(row).join(""):`<p class="mut">알아들은 음식이 없어요.</p>`}</div>
-    <button class="btn" id="vadd"></button><button class="btn ghost neutral" id="cl">취소</button>`);
+    sheet(`<h2 style="margin-top:0">알아들은 내용</h2><p class="mut">“${esc(said)}”</p>
+    <div id="vlist">${items.length?items.map(row).join(""):`<p class="mut">알아들은 음식이 없어요. 음식 이름과 양을 같이 말해 주세요.</p>
+      <div class="vtop"><button class="btn sm vmic" id="vagain" aria-label="다시 말하기">🎤 다시 말하기</button><button class="chip" id="vwrite" aria-label="말하는 대신 적기">대신 적기</button></div>`}</div>
+    <button class="btn" id="vadd"></button><p id="vaddhint" role="status" hidden>노란 줄 친 양을 확인하고 ‘이 양이 맞아요’에 체크해 주세요.</p>
+    <button class="btn ghost neutral" id="cl" aria-label="취소하고 음식 추가 화면으로 (알아들은 문장은 적기 칸에 남아요)">취소</button>`);
+    $("#mbg").setAttribute("aria-label","알아들은 내용");
     addLabel();
-    // 양을 칠 때는 화면을 다시 그리지 않고 그 줄 글자만 바꿈
-    document.querySelectorAll("[data-vq]").forEach(inp=>inp.oninput=()=>{ const x=items[+inp.dataset.vq]; x.q=Math.max(0,+inp.value||0); const k=$("#vk"+inp.dataset.vq); if(k) k.textContent=info(x); addLabel(); });
-    document.querySelectorAll("[data-vdel]").forEach(b=>b.onclick=()=>{ items.splice(+b.dataset.vdel,1); draw(); const a=$("#vadd"); if(a&&!a.disabled) a.focus(); });
+    if(!items.length){ $("#vagain").onclick=()=>foodSheet(meal,{voice:"mic"}); $("#vwrite").onclick=()=>foodSheet(meal,{voice:"type",text:said}); }
+    document.querySelectorAll("[data-vq]").forEach(inp=>inp.oninput=()=>upd(+inp.dataset.vq,+inp.value||0,true));
+    // −/+ : 0.5인분씩, 버튼으로는 0.5 아래로 내려가지 않음(0으로 만들려면 칸에 적거나 ✕)
+    document.querySelectorAll("[data-vstep]").forEach(b=>b.onclick=()=>{ const i=+b.dataset.vi, x=items[i], d=+b.dataset.vstep;
+      if(d<0&&x.q<=0.5) return;
+      upd(i, d>0?Math.floor(x.q/0.5+1e-9)*0.5+0.5:Math.max(0.5,Math.ceil(x.q/0.5-1e-9)*0.5-0.5), false); });
+    document.querySelectorAll("[data-vok]").forEach(c=>c.onchange=()=>{ items[+c.dataset.vok].okBig=c.checked; addLabel(); });
+    document.querySelectorAll("[data-vdel]").forEach(b=>b.onclick=()=>{ items.splice(+b.dataset.vdel,1); draw(); const a=$("#vadd"), g=$("#vagain"); if(a&&!a.disabled&&!a.hidden) a.focus(); else if(g) g.focus(); });
     document.querySelectorAll("[data-vpick]").forEach(b=>b.onclick=()=>{ const x=items[+b.dataset.vpick];
-      foodSheet(meal,{q:x.said, onPick:f=>{ x.f=f; draw(); }, onBack:draw}); });
+      foodSheet(meal,{q:x.said, onPick:f=>{ x.f=f; if(x.gd!=null) x.q=Math.round(x.gd/f[7]*100)/100; draw(); }, onBack:draw}); });   // g으로 말했으면 바꾼 음식에서도 그 g 유지
     $("#vadd").onclick=()=>{ const l=ok(); if(!l.length) return;
-      addMealItems(meal,l.map(x=>{ const base=baseOf(x.f); return mealItem(base,r1(base.sv*x.q),null); })); closeSheet(); renderFood(); };
-    $("#cl").onclick=()=>foodSheet(meal);
+      const n0=dayMeals()[meal].length;
+      addMealItems(meal,l.map(x=>{ const base=baseOf(x.f); return mealItem(base,r1(gOf(x)),null); })); vSeenSet(); closeSheet(); renderFood();
+      // 추가 뒤 포커스: 끼니 목록의 새 항목(접혀 있으면 그 끼니의 '＋ 추가' 버튼)
+      const t=document.querySelector(`[data-edit="${meal}|${n0}"]`), a=document.querySelector(`[data-add="${meal}"]`);
+      if(t&&t.offsetParent) t.focus(); else if(a) a.focus(); };
+    // 0.1.20: 취소해도 들린(적은) 문장은 적기 칸에 남겨 둠 → 고쳐 쓰거나 다시 말할 수 있게 (팀장 임시 결정)
+    $("#cl").onclick=()=>foodSheet(meal,{voice:"type",text:said});
   };
   draw();
 }
