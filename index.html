@@ -148,6 +148,8 @@ main{padding-top:calc(54px + env(safe-area-inset-top))!important}
 .unitbox input{flex:1;min-width:0;border:0!important;background:none!important;padding:10px 0!important;font:800 24px var(--cond)!important;color:var(--ink)}
 .unitbox span{font:800 18px var(--cond);color:var(--gold);flex:none}
 .hid{display:none!important}
+.qvmore{display:inline-flex;align-items:center;min-height:44px;margin:-4px 0 4px;padding:0 4px;background:none;border:0;color:var(--mut);font:600 15px Pretendard,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.obimp .lnk{display:inline-flex;align-items:center;min-height:44px;margin-top:10px;padding:0 4px;background:none;border:0;color:var(--mut);font:500 15px Pretendard,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 /* 커서가 마지막 숫자를 가리지 않게: 입력칸 글자는 기울이지 않음 */
 input[type=number],input[type=text],.hmbox input{font-style:normal!important}
 .pick2 .hmbox{justify-content:flex-start}.hmbox input{flex:none!important;width:2.4em!important;text-align:right;padding-right:3px!important}.hmbox span{margin-right:10px}
@@ -348,7 +350,7 @@ function band(p){ const a=ageOf(p);
   return {id:"m50",name:"성인 · 50세 이상",youth:false}; }
 
 /* ───────── 종목 ───────── */
-const APP_VER = "0.1.14";
+const APP_VER = "0.1.15";
 // subs 값: null = 포지션 없음 / [[묶음 이름, [포지션…]], …]
 const SPORTS = {
   "투기": { subs:{ "MMA":null }, weightClass:true }
@@ -500,9 +502,9 @@ function pickOpts(v,lo,hi,step,unit,cus){
     o.map(x=>`<option value="${x}" ${!custom&&x===+v?"selected":""}>${x}${unit}</option>`).join("");
 }
 // 고르기 바로 밑 '직접 입력'을 고르면 아래에 입력칸이 열림
-function picker(id,v,lo,hi,step,unit,ph,open,pre=""){
+function picker(id,v,lo,hi,step,unit,ph,open,pre="",more=""){
   const custom = open || (v!==""&&v!=null&&!inRange(v,lo,hi,step));
-  return `<div class="pick2">${pre}<select id="${id}_s" data-pick="${id}" data-lo="${lo}" data-hi="${hi}" data-st="${step}" data-u="${unit}">${pickOpts(v,lo,hi,step,unit)}</select>
+  return `<div class="pick2">${pre}${qvMore(id,pre,v,more,`<select id="${id}_s" data-pick="${id}" data-lo="${lo}" data-hi="${hi}" data-st="${step}" data-u="${unit}">${pickOpts(v,lo,hi,step,unit)}</select>`)}
   <div class="unitbox ${custom?"":"hid"}" id="${id}_box" ${open?'data-open="1"':""}><input id="${id}" type="text" inputmode="decimal" value="${esc(v??"")}" placeholder="${ph||"예: 70.4"}"><span>${unit}</span></div></div>`;
 }
 const wRange = w => { const c=Math.round(+w||70); return [Math.max(25,c-12), Math.min(200,c+12)]; };
@@ -527,7 +529,7 @@ function sleepOpts(v,cus){ const o=[]; for(let x=3;x<=12;x+=0.5) o.push(x);
     o.map(x=>`<option value="${x}" ${!custom&&hasSleep(v)&&Math.abs(x-v)<1e-6?"selected":""}>${fmtSleep(x)}</option>`).join(""); }
 function sleepPicker(v,pre=""){ const [h,m]=hasSleep(v)?hm(v):["",""];
   const custom = hasSleep(v) && !(v>=3&&v<=12&&Math.abs(v*2-Math.round(v*2))<1e-6);
-  return `<div class="pick2">${pre}<select id="sh_s">${sleepOpts(v)}</select>
+  return `<div class="pick2">${pre}${qvMore("sh",pre,v,"다른 시간 고르기",`<select id="sh_s">${sleepOpts(v)}</select>`)}
   <div class="hmbox ${custom?"":"hid"}" id="sh_box"><input id="sh_h" type="text" inputmode="numeric" maxlength="2" value="${h}" placeholder="0"><span>시간</span>
   <input id="sh_m" type="text" inputmode="numeric" maxlength="2" value="${hasSleep(v)?String(m).padStart(2,"0"):""}" placeholder="00"><span>분</span></div></div>`; }
 function bindSleep(onv){
@@ -559,7 +561,7 @@ function renderOnboard(){
     <div class="row"><select id="by"><option value="">년</option>${years.map(v=>`<option ${+p.birthYear===v?"selected":""}>${v}</option>`).join("")}</select>
     <select id="bm"><option value="">월</option>${Array.from({length:12},(_,i)=>`<option ${+p.birthMonth===i+1?"selected":""}>${i+1}</option>`).join("")}</select></div>
     <label class="f">성별</label><div class="chips">${["남성","여성"].map(v=>`<button class="chip ${p.sex===v?"on":""}" data-sex="${v}">${v}</button>`).join("")}</div>
-    ${!obPrev?`<div class="obimp"><button class="btn sm ghost neutral" id="obimp">폰을 바꿨나요? 백업 파일로 기록 가져오기</button><input type="file" id="obimpf" accept=".json,application/json" hidden></div>`:""}`;
+    ${!obPrev?`<div class="obimp"><button type="button" class="lnk" id="obimp">백업 파일이 있다면 여기서 가져오기</button><input type="file" id="obimpf" accept=".json,application/json" hidden></div>`:""}`;
     ok=p.birthYear&&p.birthMonth&&p.sex;
   } else if(st===1){
     h=`<h1>몸과 훈련</h1>
@@ -723,9 +725,9 @@ function signal(date){
   if(pr) up(1,`오늘은 투구 쉬는 날이에요. ${md(pr.from)}에 ${pr.n}개를 던져서 ${pr.rest}일 휴식이 필요해요 (만 ${pr.R.age}세 기준). 던지기 말고 다른 훈련만 하세요.`);
   if(L.pitches&&isPitcher(p)){ const R=psRule(p); if(R&&L.pitches>R.max) up(1,`오늘 투구 수 ${L.pitches}개가 하루 최대 ${R.max}개(만 ${R.age}세)를 넘었어요.`); }
   if(!why.some(a=>a[0])){
-    const sum=`${hasSleep(L.sleepH)?`잠 ${fmtSleep(L.sleepH)} · `:""}잠의 질 ${scoreTxt("sleepQ",L.sleepQ)}, 피로 ${scoreTxt("fatigue",L.fatigue)}, 근육통 ${scoreTxt("soreness",L.soreness)}, 스트레스 ${scoreTxt("stress",L.stress)}<br><b>컨디션 점수 ${w}/20</b> (좋은 쪽으로 맞춰 더한 값, 높을수록 좋음)`;
-    const li=lowItems(L);
-    why.unshift([0, past.length>=7 ? `${sum}, 평소(최근 ${past.length}일)와 비슷하거나 좋아요.${li?"<br>"+li.trim()+" 이 항목은 살펴 주세요.":""}` : li ? `${sum}.<br>${li.trim()} 합계로는 괜찮은 편이에요.` : `${sum}. 안 좋게 나온 항목이 없어요.`]);
+    const sum=`${hasSleep(L.sleepH)?`잠 ${fmtSleep(L.sleepH)} · `:""}잠의 질 ${scoreTxt("sleepQ",L.sleepQ)}, 피로 ${scoreTxt("fatigue",L.fatigue)}, 근육통 ${scoreTxt("soreness",L.soreness)}, 스트레스 ${scoreTxt("stress",L.stress)}`;
+    const bad=[["잠의 질","sleepQ"],["피로","fatigue"],["근육통","soreness"],["스트레스","stress"]].filter(x=>L[x[1]]&&L[x[1]]<=2).map(x=>x[0]);   // lowItems와 같은 기준
+    why.unshift([0, `${sum}<br><b>컨디션 점수 ${w}/20</b> · ${bad.length?`안 좋은 항목: ${bad.join(", ")}`:"안 좋은 항목 없음"}${past.length>=7?`<br>평소(최근 ${past.length}일)와 비슷하거나 좋아요.`:""}`]);
   }
   const msg=["평소대로 훈련해도 좋아요.","강도를 조금 낮추거나 회복(잠·식사·수분)에 신경 써 주세요.",
     "오늘은 쉬세요. 움직인다면 가벼운 회복 운동(걷기·스트레칭)만 하세요."+(L.pain===3?" 심한 통증이 계속되면 진료를 받아 보세요.":"")][lv]
@@ -803,6 +805,15 @@ const PARTS=["목","어깨","팔꿈치·손목","허리","엉덩이","무릎","�
 const qvOn=(a,v)=>v!==""&&v!=null&&!isNaN(+v)&&Math.abs(+a-+v)<1e-6;
 function qvHtml(id,vals,v,unit,lab,aria){ return `<div class="qv" data-for="${id}" role="group" aria-label="${lab}">${vals.map(a=>`<button type="button" class="chip ${qvOn(a,v)?"on":""}" data-qv="${a}" aria-pressed="${qvOn(a,v)}" aria-label="${aria(a)}">${a}<small>${unit}</small></button>`).join("")}</div>`; }
 function qvSync(id,v){ document.querySelectorAll(`.qv[data-for="${id}"] [data-qv]`).forEach(b=>{ const on=qvOn(b.dataset.qv,v); b.classList.toggle("on",on); b.setAttribute("aria-pressed",on?"true":"false"); }); }
+// 칩 아래 목록은 접어 둠: '다른 … 고르기 ▾'를 누르면 펼침. 지금 값이 칩에 없으면(예: 5시간) 처음부터 펼쳐 둠
+const qvOpenU={};
+function qvMore(id,pre,v,label,sel){ if(!pre||!label) return sel;
+  const m=pre.match(/data-qv="[^"]*"/g)||[], inChip=m.some(a=>qvOn(a.slice(9,-1),v)), empty=v===""||v==null;
+  const open=qvOpenU[id]||(!empty&&!inChip);
+  return `<button type="button" class="qvmore" id="${id}_mb" data-lab="${label}" aria-expanded="${open}" aria-controls="${id}_more">${open?"접기 ▴":label+" ▾"}</button><div id="${id}_more" class="qvwrap${open?"":" hid"}">${sel}</div>`; }
+function bindQvMore(){ document.querySelectorAll(".qvmore").forEach(b=>b.onclick=()=>{ const w=document.getElementById(b.getAttribute("aria-controls")); if(!w) return;
+  const open=w.classList.toggle("hid")===false; qvOpenU[b.id.replace(/_mb$/,"")]=open; b.setAttribute("aria-expanded",open?"true":"false"); b.textContent=open?"접기 ▴":b.dataset.lab+" ▾";
+  if(open){ const s=w.querySelector("select"); if(s) s.focus(); } }); }
 function wQuick(){ const [lo,hi]=wRange(curWeight()), c=Math.round(+curWeight()||70); return [c-2,c-1,c,c+1,c+2].filter(a=>a>=lo&&a<=hi); }
 function checkinForm(x){
   return `<div class="card">
@@ -813,7 +824,7 @@ function checkinForm(x){
   ${scaleHtml("soreness",x.soreness,"1 전혀 없음","5 아주 심함","근육통은?")}
   ${scaleHtml("stress",x.stress,"1 전혀 없음","5 아주 심함","스트레스는?")}
   <div class="optsep"></div>
-  <label class="f">아침 몸무게 <span class="mut">(선택 · 최근 ${curWeight()}kg)</span></label>${picker("mw",x.weight,...wRange(curWeight()),1,"kg",undefined,undefined,qvHtml("mw",wQuick(),x.weight,"kg","아침 몸무게",a=>`${a}kg`))}
+  <label class="f">아침 몸무게 <span class="mut">(선택 · 최근 ${curWeight()}kg)</span></label>${picker("mw",x.weight,...wRange(curWeight()),1,"kg",undefined,undefined,qvHtml("mw",wQuick(),x.weight,"kg","아침 몸무게",a=>`${a}kg`),"다른 몸무게 고르기")}
   <label class="f">아픈 곳이 있나요?</label>
   <div class="chips">${["없음","약간","중간","심함"].map((v,i)=>`<button class="chip ${x.pain===i?"on":""}" data-pain="${i}">${v}</button>`).join("")}</div>
   ${x.pain>0?`<label class="f">어디가 아픈가요?</label><div class="chips">${PARTS.map(v=>`<button class="chip ${x.painPart===v?"on":""}" data-part="${v}">${v}</button>`).join("")}</div>`:""}
@@ -830,16 +841,16 @@ function bindCheckin(edit,L){
     b.parentNode.querySelectorAll("button").forEach(x=>{ const on=x===b; x.classList.toggle("on",on); x.setAttribute("aria-pressed",on?"true":"false"); }); updSaveCk(); });
   document.querySelectorAll("[data-pain]").forEach(b=>b.onclick=()=>{ draft.pain=+b.dataset.pain; if(!draft.pain) draft.painPart=""; re(); });
   document.querySelectorAll("[data-part]").forEach(b=>b.onclick=()=>{ draft.painPart=b.dataset.part; re(); });
-  bindSleep(v=>{ draft.sleepH=v; updSaveCk(); qvSync("sh",v); });
+  bindSleep(v=>{ draft.sleepH=v; updSaveCk(); qvSync("sh",v); }); bindQvMore();
   $("#mw").oninput=e=>{ draft.weight=e.target.value; qvSync("mw",draft.weight); };
   // 칩을 누르면 아래 목록에서 같은 값을 고른 것과 똑같이 처리 (입력칸은 다시 그리지 않음)
   document.querySelectorAll(".qv [data-qv]").forEach(b=>b.onclick=()=>{ const s=$("#"+b.parentNode.dataset.for+"_s"); if(!s) return; s._kbd=false; s.value=b.dataset.qv; s.dispatchEvent(new Event("change",{bubbles:true})); });
   $("#saveck").onclick=()=>{
-    const wv=+draft.weight; if(draft.weight!==""&&draft.weight!=null&&!(wv>=20&&wv<=250)){ const el=$("#mw"); if(el){ const bx=$("#mw_box"); if(bx) bx.classList.remove("hid"); fieldErr(el,"20~250kg 사이로 적어 주세요."); } toast("몸무게를 확인해 주세요 (20~250kg)."); return; }
+    const wv=+draft.weight; if(draft.weight!==""&&draft.weight!=null&&!(wv>=20&&wv<=250)){ const el=$("#mw"); if(el){ const bx=$("#mw_box"); if(bx) bx.classList.remove("hid"); const mm=$("#mw_more"); if(mm&&mm.classList.contains("hid")) $("#mw_mb").click(); fieldErr(el,"20~250kg 사이로 적어 주세요."); } toast("몸무게를 확인해 주세요 (20~250kg)."); return; }
     if(!(+draft.sleepH>=0&&+draft.sleepH<=24)){ const el=$("#sh_h"); if(el) fieldErr(el,"0~24시간 사이로 적어 주세요."); toast("잠잔 시간을 확인해 주세요 (0~24시간)."); return; }
     const d=today(); const prev=S.logs[d]||{};
     S.logs[d]={...prev, sleepH:+draft.sleepH, sleepQ:draft.sleepQ, fatigue:draft.fatigue, soreness:draft.soreness, stress:draft.stress, pain:draft.pain, painPart:draft.painPart, weight:draft.weight?+draft.weight:null};
-    draft=null; save(); if(tab==="edit"){ tab="today"; goBack(); if(tab!=="today") go("today",true); } else renderToday();
+    draft=null; for(const k in qvOpenU) delete qvOpenU[k]; save(); if(tab==="edit"){ tab="today"; goBack(); if(tab!=="today") go("today",true); } else renderToday();
     window.scrollTo(0,0); const sh=$(".sigh"); if(sh) sh.focus({preventScroll:true});
   };
 }
