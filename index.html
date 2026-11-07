@@ -11,7 +11,9 @@
 <meta name="theme-color" content="#15171a">
 <script>
 /* 0.1.21 화면 밝기: 자동(폰 설정) / 밝게 / 어둡게 — 기록 데이터와 따로, 작은 키에만 */
-(function(){ var m="auto"; try{ var v=localStorage.getItem("condition-mma-theme"); if(v==="light"||v==="dark") m=v; }catch(e){}
+/* 0.1.23 포트폴리오 시연(임베드)은 window.__THEME_LOCK 으로 고정 — 폰 설정·저장값 무시 */
+(function(){ var m="auto", L=window.__THEME_LOCK; try{ var v=localStorage.getItem("condition-mma-theme"); if(v==="light"||v==="dark") m=v; }catch(e){}
+  if(L==="light"||L==="dark") m=L;
   var d=m!=="auto"?m:(window.matchMedia&&matchMedia("(prefers-color-scheme: light)").matches?"light":"dark");
   document.documentElement.setAttribute("data-theme",d);
   var t=document.querySelector('meta[name="theme-color"]'); if(t) t.setAttribute("content",d==="light"?"#ffffff":"#15171a"); })();
@@ -578,7 +580,7 @@ function band(p){ const a=ageOf(p);
   return {id:"m50",name:"성인 · 50세 이상",youth:false}; }
 
 /* ───────── 종목 ───────── */
-const APP_VER = "0.1.22";
+const APP_VER = "0.1.23";
 // subs 값: null = 포지션 없음 / [[묶음 이름, [포지션…]], …]
 const SPORTS = {
   "투기": { subs:{ "MMA":null }, weightClass:true }
@@ -1457,10 +1459,11 @@ function bindVideo(){
 /* ───────── 화면 밝기 (0.1.21) ───────── */
 const THEME_KEY="condition-mma-theme";   // 기록 데이터(condition-mma-v1)와 따로. 바꿀 때만 씀
 let THEME_MEM=null;   // 저장소가 막혀도 이번 실행 동안은 고른 값을 씀
-function themeMode(){ if(THEME_MEM) return THEME_MEM; try{ const v=localStorage.getItem(THEME_KEY); return v==="light"||v==="dark"?v:"auto"; }catch(e){ return "auto"; } }
+const THEME_LOCK=(window.__THEME_LOCK==="light"||window.__THEME_LOCK==="dark")?window.__THEME_LOCK:null;   // 0.1.23 시연(임베드) 고정
+function themeMode(){ if(THEME_LOCK) return THEME_LOCK; if(THEME_MEM) return THEME_MEM; try{ const v=localStorage.getItem(THEME_KEY); return v==="light"||v==="dark"?v:"auto"; }catch(e){ return "auto"; } }
 function applyTheme(){ const m=themeMode(), d=m!=="auto"?m:(matchMedia("(prefers-color-scheme: light)").matches?"light":"dark");
   document.documentElement.setAttribute("data-theme",d); const t=document.querySelector('meta[name="theme-color"]'); if(t) t.setAttribute("content",d==="light"?"#ffffff":"#15171a"); }
-function setTheme(m){ THEME_MEM=m; try{ if(m==="auto") localStorage.removeItem(THEME_KEY); else localStorage.setItem(THEME_KEY,m); }catch(e){} applyTheme();
+function setTheme(m){ if(THEME_LOCK) return; THEME_MEM=m; try{ if(m==="auto") localStorage.removeItem(THEME_KEY); else localStorage.setItem(THEME_KEY,m); }catch(e){} applyTheme();
   toast({auto:"화면 밝기: 자동 (폰 설정을 따라가요)",light:"화면 밝기: 밝게",dark:"화면 밝기: 어둡게"}[m]||""); }
 try{ const mq=matchMedia("(prefers-color-scheme: light)"); const f=()=>{ if(themeMode()==="auto") applyTheme(); }; mq.addEventListener?mq.addEventListener("change",f):mq.addListener(f); }catch(e){}
 applyTheme();
@@ -1471,7 +1474,7 @@ function renderSettings(){
   <div class="card"><b>${b.name}</b> · 만 ${ageOf(p)}세 · ${esc(p.sex)} · ${esc(p.height)}cm · ${esc(p.weight)}kg<div class="mut">${esc(p.subName||p.sub)}${p.pos?" · "+esc(p.pos):""}${p.weightClass?" · "+esc(p.weightClass)+(p.classLimit?` (${esc(p.classLimit)}kg)`:""):""} · ${esc(LEVELS[p.level]||"")}</div>
   <button class="btn ghost neutral" id="rewc">체급 바꾸기</button>
   <button class="btn ghost neutral" id="reprof">처음 설정 다시 하기 (기록은 그대로)</button></div>
-  <h2>화면 밝기</h2><div class="card"><div class="chips" role="group" aria-label="화면 밝기">${[["auto","자동"],["light","밝게"],["dark","어둡게"]].map(([k,n])=>`<button class="chip ${themeMode()===k?"on":""}" data-theme-set="${k}">${n}</button>`).join("")}</div><p class="mut" style="margin:10px 0 0">자동은 폰 설정(밝은 화면·어두운 화면)을 따라가요.</p></div>
+  <h2>화면 밝기</h2><div class="card"><div class="chips" role="group" aria-label="화면 밝기">${[["auto","자동"],["light","밝게"],["dark","어둡게"]].map(([k,n])=>`<button class="chip ${themeMode()===k?"on":""}" data-theme-set="${k}"${THEME_LOCK?" disabled":""}>${n}</button>`).join("")}</div><p class="mut" style="margin:10px 0 0">${THEME_LOCK?"시연에서는 어둡게로 고정돼요":"자동은 폰 설정(밝은 화면·어두운 화면)을 따라가요."}</p></div>
   <h2>백업 · 데이터</h2><div class="card"><p class="mut">기록은 이 휴대폰에만 있어요. 폰을 바꾸거나 사파리 데이터를 지우면 사라질 수 있으니 가끔 내보내 두세요.${S.lastBackup?` 마지막 백업: ${esc(S.lastBackup)}`:""}</p>
   <button class="btn" id="exj">기록 내보내기 (복원용 파일)</button>
   <button class="btn ghost neutral" id="exc">엑셀용 파일(CSV) 내보내기</button>
