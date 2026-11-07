@@ -1220,7 +1220,7 @@ function renderSettings(){
   <button class="btn" id="exj">기록 내보내기 (복원용 파일)</button>
   <button class="btn ghost neutral" id="exc">엑셀용 파일(CSV) 내보내기</button>
   <button class="btn ghost neutral" id="imp">기록 가져오기</button><input type="file" id="impf" accept=".json,application/json" hidden>
-  <details class="fold"><summary>백업 파일은 어디에? 새 폰으로 옮기기</summary><div>아이폰은 저장할 곳을 고르는 창이 떠요. '파일' 앱이나 iCloud Drive에 두거나, 카톡 '나와의 채팅'으로 보내 두면 안전해요. 안드로이드는 '다운로드' 폴더에 저장돼요.<br>새 폰에서는 앱을 연 뒤 처음 화면의 '백업 파일로 기록 가져오기'(또는 설정 → 기록 가져오기)를 누르고 <b>컨디션신호등MMA_백업_날짜.json</b> 파일을 고르세요. 엑셀용(CSV) 파일로는 되살릴 수 없어요.</div></details>
+  <details class="fold"><summary>백업 파일은 어디에? 새 폰으로 옮기기</summary><div>아이폰은 저장할 곳을 고르는 창이 떠요. '파일' 앱이나 iCloud Drive에 두거나, 카톡 '나와의 채팅'으로 보내 두면 안전해요. 안드로이드는 '다운로드' 폴더에 저장돼요.<br>새 폰에서는 앱을 연 뒤 처음 화면의 '백업 파일이 있다면 여기서 가져오기'(또는 설정 → 기록 가져오기)를 누르고 <b>컨디션신호등MMA_백업_날짜.json</b> 파일을 고르세요. 엑셀용(CSV) 파일로는 되살릴 수 없어요.</div></details>
   <div class="wipe-row"><button class="btn danger" id="wipe">이 폰의 모든 기록 지우기</button></div></div>
   ${ageTips(p)?`<h2>나이대별 확인 (${band(p).id==="m50"?"50세 이상":"35~49세"})</h2><div class="card" style="font-size:15px"><ul class="why">${ageTips(p).map(([t,k])=>`<li class="lo"><span>${t}<small class="src">${AGE_SRC[k]}</small></span></li>`).join("")}</ul></div>`:""}
   <h2 id="crit" tabindex="-1">판단 기준과 출처</h2><div class="card fold-card" style="font-size:15px"><p class="mut" style="margin-top:0">누르면 펼쳐져요.</p>
