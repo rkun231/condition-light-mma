@@ -394,7 +394,7 @@ function band(p){ const a=ageOf(p);
   return {id:"m50",name:"성인 · 50세 이상",youth:false}; }
 
 /* ───────── 종목 ───────── */
-const APP_VER = "0.1.20";
+const APP_VER = "0.1.21";
 // subs 값: null = 포지션 없음 / [[묶음 이름, [포지션…]], …]
 const SPORTS = {
   "투기": { subs:{ "MMA":null }, weightClass:true }
@@ -1558,7 +1558,7 @@ function foodSheet(meal,opt){
    ② 아래 규칙으로 음식·양 쪼개기  ③ 식약처 DB 검색(searchFoods)  ④ 확인 화면에서 고친 뒤 한 번에 추가
    음성 인식이 없거나(아이폰 홈 화면 앱 등) 마이크가 막히면 같은 문장을 칸에 적어도 똑같이 동작 */
 let _vrec=null;
-function voiceStop(){ if(_vrec){ const r=_vrec; _vrec=null; r._stop=true; try{ r.abort(); }catch(e){} } }
+function voiceStop(){ if(_vrec){ const r=_vrec; _vrec=null; r._stop=true; clearTimeout(r._t); try{ r.abort(); }catch(e){} } }   // 닫기·ESC·뒤로·탭 이동: 버림
 function voiceWire(meal){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   const mic=$("#vmic"), st=$("#vstat"), box=$("#vbox"), tx=$("#vtx");
@@ -1573,18 +1573,25 @@ function voiceWire(meal){
   mic.setAttribute("aria-pressed","false");
   mic.onclick=()=>{
     help.hidden=true;
-    if(_vrec){ voiceStop(); idle(); st.textContent=""; return; }        // 듣는 중에 다시 누르면 멈춤
+    // 0.1.21 듣는 중에 다시 누르면 stop(): 말한 내용을 받아서 멈춤(abort는 버림). 1.5초 안에 결과가 없으면 마지막 중간 글자로, 그것도 없으면 '잘 못 들었어요'
+    if(_vrec){ const r=_vrec; if(r._ending) return; r._ending=true; idle(); st.textContent=V_STOPPING;
+      try{ r.stop(); }catch(e){} r._t=setTimeout(()=>{ if(r._fin) r._fin(); try{ r.abort(); }catch(e){} },V_STOP_MS); return; }
     if(!SR) return showBox(NO);
-    let r; try{ r=new SR(); r.lang="ko-KR"; r.interimResults=false; r.continuous=false; r.maxAlternatives=1; }catch(e){ return showBox(NO); }
-    let done=false; const alive=()=>!r._stop&&mic.isConnected;
-    r.addEventListener("result",e=>{ if(done) return; done=true; if(_vrec===r) _vrec=null; if(!alive()) return;
-      const t=String((((e.results||[])[0]||[])[0]||{}).transcript||"").trim(); if(t) voiceConfirm(meal,t); else showBox(AGAIN); });
-    r.addEventListener("error",e=>{ if(done) return; done=true; if(_vrec===r) _vrec=null; if(!alive()) return;
+    let r; try{ r=new SR(); r.lang="ko-KR"; r.interimResults=true; r.continuous=false; r.maxAlternatives=1; }catch(e){ return showBox(NO); }
+    let done=false, last=""; const alive=()=>!r._stop&&mic.isConnected;
+    const fin=t=>{ if(done) return; done=true; clearTimeout(r._t); if(_vrec===r) _vrec=null; if(!alive()) return; if(t) voiceConfirm(meal,t); else showBox(AGAIN); };
+    r._fin=()=>fin(last);
+    r.addEventListener("result",e=>{ if(done) return; const R=e.results||[]; let t="", ok=R.length>0;
+      for(let i=0;i<R.length;i++){ t+=String(((R[i]||[])[0]||{}).transcript||""); if(!R[i]||!R[i].isFinal) ok=false; }
+      t=t.trim(); if(t) last=t;                                          // 중간 글자도 모아 둠(멈췄는데 마지막 결과가 안 오면 이걸로)
+      if(ok) fin(t); });
+    r.addEventListener("error",e=>{ if(done) return; if(_vrec===r) _vrec=null; if(!alive()){ done=true; return; }
       const er=e.error||"";
-      if(er==="not-allowed") return showBox(V_PERM,true);                 // 마이크 권한 거부: 전용 안내 + 다시 허용하는 방법
-      showBox(/service-not-allowed|audio-capture|language-not-supported/.test(er)?NO:AGAIN); });
-    r.addEventListener("end",()=>{ if(_vrec===r) _vrec=null; if(done||!alive()) return; done=true; showBox(AGAIN); });
-    _vrec=r; mic.classList.add("on"); mic.setAttribute("aria-pressed","true"); mic.textContent="■ 누르면 멈춰요"; mic.setAttribute("aria-label","누르면 멈춰요"); st.textContent="듣고 있어요… 다 말하면 잠시 기다리세요";
+      if(er==="not-allowed"){ done=true; clearTimeout(r._t); return showBox(V_PERM,true); }       // 마이크 권한 거부: 전용 안내 + 다시 허용하는 방법
+      if(/service-not-allowed|audio-capture|language-not-supported/.test(er)){ done=true; clearTimeout(r._t); return showBox(NO); }
+      fin(last); });
+    r.addEventListener("end",()=>{ if(_vrec===r) _vrec=null; if(done) return; fin(last); });
+    _vrec=r; mic.classList.add("on"); mic.setAttribute("aria-pressed","true"); mic.textContent="■ "+V_STOPBTN; mic.setAttribute("aria-label",V_STOPBTN); st.textContent="듣고 있어요…";
     try{ r.start(); }catch(e){ _vrec=null; done=true; showBox(NO); }
   };
 }
@@ -1616,6 +1623,7 @@ const V_SKIP=["물","생수","맹물"];   // 열량 0 → 기록하지 않음(�
 const V_PHRASE=[[/치킨\s*(한|두|세|네|반|\d+(?:\.\d+)?)\s*마리/g,"치킨 $1마리분"]];   // 치킨 N마리 → N인분(DB 1인분이 한 마리), 화면에는 'N마리'
 const V_EX="예: 라면 1개반, 바나나 반 개";   // 적기 칸 안내와 같은 예시
 const V_PERM="마이크 사용이 막혀 있어요. 아래 칸에 적어 주세요.";
+const V_STOPBTN="다 말했으면 눌러서 멈추기", V_STOPPING="정리하고 있어요…", V_STOP_MS=1500;   // 0.1.21 듣는 중 버튼 · 멈춘 뒤 결과 기다리는 문구 · 기다리는 시간
 const V_PERM_HOW="다시 허용하려면: 아이폰은 설정 → Safari → 마이크 → 허용, 크롬은 주소창 왼쪽 아이콘 → 권한 → 마이크 허용.";
 const vName=s=>s.split(" ").map(w=>V_ALIAS[w]||w).join(" ");
 // 0.1.19 확인 화면 표시 이름: '닭튀김_간편조리세트_후라이드치킨' → '후라이드치킨'.
@@ -1630,6 +1638,11 @@ function vFind(said){ const q=vName(said), n=norm(q), r=searchFoods(q); return r
 // 찾은 이름이 말한 이름과 같거나 '말한 이름(…)·말한 이름_…' 꼴이면 확실, 아니면(물→물회, 검색 1등 등) '맞나요?' 표시
 function vSure(said,f){ const a=String(f[0]).replace(/\s/g,""), b=vName(said).replace(/\s/g,"");
   if(norm(a)===norm(b)) return true; return a.startsWith(b)&&/^[(_·/]/.test(a.slice(b.length)); }
+// 0.1.21 우리말 수+단위가 음식 이름에 붙은 낱말(라면한개·바나나반개·밥한공기·라면한개반) → '음식 수단위'로 띄움.
+// 낱말 전체가 DB 음식 이름과 똑같으면 이름의 일부이므로 나누지 않음. '일·이·삼·사·오'는 이름 글자와 헷갈려서 붙어 있을 땐 읽지 않음
+const V_GLUE=new RegExp(`^(.*?[가-힣a-zA-Z])((?:한|두|세|네|다섯|여섯|일곱|여덟|아홉|열|반)(?:${V_U})반?)$`,"i");
+function vGlue(w){ const m=V_GLUE.exec(w); if(!m) return w; const n=norm(V_ALIAS[w]||w);
+  if(searchFoods(w).some(f=>norm(f[0])===n)) return w; return m[1]+" "+m[2]; }
 let _vnames=null;
 function vHas(q){ const n=norm(V_ALIAS[q]||q); if(!n) return false;
   if(!_vnames||_vnames.src!==FOODLIST||_vnames.mine!==S.myFoods) _vnames=Object.assign([...(S.myFoods||[]),...(FOODLIST||[])].map(f=>norm(f[0])),{src:FOODLIST,mine:S.myFoods});
@@ -1639,6 +1652,7 @@ function parseMeal(text){
   let s=String(text).replace(/[(（\[]([^)）\]]*)[)）\]]/g,(_,x)=>{ notes.push(x.trim()); return ` \u0001${notes.length-1} `; });
   V_PHRASE.forEach(([re,to])=>{ s=s.replace(re,to); });
   s=s.replace(new RegExp(`([가-힣a-zA-Z])(\\d+(?:\\.\\d+)?\\s*(?:${V_U}))`,"g"),"$1 $2");   // 라면1개 → 라면 1개
+  s=s.split(/([\s,，、;.]+)/).map(vGlue).join("");                         // 0.1.21 라면한개 → 라면 한개
   const QEND=new RegExp(`(?:${V_U}|반|\\d|하나|둘|셋|넷)$`,"i"), out=[];
   for(const seg of s.split(/\s*(?:[,，、;\n]|\.(?!\d))\s*|\s+그리고\s+/)){
     const W=seg.split(/\s+/).filter(w=>w&&w!=="그리고"), parts=[[]];
