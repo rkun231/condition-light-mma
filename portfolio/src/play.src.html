@@ -400,6 +400,7 @@ input[type=range] { height: 44px; margin: 0; }
 /* ── 개선 루프 11-07 v3 (폰 첫 화면에 목차·안내·펼치기, 터치 건너뛰기, 폰 미션 압축, 닫기 44px) ── */
 .p0-acts { display: flex; flex-wrap: wrap; gap: 8px; }
 body.print #skipStoryTouch { display: none; }
+.why li.lead { font-size: 17px; font-weight: 700; }
 .segrow .dir .nw { white-space: nowrap; }
 .ch.prolog { padding-top: 8px; }
 .prolog .ch-in { gap: 16px; }
@@ -468,13 +469,13 @@ body.print #skipStoryTouch { display: none; }
         <div class="stack">
           <p class="muted">이 앱을 시작한 계기는 세 가지였습니다.</p>
           <ul class="why">
+            <li class="l0 lead" style="color:var(--ink)">10년 넘게 MMA를 챙겨 보면서 계체 실패와 무리한 수분 감량 이야기를 계속 접했습니다.</li>
             <li class="l0" style="color:var(--ink)">아마추어 풋살 팀을 운영하며 코치를 맡았을 때, 경기 영상을 찍어 장면을 되짚어 가며 설명해 주고 싶었는데 마땅한 방법이 없었습니다.</li>
-            <li class="l0" style="color:var(--ink)">10년 넘게 MMA를 챙겨 보면서 계체 실패와 무리한 수분 감량 이야기를 계속 접했습니다.</li>
             <li class="l0" style="color:var(--ink)">유소년 선수들이 훈련량과 몸을 스스로 관리하도록 돕는 일도 언젠가 풀어 보고 싶었습니다.</li>
           </ul>
         </div>
       </div>
-      <p class="note navhint">어느 날짜든 위쪽에서 바로 갈 수 있어요. 미션을 하지 않아도 '만든 이야기'는 눌러서 펼칠 수 있어요. 오른쪽 아래 <b>📱 실제 앱</b> 버튼은 진짜 앱을 그날 상황으로 띄웁니다.</p>
+      <p class="note navhint">어느 날짜든 위쪽에서 바로 갈 수 있어요. 미션을 하지 않아도 '만든 이야기'는 눌러서 펼칠 수 있어요. 월요일부터 오른쪽 아래에 나오는 <b>📱 실제 앱</b> 버튼은 진짜 앱을 그날 상황으로 띄웁니다.</p>
       <p class="note printonly">직접 눌러 보기: rkun231.github.io/condition-light-mma/portfolio/ (QR 코드는 마지막 쪽에 있어요)</p>
     </div>
   </section>
@@ -812,7 +813,7 @@ body.print #skipStoryTouch { display: none; }
   host.innerHTML = `<div class="scen">${Object.entries(SCENES).map(([k, s]) => `<button type="button" data-s="${k}">${s[0]}</button>`).join("")}</div>
     <div class="device"><div class="screen-area" data-r="screen"></div>
     <div class="navbar"><button type="button" data-a="back"><span class="glyph">◀</span>뒤로</button><button type="button" data-a="reset"><span class="glyph">↺</span>처음부터</button></div></div>
-    <p class="phone-hint">실제 앱 파일(MMA v${(appHtml().match(/const APP_VER = "([^"]+)"/) || [, "?"])[1]}) 그대로예요. 피로·근육통·스트레스는 1이 좋은 쪽이에요. 초록·노랑·빨강은 오늘 컨디션 신호예요. 앱 안 날짜는 오늘로 보여요. 누른 내용은 이 브라우저에만 남아요.</p>`;
+    <p class="phone-hint">실제 앱 파일(MMA v${(appHtml().match(/const APP_VER = "([^"]+)"/) || [, "?"])[1]}) 그대로예요. 피로·근육통·스트레스는 1이 좋은 쪽이에요. 초록·노랑·빨강은 오늘 컨디션 신호예요. 앱 안 날짜는 오늘로 보여요. 누른 내용은 이 브라우저에만 남아요. (장면을 바꾸면 체험 내용은 지워져요)</p>`;
   let frame = null, cur = "before";
   function load(kind) {
     cur = kind;
@@ -1210,9 +1211,29 @@ body.print #skipStoryTouch { display: none; }
     const d = el.tagName === "DETAILS" ? el : el.closest("details"); if (d) d.open = true;
     setTimeout(() => { el.scrollIntoView({ block: el.offsetHeight > innerHeight * 0.6 ? "start" : "center" }); el.classList.remove("golink"); void el.offsetWidth; el.classList.add("golink"); }, 60);
   };
-  addEventListener("hashchange", () => go());
+  let lastHash = location.hash;
+  addEventListener("hashchange", () => { lastHash = location.hash; go(); });
+  // 주소가 이미 같은 #go-… 이면 hashchange가 안 나서 안 움직임 → 같은 주소로 다시 와도 직접 이동
+  addEventListener("popstate", () => { if (location.hash === lastHash) go(); });
+  document.addEventListener("click", e => {
+    const a = e.target.closest && e.target.closest('a[href*="#go-"]'); if (!a || a.target === "_blank") return;
+    const u = new URL(a.href, location.href); if (u.pathname !== location.pathname || u.hash !== location.hash) return;
+    e.preventDefault(); go(decodeURIComponent(u.hash.slice(1)));
+  });
   // 체크리스트 페이지가 이 페이지를 안에 띄워 놓고 보내는 바로가기 요청
   addEventListener("message", e => { if (e.data && typeof e.data.pfGo === "string") go(e.data.pfGo); }); if (document.readyState === "complete") setTimeout(() => go(), 300); else addEventListener("load", () => setTimeout(() => go(), 300));
+})();
+/* '월요일 아침으로': 누를 때마다 #d1로 직접 이동. 데스크톱에서는 최대 60px 더 내려 도착(아래쪽이 화면 끝에 덜 걸리게). 주소 #d1은 그대로 */
+(() => {
+  const a = document.querySelector('.p0-btns a[href="#d1"]'), t = document.getElementById("d1"); if (!a || !t) return;
+  a.addEventListener("click", e => {
+    e.preventDefault();
+    const pad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0, dl = t.querySelector(".dayline"), hud = document.querySelector(".hud");
+    // 최대 60px, 단 'D-6 · 월' 줄이 위 막대(HUD)에 가리지 않는 만큼만
+    const off = matchMedia("(min-width: 900px)").matches && dl && hud ? Math.max(0, Math.min(60, pad + dl.getBoundingClientRect().top - t.getBoundingClientRect().top - hud.getBoundingClientRect().bottom - 6)) : 0;
+    scrollTo({ top: t.getBoundingClientRect().top + scrollY - pad + off, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    if (location.hash !== "#d1") history.pushState(null, "", "#d1");
+  });
 })();
 </script>
 </body>
