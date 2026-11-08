@@ -575,6 +575,7 @@ input[type=range] { height: 44px; margin: 0; }
 .glasses button::after { inset: 0; }
 .toast button { min-width: 44px; min-height: 44px; }
 .finish a { display: inline-flex; align-items: center; min-height: 44px; }
+#e2 .note a { display: inline-flex; align-items: center; min-height: 44px; }
 @media (pointer: coarse) { .fab { width: 52px; height: 52px; } }
 @media (max-width: 640px) {
   :root { --hud: 84px; }
@@ -770,7 +771,7 @@ body.print #skipStoryTouch { display: none; }
   </section>
 
   <!-- 목 -->
-  <section class="ch" id="d4" data-day="목" data-label="D-3" data-w="71.6" data-scene="good">
+  <section class="ch" id="d4" data-day="목" data-label="D-3" data-w="71.6" data-scene="food">
     <div class="ch-in">
       <div class="dayline"><span class="d">D-3 · 목</span><span class="t">12:30 · 점심</span></div>
       <h2>감량 중 점심, 뭘 먹을까</h2>
@@ -782,12 +783,15 @@ body.print #skipStoryTouch { display: none; }
           <div class="stack" id="meters"></div>
           <div class="stack"><div class="verdict" id="verdict" aria-live="polite"></div><p class="src" id="foodSrc"></p></div>
         </div>
+        <div class="row-btns"><button class="ghost-btn" data-app="food">실제 앱에서 말로 넣어 보기 →</button></div>
       </div>
       <details class="story" data-s="4"><summary><span class="lock">만든 이야기 4</span>1,015개 음식 데이터와 한글 입력 버그<span class="hint2"></span></summary>
         <div class="sb">
           <div><span class="k">데이터</span>식약처 식품영양성분 통합DB에서 가정식·외식·식재료 1,015개를 골라 넣었습니다. 하루 목표는 기초대사량(Mifflin-St Jeor)과 훈련 시간으로 계산합니다.</div>
           <div><span class="k">발견</span>11월 1일 아이폰에서 '쌀밥'을 치니 'ㅆㅆㅏㄹㅂㅏㅂ'처럼 타이핑이 이상하게 되는 문제를 발견했고, 글자를 칠 때마다 검색창이 통째로 다시 그려져 한글 조합이 끊기는 현상이라는 걸 알게 되었습니다.</div>
           <div><span class="k">수정</span>입력칸은 한 번만 만들고 결과 목록만 바꾸게 했습니다. 이후로는 '입력 중인 칸은 다시 그리지 않는다'라는 규칙을 잘 지켰습니다.</div>
+          <div><span class="k">말로 넣기</span>손으로 치기 귀찮을 때가 있을 수 있어서, 마이크로 먹은 것을 말하면 칼로리를 찾아 주는 기능을 부탁했는데요. 돈이 든다면 보류하려 했고, AI가 두 방식을 비교해 준 뒤 돈이 안 드는 방식으로 정했습니다. 브라우저 음성 인식과 앱 안의 식약처 DB만 씁니다. 대신 '국물 빼고' 같은 말은 알아듣지 못해 메모로 남기고, 말한 대로 바로 넣지 않고 확인 화면에서 고친 뒤 넣게 했습니다. 자동 검증을 네 번 돌려 71점에서 91점까지 올렸습니다.</div>
+          <div><span class="k">직접 써 보며</span>아이폰으로 말해 보니 다 말했는데도 마이크가 꺼지지 않았고, '라면한개'처럼 붙여 말하면 양으로 읽지 못했습니다. 버튼을 다시 누르면 말한 내용을 가지고 멈추게 하고, 붙여 말한 양도 읽게 고쳤습니다.</div>
         </div>
       </details>
     </div>
@@ -912,15 +916,16 @@ body.print #skipStoryTouch { display: none; }
       </dl>
       <div class="toggles" id="whoT"></div>
       <div class="table-box"><table><thead><tr><th>무엇</th><th>낸 쪽</th><th>결과와 이유</th></tr></thead><tbody id="whoBody"></tbody></table></div>
+      <p class="note" style="margin-top:8px"><a href="https://rkun231.github.io/aigen-portfolio/decisions.html#c" target="_blank" rel="noopener">AI 제안과 제가 고른 결정 기록 전체 보기 ↗</a></p>
     </div>
   </section>
 
-  <section class="ch epi" id="e3" data-day="흐름" data-label="5 DAYS">
+  <section class="ch epi" id="e3" data-day="흐름" data-label="8 DAYS">
     <div class="ch-in">
-      <span class="tag">실제로 만든 5일</span>
-      <h2>11월 1일 첫 버전부터<br>11월 5일 MMA 분리까지</h2>
+      <span class="tag">실제로 만든 8일</span>
+      <h2>11월 1일 첫 버전부터<br>11월 5일 MMA 분리, 이후 마지막 검증까지</h2>
       <div class="stats">
-        <div><span class="big-num">19<small>번</small></span><span class="cap">고칠 때마다 남긴 커밋 (여러 종목 18 + MMA 1)</span></div>
+        <div><span class="big-num">63<small>번</small></span><span class="cap">고칠 때마다 남긴 커밋 (여러 종목 18 + MMA 앱·포트폴리오 45)</span></div>
         <div><span class="big-num">78→90</span><span class="cap">자동 검증 3차례 평가 점수</span></div>
         <div><span class="big-num">1,015<small>개</small></span><span class="cap">식약처 DB에서 고른 음식</span></div>
         <div><span class="big-num">1<small>명</small></span><span class="cap">매일 쓰는 사용자 (만든 본인)</span></div>
@@ -940,7 +945,7 @@ body.print #skipStoryTouch { display: none; }
       <dl class="kv card">
         <dt id="go-storage">기록은 어디에</dt><dd>폰 브라우저의 <span class="mono">localStorage</span>에만 있습니다. 서버가 없고 휴대폰 안에만 저장됩니다. 여러 종목 앱(<span class="mono">condition-note-v1</span>)과 MMA 앱(<span class="mono">condition-mma-v1</span>)은 저장 이름을 나눠 섞이지 않습니다.</dd>
         <dt>백업</dt><dd>JSON 내보내기·가져오기, 엑셀용 CSV. 14일이 지나면 백업 안내가 뜹니다.</dd>
-        <dt>이 페이지의 휴대폰</dt><dd>실제 앱 파일을 그대로 띄우되 저장 이름만 <span class="mono">condition-portfolio-demo</span>로 바꿔 예시 기록을 넣었습니다.</dd>
+        <dt>이 페이지의 휴대폰</dt><dd>실제 앱 파일을 그대로 띄우되 저장 이름만 <span class="mono">condition-portfolio-demo</span>로 바꿔 예시 기록을 넣었고, 화면은 어둡게로 고정했습니다.</dd>
       </dl>
     </div>
   </section>
@@ -950,7 +955,7 @@ body.print #skipStoryTouch { display: none; }
       <span class="tag">회고</span>
       <h2>배운 것, 놓친 것, 이어갈 것</h2>
       <div class="retro">
-        <div class="r-g" id="go-learn"><b>배운 것</b><span>먼저 만들면서 배운 것입니다.</span><ul><li>직접 써 봐야 문제가 보였습니다. 아이폰에서 '쌀밥'을 치다 한글이 깨지는 버그를 찾았고, 영상 건너뛰기와 크게 보기도 써 보면서 넣었습니다.</li><li>AI에게 맡기기 전에 점검 기준(체크리스트)부터 정했습니다. 그래야 고친 결과를 믿고 확인할 수 있었습니다.</li><li>피로·근육통·스트레스 점수를 처음엔 '5가 좋음'으로 받았는데, 보통은 낮을수록 없다고 생각한다는 걸 알고 1이 좋은 쪽으로 뒤집었습니다.</li></ul><span>설문으로 현장에 물어보니 몰랐던 것들도 보였습니다.</span><ul><li>선수마다 평소 체중에서 빼는 폭이 꽤 달랐고, 감량법을 배운 곳도 제각각이었습니다.</li><li>반면 계체 후 경기 전까지 다시 채우는 방법(전해질 음료 → 탄수화물)은 대부분 비슷했습니다.</li><li>감량·회복 중에 어지럼이나 경기력 저하 같은 문제를 겪은 경우가 생각보다 많았고, 기록은 주로 휴대폰 메모로 하고 있었습니다.</li><li>격투기 관련 앱을 쓰는 분은 없었지만, 의학 논문과 전문가 자문을 바탕으로 한 앱이라면 쓰겠다는 답이 많았습니다.</li><li>필요한 기능을 고르게 하니 한 분은 7개를 모두, 나머지 분들도 3~4개씩 골라 생각보다 이런 앱이 필요하다는 걸 느꼈고, 자동화했으면 하는 일을 적어 준 분도 있었습니다.</li><li>김채현 선수를 비롯해 연락드린 선수분들이 좋게 반응해 주셨습니다. 김채현 선수는 "설문 완료했습니다!! 격투기 선수에게 정말 좋은 앱을 만드시는 것 같습니다!! 화이팅 하십쇼!!"라는 말까지 남겨 주셔서, 이런 앱을 바라는 사람이 있을 수 있겠다고 느꼈습니다.</li></ul></div>
+        <div class="r-g" id="go-learn"><b>배운 것</b><span>먼저 만들면서 배운 것입니다.</span><ul><li>직접 써 봐야 문제가 보였습니다. 아이폰에서 '쌀밥'을 치다 한글이 깨지는 버그를 찾았고, 영상 건너뛰기와 크게 보기도 써 보면서 넣었습니다. 말로 넣기도 아이폰으로 직접 말해 보고 나서야 마이크가 안 꺼지는 문제를 알았습니다.</li><li>AI에게 맡기기 전에 점검 기준(체크리스트)부터 정했습니다. 그래야 고친 결과를 믿고 확인할 수 있었습니다.</li><li>피로·근육통·스트레스 점수를 처음엔 '5가 좋음'으로 받았는데, 보통은 낮을수록 없다고 생각한다는 걸 알고 1이 좋은 쪽으로 뒤집었습니다.</li></ul><span>설문으로 현장에 물어보니 몰랐던 것들도 보였습니다.</span><ul><li>선수마다 평소 체중에서 빼는 폭이 꽤 달랐고, 감량법을 배운 곳도 제각각이었습니다.</li><li>반면 계체 후 경기 전까지 다시 채우는 방법(전해질 음료 → 탄수화물)은 대부분 비슷했습니다.</li><li>감량·회복 중에 어지럼이나 경기력 저하 같은 문제를 겪은 경우가 생각보다 많았고, 기록은 주로 휴대폰 메모로 하고 있었습니다.</li><li>격투기 관련 앱을 쓰는 분은 없었지만, 의학 논문과 전문가 자문을 바탕으로 한 앱이라면 쓰겠다는 답이 많았습니다.</li><li>필요한 기능을 고르게 하니 한 분은 7개를 모두, 나머지 분들도 3~4개씩 골라 생각보다 이런 앱이 필요하다는 걸 느꼈고, 자동화했으면 하는 일을 적어 준 분도 있었습니다.</li><li>김채현 선수를 비롯해 연락드린 선수분들이 좋게 반응해 주셨습니다. 김채현 선수는 "설문 완료했습니다!! 격투기 선수에게 정말 좋은 앱을 만드시는 것 같습니다!! 화이팅 하십쇼!!"라는 말까지 남겨 주셔서, 이런 앱을 바라는 사람이 있을 수 있겠다고 느꼈습니다.</li></ul></div>
         <div class="r-y" id="go-miss"><b>놓친 것</b><span>실제 사용자는 아직 저 하나뿐이고 설문 응답도 아직은 3명이라 경향이라 말할 수는 없다는 점입니다. 또 계체 관련해서는 의료진의 검토도 받고 싶은데 어떤 방식으로 접근해야 할지 아직 고민 중입니다. 논문을 더 찾아 근거를 쌓아야 할지, 직접 찾아뵙고 상담을 받아야 할지 정하지 못했습니다.</span></div>
         <div class="r-gold" id="go-next"><b>이어갈 것</b><span>11월 12일 설문이 마감되면 결과를 반영해 MMA 앱을 고치고, 아이디를 남겨 주신 분들께 직접 써 보시고 후기를 부탁드릴 계획입니다. 감량 계획처럼 혼자 정하면 위험할 수 있는 부분은 전문가와 함께 기준을 세운 뒤에 만들겠습니다. 또 MMA 앱을 완성한 뒤에는 다른 종목과 합칠지, 종목별로 따로 만들지를 그동안 모은 내용을 보고 정하려고 합니다.</span></div>
       </div>
@@ -1013,7 +1018,7 @@ body.print #skipStoryTouch { display: none; }
       logs, lastBackup: t, created: ymd(addD(now, -28)),
       cut: kind === "cut" ? { usualKg: 75.5, weighKg: 70.2, weighAt: loc(w), fightAt: loc(f), checks: [[loc(c1), 72.1]] } : undefined };
   }
-  const SCENES = { before: ["체크인 전", "today"], good: ["좋은 날", "today"], bad: ["나쁜 날", "today"], cut: ["회복 계산기", "recovery"], symptom: ["증상 체크", "symptom"], video: ["영상 비교", "video"] };
+  const SCENES = { before: ["체크인 전", "today"], good: ["좋은 날", "today"], bad: ["나쁜 날", "today"], food: ["식단", "food"], cut: ["회복 계산기", "recovery"], symptom: ["증상 체크", "symptom"], video: ["영상 비교", "video"] };
   const host = document.getElementById("phoneHost");
   host.className = "phone-wrap";
   host.innerHTML = `<div class="scen">${Object.entries(SCENES).map(([k, s]) => `<button type="button" data-s="${k}">${s[0]}</button>`).join("")}</div>
@@ -1026,11 +1031,13 @@ body.print #skipStoryTouch { display: none; }
     try { localStorage.setItem(DEMO_KEY, JSON.stringify(demoState(kind))); } catch (e) {}
     host.querySelectorAll("[data-s]").forEach(b => b.setAttribute("aria-pressed", b.dataset.s === kind ? "true" : "false"));
     const tab = SCENES[kind][1];
+    // 식단 장면: 앱의 '＋ 점심 추가' 시트(foodSheet)를 열어 🎤 말로 넣기가 바로 보이게. 앱이 검색칸에 주는 초점은 풀어 폰 키보드가 튀어나오지 않게
+    const extra = kind === "food" ? ' foodSheet("점심"); try{ document.activeElement.blur(); }catch(_){}' : "";
     const html = appHtml().replace("<head>", '<head><base href="https://rkun231.github.io/condition-light-mma/" target="_blank"><script>window.__THEME_LOCK="dark"<\/script>')
       .replace('const KEY = "condition-mma-v1";', `const KEY = "${DEMO_KEY}";`).replace("function arm(){", "function arm(){ return; ")
-      .replace("</body>", `<script>try{ ${tab !== "today" ? `NAV=["today"]; go("${tab}");` : ""} }catch(e){}<\/script></body>`);
+      .replace("</body>", `<script>try{ ${tab !== "today" ? `NAV=["today"]; go("${tab}");` : ""}${extra} }catch(e){}<\/script></body>`);
     if (frame) frame.remove();
-    frame = document.createElement("iframe"); frame.title = "컨디션 신호등 MMA 체험 화면"; frame.srcdoc = html;
+    frame = document.createElement("iframe"); frame.title = "컨디션 신호등 MMA 체험 화면"; frame.allow = "microphone"; frame.srcdoc = html;
     frame.addEventListener("load", function () { try { this.contentDocument.addEventListener("keydown", e => { if (e.key === "Escape") close(); }); } catch (_) {} });
     host.querySelector('[data-r="screen"]').appendChild(frame);
   }
@@ -1112,20 +1119,26 @@ body.print #skipStoryTouch { display: none; }
   function signal(o) {
     let lv = 0; const why = []; const up = (n, t, more) => { lv = Math.max(lv, n); why.push([n, t, more || ""]); };
     const pp = o.part ? o.part + "에 " : "";
-    if (o.pa === 3) up(2, pp + "심한 통증이 있어요."); else if (o.pa === 2) up(1, pp + "중간 정도 통증이 있어요.");
+    if (o.pa === 3) up(2, pp + "심한 통증이 있어요."); else if (o.pa === 2) up(1, pp + "중간 정도 통증이 있어요."); else if (o.pa === 1) why.push([0, pp + "약간 통증이 있어요. 심해지면 강도를 낮추세요."]);
     const w = o.sQ + o.fa + o.so + o.st, m = o.base, sd = o.sd, z = (w - m) / sd;
     // 앱 v0.1.8~: 빨강은 평소보다 크게 벗어나면서(z ≤ −1.5) 4점 이상 낮을 때만
     // 앱처럼 빨강·노랑 모두 '평소보다 나빠진 것' 줄을 붙임 (앱 dropItems: 평소보다 0.5점 이상 나빠진 항목 최대 2개)
     if (z <= -1.5 && m - w >= 4) up(2, `컨디션 점수(${w}/20)가 평소(${m.toFixed(1)})보다 많이 낮아요.`, dropItems(o)); else if (z <= -1) up(1, `컨디션 점수(${w}/20)가 평소(${m.toFixed(1)})보다 낮아요.`, dropItems(o));
     if (o.H < 6) up(1, `잠잔 시간 ${fmtSleep(o.H)} · 권장 7시간 이상보다 적어요.`);
     if (o.W != null && o.W <= -2) up(1, `몸무게가 평소보다 ${Math.abs(o.W).toFixed(1)}% 줄었어요. 덜 먹었거나 물이 부족할 수 있어요.`);
-    if (!why.length) why.push([0, "평소와 비슷하거나 좋아요."]);
+    // 앱 v0.1.23 signal()과 같은 초록 이유 (잠·점수 요약 + 컨디션 점수 + 안 좋은 항목 + 평소 비교). 예시 선수는 지난 27일 기록이 있음
+    // 정해진 글자와 숫자로만 만든 줄이라 <br>·<b>를 그대로 씀 (4번째 값 true = HTML)
+    if (!why.some(a => a[0])) {
+      const sTxt = k => { const d = shownN(k, o[k]); return `${d}(${ENDW[k][d - 1]})`; };
+      const bad = ["sQ", "fa", "so", "st"].filter(k => o[k] <= 2).map(k => ITEM[k]);
+      why.unshift([0, `잠 ${fmtSleep(o.H)} · 잠의 질 ${sTxt("sQ")}, 피로 ${sTxt("fa")}, 근육통 ${sTxt("so")}, 스트레스 ${sTxt("st")}<br><b>컨디션 점수 ${w}/20</b> · ${bad.length ? `안 좋은 항목: ${bad.join(", ")}` : "안 좋은 항목 없음"}<br>평소(최근 27일)와 비슷하거나 좋아요.`, "", true]);
+    }
     why.sort((a, b) => b[0] - a[0]);   // 앱처럼 멈춤 → 주의 순
     return { lv, why };
   }
   const NAME = [["초록", "좋아요", "평소대로 훈련해도 좋아요."], ["노랑", "주의", "강도를 조금 낮추거나 회복(잠·식사·수분)에 신경 써 주세요."], ["빨강", "멈추세요", "오늘은 쉬세요. 움직인다면 가벼운 회복 운동(걷기·스트레칭)만 하세요."]];
   const sigHtml = s => { const c = ["g", "y", "r"][s.lv]; return `<div class="out sg-${c}"><div class="head"><div class="lamp">${["r", "y", "g"].map((k, i) => `<i class="${k} ${2 - i === s.lv ? "on" : ""}"></i>`).join("")}</div>
-    <div class="t">${NAME[s.lv][0]} · ${NAME[s.lv][1]}<small>${NAME[s.lv][2]}</small></div></div><ul class="why">${s.why.map(([n, t, more]) => `<li class="l${n}">${n ? `<span class="sr-only">${n === 2 ? "멈춤 이유: " : "주의 이유: "}</span>` : ""}${esc(t)}${more ? "<br>" + esc(more) : ""}</li>`).join("")}</ul><p class="src">참고 신호예요. 진단이 아니에요.</p></div>`; };
+    <div class="t">${NAME[s.lv][0]} · ${NAME[s.lv][1]}<small>${NAME[s.lv][2]}</small></div></div><ul class="why">${s.why.map(([n, t, more, raw]) => `<li class="l${n}">${n ? `<span class="sr-only">${n === 2 ? "멈춤 이유: " : "주의 이유: "}</span>` : ""}${raw ? t : esc(t)}${more ? "<br>" + esc(more) : ""}</li>`).join("")}</ul><p class="src">참고 신호예요. 진단이 아니에요.</p></div>`; };
 
   /* MISSION 1: 체크인 */
   const CK = { sQ: 0, fa: 0, so: 0, st: 0, pa: -1 };
@@ -1321,7 +1334,7 @@ body.print #skipStoryTouch { display: none; }
   function ver() { $("verT").innerHTML = VER.map(([n], i) => `<button type="button" data-i="${i}" aria-pressed="${i === verSel}">${n}</button>`).join(""); $("mock").innerHTML = VER[verSel][1];
     $("verNote").innerHTML = `<ul class="why">${VER[verSel][2].map(t => `<li class="l${verSel ? 0 : 1}" style="color:var(--ink)">${esc(t)}</li>`).join("")}</ul>`; }
   $("verT").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { verSel = +b.dataset.i; ver(); } }); ver();
-  const WHO = [["디자인: 검정 바탕·금색 줄·기울인 숫자", "me", "본인", "여러 디자인 시안 중 D안을 골랐습니다."],
+  const WHO = [["디자인 다시 고르기: 둥글둥글 소프트", "me", "본인", "채택 · AI가 만든 디자인 예시 4가지 중 B안을 골랐습니다. 밝은 화면에서는 신호 색 구분이 잘 안 돼서 20% 진하게, 어두운 화면도 색이 빠져 보여서 30% 더 올렸습니다. 글씨는 제목과 큰 숫자만 두껍게 했습니다."],
     ["앱 아이콘이 오늘 신호 색으로 바뀌기", "me", "본인", "보류 · 오늘 컨디션에 따라 아이콘 색을 바꾸고 싶었는데요. 지금 같은 웹앱에서는 바꿀 수 없어서, 정식 앱이 되면 시도해 볼 생각입니다."],
     ["뒤로 버튼은 하위 화면에만", "ai", "AI", "채택 · 처음엔 모든 화면에 두려 했는데, 평가 AI가 낸 안과 비교해 보고 받아들였습니다."],
     ["감량 '계획' 계산기", "me", "본인", "보류 · 감량 폭을 정하는 건 혼자 만들면 위험하다고 보고 계체 '후' 회복만 먼저 만들었습니다."],
@@ -1329,7 +1342,10 @@ body.print #skipStoryTouch { display: none; }
     ["설문에 구글 로그인·1회 제한", "me", "본인", "뺌 · 익명 설문이라고 해 놓고 로그인을 받으면 익명이 아니라고 느낄 수 있어서 뺐습니다."],
     ["'코치이면서 현역 선수'에게 코치·선수 질문 모두 받기", "me", "본인", "채택 · AI는 선수 질문만 받자고 했지만 둘 다 받게 했고, 겹치는 2문항은 제가 뺐습니다."],
     ["'잠들기 어려움' 항목", "me", "본인", "추가 · 응답 3명 중 2명이 골랐습니다."],
-    ["MMA만 떼어 먼저 완성", "me", "본인", "채택 · 여러 종목 앱은 그대로 두고 새 저장소에 MMA 앱을 만들었습니다."]];
+    ["MMA만 떼어 먼저 완성", "me", "본인", "채택 · 여러 종목 앱은 그대로 두고 새 저장소에 MMA 앱을 만들었습니다."],
+    ["식단 말로 넣기", "me", "본인", "채택 · 마이크로 말하면 칼로리를 찾아 주는 기능을 부탁했습니다. 다만 '라면 국물 없이 면만 먹었어'처럼 조건이 붙은 말은 비용 문제로 반영하지 못했습니다. 이런 말까지 알아들으려면 말한 문장을 AI 서버(Claude·Gemini 등)에 보내야 하는데, 쓸 때마다 요금이 들고 제 계정으로 내면 쓰는 사람이 늘수록 비용이 쌓이기 때문입니다. 지금은 인식이 좀 떨어지는데, 추후에는 Genspark Speakly와 유사한 기능을 하는 앱을 하나 개발해서 이어 붙일 생각입니다."],
+    ["저장 버튼의 남은 항목 이름", "ai", "AI", "다르게 · AI는 좁은 폰에서 남은 항목 이름이 '…'으로 잘린다고 찾아 왔는데요. 이름을 줄이는 대신 '몇 개 남았어요'만 보이게 했습니다."],
+    ["처음 설정 건강 질문 하나로", "ai", "AI", "채택 · 예·아니요를 세 번 눌러야 하던 질문 3개를 '하나라도 해당되나요?' 하나로 합치자는 안을 받아들였습니다. '예'를 고르면 세부 질문 3개가 열립니다."]];
   let whoSel = "all";
   function who() { $("whoT").innerHTML = [["all", "전체"], ["me", "본인"], ["ai", "AI 제안"]].map(([k, n]) => `<button type="button" data-k="${k}" aria-pressed="${k === whoSel}">${n} <span class="mono">${k === "all" ? WHO.length : WHO.filter(w => w[1] === k).length}</span></button>`).join("");
     $("whoBody").innerHTML = WHO.filter(w => whoSel === "all" || w[1] === whoSel).map(([t, k, n, r]) => `<tr><td>${esc(t)}</td><td><span class="chip ${k}">${n}</span></td><td>${esc(r)}</td></tr>`).join(""); }
@@ -1349,7 +1365,13 @@ body.print #skipStoryTouch { display: none; }
     ["11월 4~5일", "코치·관장, 선수, 기자에게 DM", "", "field", "설문을 돌리던 중 '잠들기 어려움' 추가."],
     ["11월 5일", "응답 3명", "", "field", "잠들기 어려움 2명, 격투기 관련 앱 써 본 사람 0명."],
     ["11월 5일", "MMA만 떼어 새 앱으로", "MMA v0.1.0", "build", "종목을 MMA로 고정, 저장 공간 분리. 여러 종목 앱은 그대로."],
-    ["11월 6일", "검증·평가 루프 8라운드, 휴리스틱 점검", "MMA v0.1.11", "test", "피로·근육통·스트레스는 1이 좋음으로 번호를 뒤집고, 빨강은 평소보다 4점 이상 낮을 때만 켜지게 바꿨습니다. 이유에 '평소보다 나빠진 것'을 보여 주고, 닐슨 휴리스틱 10원칙으로 다시 점검했습니다."]];
+    ["11월 6일", "검증·평가 루프 8라운드, 휴리스틱 점검", "MMA v0.1.11", "test", "피로·근육통·스트레스는 1이 좋음으로 번호를 뒤집고, 빨강은 평소보다 4점 이상 낮을 때만 켜지게 바꿨습니다. 이유에 '평소보다 나빠진 것'을 보여 주고, 닐슨 휴리스틱 10원칙으로 다시 점검했습니다."],
+    ["11월 7일", "제가 자는 동안 AI 개선 루프 3라운드", "MMA v0.1.12~0.1.14", "build", "AI가 고치고·찾고·채점. 78 → 86.5 → 90점. 저장 버튼을 화면 아래에 붙이고, 잠·몸무게는 자주 쓰는 값을 버튼으로."],
+    ["11월 7일", "AI가 찾아 온 제안 직접 고르기", "MMA v0.1.15~0.1.16", "build", "MMA 앱 제안 17건 중 9건을 바꾸기로 했습니다. 건강 질문 3개를 하나로, 식단 끼니 접기, 저장 버튼엔 남은 개수만, 몸무게 버튼은 다시 누르면 꺼지게."],
+    ["11월 7일", "식단 말로 넣기", "MMA v0.1.17", "build", "마이크로 '라면 1개 반, 바나나 반 개'처럼 말하면 음식과 양을 나눠 확인 화면에 보여 줍니다. 브라우저 음성 인식과 앱 안 식약처 DB만 써서 돈이 들지 않습니다."],
+    ["11월 7일 밤", "말로 넣기 개선 루프 4라운드", "MMA v0.1.18~0.1.20", "build", "71 → 86 → 89 → 91점. 너무 많은 양은 한 번 더 묻고, 말한 단위(개·공기·마리)를 그대로 보여 주게."],
+    ["11월 8일", "발견 · 아이폰으로 직접 말해 보기", "MMA v0.1.21", "find", "다 말했는데 마이크가 안 꺼지고, '라면한개'처럼 붙여 말하면 양으로 못 읽음 → 다시 누르면 멈추게, 붙여 말한 양도 읽게."],
+    ["11월 8일", "디자인 B 둥글둥글 소프트", "MMA v0.1.22~0.1.23", "build", "디자인 예시 4가지 중 B를 골랐고, 신호 색 세기(밝은 화면 +20%, 어두운 화면 +30%)도 직접 정했습니다. 화면 밝기를 자동·밝게·어둡게 중에 고를 수 있게."]];
   let fSel = "all";
   function flow() { $("flowT").innerHTML = [["all", "전체"], ["find", "직접 써 보며 찾은 것"], ["field", "현장에 물은 것"], ["build", "만든 것"]].map(([k, n]) => `<button type="button" data-k="${k}" aria-pressed="${k === fSel}">${n}</button>`).join("");
     $("tl").innerHTML = FLOW.filter(f => fSel === "all" || f[3] === fSel).map(([d, w, v, k, p]) => `<li class="${k}"><div class="when">${d}</div><div class="what">${esc(w)}${v ? `<span class="ver">${v}</span>` : ""}</div><p>${esc(p)}</p></li>`).join(""); }
