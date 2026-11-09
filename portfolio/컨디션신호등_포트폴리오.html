@@ -706,6 +706,7 @@ body.print #skipStoryTouch { display: none; }
       <div class="dayline"><span class="d">D-6 · 월</span><span class="t">07:10 · 아침</span></div>
       <h2>눈 뜨자마자 30초 체크인</h2>
       <p class="situ">어젯밤 스파링이 길었습니다. 몸이 어떤지 감으로 말고, 기록으로 판단해 보세요.</p>
+      <p class="note printonly">종이로 보시는 분께: 미션 결과는 예시 값으로 미리 눌러 둔 화면이에요. 첫 장 QR로 열면 직접 눌러 볼 수 있어요.</p>
       <div class="mission" id="m1">
         <div class="mh"><b>MISSION 1</b><span>칸을 모두 채우고 오늘 신호 받기</span></div>
         <div class="ck">
@@ -803,7 +804,7 @@ body.print #skipStoryTouch { display: none; }
           <div><span class="k">데이터</span>식약처 식품영양성분 통합DB에서 가정식·외식·식재료 1,015개를 골라 넣었습니다. 하루 목표는 기초대사량 공식과 훈련 시간으로 계산합니다.</div>
           <div><span class="k">발견</span>11월 1일 아이폰에서 '쌀밥'을 치니 'ㅆㅆㅏㄹㅂㅏㅂ'처럼 타이핑이 이상하게 되는 문제를 발견했고, 글자를 칠 때마다 검색창이 통째로 다시 그려져 한글 조합이 끊기는 현상이라는 걸 알게 되었습니다.</div>
           <div><span class="k">수정</span>입력칸은 한 번만 만들고 결과 목록만 바꾸게 했습니다. 이후로는 '입력 중인 칸은 다시 그리지 않는다'라는 규칙을 잘 지켰습니다.</div>
-          <div><span class="k">말로 넣기</span>손으로 치기 귀찮을 때가 있을 수 있어서, 마이크로 먹은 것을 말하면 칼로리를 찾아 주는 기능을 부탁했는데요. 돈이 든다면 보류하려 했고, AI가 두 방식을 비교해 준 뒤 돈이 안 드는 방식으로 정했습니다. 브라우저 음성 인식과 앱 안의 식약처 DB만 씁니다. 대신 '국물 빼고' 같은 말은 알아듣지 못해 메모로 남기고, 말한 대로 바로 넣지 않고 확인 화면에서 고친 뒤 넣게 했습니다. 자동 검증을 네 번 돌려 71점에서 91점까지 올렸습니다.</div>
+          <div><span class="k">말로 넣기</span>손으로 치기 귀찮을 때가 있을 수 있어서, 마이크로 먹은 것을 말하면 칼로리를 찾아 주는 기능을 부탁했는데요. 돈이 든다면 보류하려 했고, AI가 두 방식을 비교해 준 뒤 돈이 안 드는 방식으로 정했습니다. 브라우저 음성 인식과 앱 안의 식약처 DB만 씁니다. 대신 '국물 빼고' 같은 말은 알아듣지 못해 메모로 남기고, 말한 대로 바로 넣지 않고 확인 화면에서 고친 뒤 넣게 했습니다. 제가 정한 기준으로 AI가 점검하고 점수를 매기게 해서, 네 번에 71점에서 91점까지 올렸습니다.</div>
           <div><span class="k">직접 써 보며</span>아이폰으로 말해 보니 다 말했는데도 마이크가 꺼지지 않았고, '라면한개'처럼 붙여 말하면 양으로 읽지 못했습니다. 버튼을 다시 누르면 말한 내용을 가지고 멈추게 하고, 붙여 말한 양도 읽게 고쳤습니다.</div>
         </div>
       </details>
@@ -828,7 +829,7 @@ body.print #skipStoryTouch { display: none; }
         <div class="sb">
           <div><span class="k">해결</span>증상은 목록에서 고르게 했습니다. 응급의료 안내 같은 공식 지침에 근거해 단계를 나눴고, 119·병원 단계를 기록하면 그날 신호가 빨간색이 됩니다.</div>
           <div><span class="k">검증</span>앱 초기 버전을 만들고 나니 오류가 생각보다 많았는데요. 그래서 제가 테스트 기준을 만들어 AI에게 자동 검증을 맡겼습니다. 한 AI는 고치고, 다른 AI는 문제를 찾고, 또 다른 AI는 점수를 매기게 해서 세 번에 걸쳐 고쳤습니다. 고친 부분을 확인할 수 있게 체크리스트를 만들라고 했고, 그 체크리스트를 보며 제가 직접 다시 확인했습니다.</div>
-          <div class="full"><span class="k">검증할 때마다 오른 점수</span><div class="bars" id="loopBars"></div></div>
+          <div class="full"><span class="k">제가 정한 기준으로 AI가 매긴 점수</span><div class="bars" id="loopBars"></div></div>
         </div>
       </details>
     </div>
@@ -888,9 +889,9 @@ body.print #skipStoryTouch { display: none; }
         <div class="row-btns"><button class="ghost-btn" data-app="video">실제 앱 영상 비교 →</button></div>
       </div>
       <div class="finish" id="finish" hidden><span>일주일 완주! 미션 7개를 모두 끝냈어요.</span><a href="#e1">현장 이야기로 →</a></div>
-      <details class="story" data-s="7"><summary><span class="lock">만든 이야기 7</span>풋살 팀에서 못 했던 '영상으로 짚어 주기'<span class="hint2"></span></summary>
+      <details class="story" data-s="7"><summary><span class="lock">만든 이야기 7</span>풋살 팀에서 아쉬웠던 '영상으로 짚어 주기'<span class="hint2"></span></summary>
         <div class="sb">
-          <div><span class="k">과제정의</span>풋살 팀 코치를 할 때 경기 영상을 되짚어 가며 설명해 주고 싶었는데 마땅한 방법이 없었습니다. 그래서 느리게, 한 프레임씩, 두 영상을 나란히 같은 순간으로 맞추는 기능을 넣었습니다.</div>
+          <div><span class="k">과제정의</span>풋살 팀 코치를 할 때 경기 영상을 돌려 보며 설명은 했지만, 원하는 장면을 정확히 짚어 줄 도구가 없었습니다. 그래서 느리게, 한 프레임씩, 두 영상을 나란히 같은 순간으로 맞추는 기능을 넣었습니다.</div>
           <div><span class="k">직접 써 보며</span>써 보니 1·5·10초씩 건너뛰기가 필요했고, 화면을 꽉 채우는 '크게 보기'와 소리 켜기를 넣었습니다. 크게 보기에서 설정을 펼치면 검은 화면이 되던 문제는 2차 자동 검증에서 찾아 고쳤습니다.</div>
           <div><span class="k">보류</span>AI 자세 분석은 뺐습니다. 격투기는 상대와 상황에 따라 움직임이 달라서 '정답 자세'가 없다고 봤기 때문인데요. 골프처럼 정해진 동작을 반복하는 종목에는 나중에 넣어 볼 생각입니다.</div>
         </div>
@@ -902,8 +903,8 @@ body.print #skipStoryTouch { display: none; }
   <section class="ch epi" id="e1" data-day="현장" data-label="FIELD">
     <div class="ch-in">
       <span class="tag">경기가 끝난 뒤 · 검증</span>
-      <h2>혼자 만들어 쓰다 보니<br>궁금한 점이 생겨 현장에 물었습니다</h2>
-      <p class="situ" id="go-survey">11월 4~5일 MMA 코치·관장, 선수, 기자 분들에게 인스타 DM으로 직접 설문을 부탁했습니다. 기자님께는 답 대신 주변 선수·코치에게 전해 달라 부탁했습니다. 4일에는 유명 선수와 코치님들께 먼저 부탁드렸는데 답이 없어서, 5일에는 어린 선수들 위주로 부탁드렸더니 답이 왔습니다.</p>
+      <h2>먼저 만들고 나서야 현장에 물었습니다<br>순서가 거꾸로였다는 걸 배웠습니다</h2>
+      <p class="situ" id="go-survey">11월 4~5일 MMA 코치·관장, 선수, 기자 분들에게 인스타 DM으로 직접 설문을 부탁했습니다. 기자님께는 답 대신 주변 선수·코치에게 전해 달라 부탁했습니다. 4일에는 유명 선수와 코치님들께 먼저 부탁드렸는데 답이 없어서, 5일에는 어린 선수들 위주로 부탁드렸더니 답이 왔습니다. 함께 만든 사람 없이 혼자 만들다 보니 현장에 묻는 게 늦었습니다. 다음에는 만들기 전에 먼저 묻겠습니다.</p>
       <div class="card stack">
         <div class="toggles" id="roleT" aria-label="설문에서 고른 입장"></div>
         <div class="route" id="route" aria-live="polite"></div>
@@ -935,10 +936,11 @@ body.print #skipStoryTouch { display: none; }
       <h2>여러 종목 앱은 그대로 두고<br>MMA만 떼어 먼저 완성합니다</h2>
       <div class="toggles" id="verT"></div>
       <div class="split"><div class="mock" id="mock"></div><div class="stack" id="verNote"></div></div>
-      <h3 id="go-who" style="font-family:var(--display);font-weight:400;font-size:28px;margin-top:20px">제가 팀장이 되어 AI에게 지시하고, 지시 받은 AI가 일했습니다</h3>
+      <h3 id="go-who" style="font-family:var(--display);font-weight:400;font-size:28px;margin-top:20px">코드는 AI가 쓰고, 무엇을 만들고 어떤 기준으로 볼지는 제가 정했습니다</h3>
       <dl class="kv card">
         <dt>본인</dt><dd>문제 정하기, 넣고 뺄 기능, 디자인 시안 고르기, 아이폰으로 직접 써 보며 문제 찾기, 점검 기준 정하기, 설문 질문·대상, 코치·선수·기자에게 직접 연락, MMA 분리</dd>
         <dt>AI (Claude)</dt><dd>코드 작성, 근거 논문·공식 기준 찾기, 디자인 시안 제작, 자동 테스트, 문제 찾기·점수 매기기 역할, 설문 미리보기·DM 문구 초안</dd>
+        <dt>사람</dt><dd>설문에 답해 주신 선수·코치 5명, 설문을 주변에 전해 달라고 부탁드린 기자분</dd>
       </dl>
       <div class="toggles" id="whoT"></div>
       <div class="table-box"><table><thead><tr><th>무엇</th><th>낸 쪽</th><th>결과와 이유</th></tr></thead><tbody id="whoBody"></tbody></table></div>
@@ -951,9 +953,9 @@ body.print #skipStoryTouch { display: none; }
       <span class="tag">실제로 만든 8일</span>
       <h2>11월 1일 첫 버전부터<br>11월 5일 MMA 분리, 이후 마지막 검증까지</h2>
       <div class="stats">
-        <div><span class="big-num">65<small>번</small></span><span class="cap">고칠 때마다 남긴 커밋 (여러 종목 18 + MMA 앱·포트폴리오 47)</span></div>
-        <div><span class="big-num">78→90</span><span class="cap">자동 검증 3차례 평가 점수</span></div>
-        <div><span class="big-num">1,015<small>개</small></span><span class="cap">식약처 DB에서 고른 음식</span></div>
+        <div><span class="big-num">5<small>명</small></span><span class="cap">설문에 답한 선수·코치 (11월 12일 마감)</span></div>
+        <div><span class="big-num">1<small>개</small></span><span class="cap">설문을 돌리다 추가한 항목 (잠들기 어려움)</span></div>
+        <div><span class="big-num">3<small>개</small></span><span class="cap">위험하거나 아직 이르다고 보류한 기능 (감량 계획, AI 자세 분석, 아이콘 색)</span></div>
         <div><span class="big-num">1<small>명</small></span><span class="cap">매일 쓰는 사용자 (만든 본인)</span></div>
       </div>
       <div class="toggles" id="flowT"></div>
@@ -966,8 +968,9 @@ body.print #skipStoryTouch { display: none; }
     <div class="ch-in">
       <span class="tag">판단 기준과 출처 · 기록 저장 방식</span>
       <h2>판단 기준과 출처를 모두 적었습니다</h2>
+      <p class="note rules-head">의료진 검토 전이라, 아래 기준은 오늘 훈련 강도와 회복을 참고로 보여 주는 데만 씁니다. 진단에는 쓰지 않습니다.</p>
       <input class="search" id="ruleQ" type="search" placeholder="찾기 (예: 잠, 감량, ISSN)" aria-label="판단 기준 찾기">
-      <div class="table-box"><table><thead><tr><th>무엇</th><th>기준</th><th>출처</th></tr></thead><tbody id="ruleBody"></tbody></table></div>
+      <div class="table-box"><table><thead><tr><th>무엇</th><th>기준</th><th>어떤 근거</th><th>출처</th></tr></thead><tbody id="ruleBody"></tbody></table></div>
       <dl class="kv card">
         <dt id="go-storage">기록은 어디에</dt><dd>폰 브라우저의 <span class="mono">localStorage</span>에만 있습니다. 서버가 없고 휴대폰 안에만 저장됩니다. 여러 종목 앱(<span class="mono">condition-note-v1</span>)과 MMA 앱(<span class="mono">condition-mma-v1</span>)은 저장 이름을 나눠 섞이지 않습니다.</dd>
         <dt>백업</dt><dd>JSON 내보내기·가져오기, 엑셀용 CSV. 14일이 지나면 백업 안내가 뜹니다.</dd>
@@ -984,7 +987,7 @@ body.print #skipStoryTouch { display: none; }
         <div class="r-g" id="go-learn"><b>배운 것</b><span>먼저 만들면서 배운 것입니다.</span><ul><li>직접 써 봐야 문제가 보였습니다. 아이폰에서 '쌀밥'을 치다 한글이 깨지는 버그를 찾았고, 영상 건너뛰기와 크게 보기도 써 보면서 넣었습니다. 말로 넣기도 아이폰으로 직접 말해 보고 나서야 마이크가 안 꺼지는 문제를 알았습니다.</li><li>AI에게 맡기기 전에 점검 기준(체크리스트)부터 정했습니다. 그래야 고친 결과를 믿고 확인할 수 있었습니다.</li><li>피로·근육통·스트레스 점수를 처음엔 '5가 좋음'으로 받았는데, 보통은 낮을수록 없다고 생각한다는 걸 알고 1이 좋은 쪽으로 뒤집었습니다.</li></ul><span>설문으로 현장에 물어보니 몰랐던 것들도 보였습니다.</span><ul><li>선수마다 평소 체중에서 빼는 폭이 꽤 달랐고, 감량법을 배운 곳도 제각각이었습니다.</li><li>반면 계체 후 경기 전까지 다시 채우는 방법(전해질 음료 → 탄수화물)은 대부분 비슷했습니다.</li><li>감량·회복 중에 어지럼이나 경기력 저하 같은 문제를 겪은 경우가 생각보다 많았고, 기록은 주로 휴대폰 메모로 하고 있었습니다.</li><li>격투기 전용 앱을 쓰는 분은 없었지만, 의학 논문과 전문가 자문을 바탕으로 한 앱이라면 쓰겠다는 답이 많았습니다.</li><li>한 선수는 제미나이로 칼로리를 계산하고 가이드를 받았는데, 가끔 틀린 정보를 가져와서 코치님 의견을 1순위, AI를 2순위로 두고 자기 생각을 말하며 조율했다고 적어 주셨습니다. 이 앱을 논문에 의거하거나 의료진의 검토가 있는 방향으로 발전시키면 선수들이 더 믿고 활용하겠구나 하는 생각을 했습니다.</li><li>필요한 기능을 고르게 하니 두 분은 7개를 모두, 나머지 분들도 3~4개씩 골라 생각보다 이런 앱이 필요하다는 걸 느꼈고, 자동화했으면 하는 일을 적어 준 분도 있었습니다.</li><li>5명 모두 필요한 기능으로 감량 계획과 식단 기록을 골랐습니다. 확실히 선수들이 필요로 하는 기능이구나 싶었습니다.</li><li>연락드린 선수분들이 좋게 반응해 주셨습니다. 한 선수는 설문을 마친 뒤 격투기 선수에게 좋은 앱을 만드는 것 같다며 응원 메시지까지 남겨 주셔서, 이런 앱을 바라는 사람이 있을 수 있겠다고 느꼈습니다.</li></ul></div>
         <div class="r-y" id="go-miss"><b>놓친 것</b><span>실제 사용자는 아직 저 하나뿐이고 설문 응답도 아직은 5명이라 경향이라 말할 수는 없다는 점입니다. 또 계체 관련해서는 의료진의 검토도 받고 싶은데 어떤 방식으로 접근해야 할지 아직 고민 중입니다. 논문을 더 찾아 근거를 쌓아야 할지, 직접 찾아뵙고 상담을 받아야 할지 정하지 못했습니다.</span><span class="note">혼자 만든 앱이라 동료와 의견을 나누며 고친 경험은 없습니다. 다른 사람과 의견을 맞춰 본 경험은 지원서 3번(풋살 코치)에 적었습니다.</span></div>
         <div class="r-y" id="go-again"><b>다시 한다면</b><span>앱을 만들기 전에 설문부터 보내 현장에 먼저 물었을 겁니다. 이번에는 만들고 나서야 물어서, 들은 내용을 앱에 반영하는 일이 설문 마감(11월 12일) 뒤로 밀렸습니다.</span></div>
-        <div class="r-gold" id="go-next"><b>이어갈 것</b><span>11월 12일 설문이 마감되면 결과를 반영해 MMA 앱을 고치고, 아이디를 남겨 주신 분들께 직접 써 보시고 후기를 부탁드릴 계획입니다. 감량 계획처럼 혼자 정하면 위험할 수 있는 부분은 전문가와 함께 기준을 세운 뒤에 만들겠습니다. 또 MMA 앱을 완성한 뒤에는 다른 종목과 합칠지, 종목별로 따로 만들지를 그동안 모은 내용을 보고 정하려고 합니다.</span><span>처음 여러 종목 앱을 만들 때는 풋살 팀에서 아쉬웠던 영상 짚어 주기와, 유소년 선수들이 훈련량과 몸을 스스로 관리하도록 돕는 일도 계기였습니다. 영상 비교는 이미 넣어 두었고(만든 이야기 7), 유소년 쪽은 MMA 앱을 완성한 뒤 이어서 풀어 보려고 합니다.</span><span>AIGEN 2년 동안은 2지망인 문화·예술·스포츠 분야에서 이 일을 이어 가며, 선수와 코치처럼 운동하는 사람들에게 널리 도움을 주는 프로그램을 만들고 싶습니다.</span></div>
+        <div class="r-gold" id="go-next"><b>이어갈 것</b><span>11월 12일 설문이 마감되면 결과를 반영해 MMA 앱을 고치고, 아이디를 남겨 주신 세 분께 직접 써 보시고 후기를 부탁드리겠습니다. 감량 계획처럼 혼자 정하면 위험한 부분은 [언제]까지 [누구에게]에게 회복 계산과 증상 단계 기준부터 검토를 부탁드린 뒤에 만들겠습니다.</span><span>처음 여러 종목 앱을 만들 때는 풋살 팀에서 아쉬웠던 영상 짚어 주기와, 유소년 선수들이 훈련량과 몸을 스스로 관리하도록 돕는 일도 계기였습니다. 영상 비교는 이미 넣어 두었고(만든 이야기 7), 유소년 쪽은 MMA 앱을 완성한 뒤 이어서 풀어 보려고 합니다.</span><span>AIGEN 2년 동안은 2지망인 문화·예술·스포츠 분야에서 이 일을 이어 가며, 선수와 코치처럼 운동하는 사람들에게 널리 도움을 주는 프로그램을 만들고 싶습니다.</span></div>
       </div>
       <h3 id="go-qa" style="font-family:var(--display);font-weight:400;font-size:28px;margin-top:10px">나올 만한 질문과 답변</h3>
       <div class="row-btns qa-all"><button type="button" class="ghost-btn" id="qaAll" aria-controls="qa" aria-expanded="false">모두 펼치기</button></div>
@@ -992,7 +995,7 @@ body.print #skipStoryTouch { display: none; }
         <details class="qa"><summary>의학적으로 안전한가요?</summary><div>진단은 하지 않고, 오늘 훈련 강도를 신호로 참고만 하게 보여 줍니다. 참고용이지만 믿을 수 있도록 기준 숫자는 논문과 공식 입장문에서 가져와 출처를 화면에 적었습니다. 아직 의료진의 검토를 받지 못해서 감량 계획처럼 위험할 수 있는 기능은 만들지 않았고, 전문가와 함께 기준을 정한 뒤에 만들 생각입니다.</div></details>
         <details class="qa"><summary>실제로 쓰는 사람이 있나요?</summary><div>아직은 저만 사용하고 있습니다. 대신 설문으로 코치·선수분들이 지금 어떻게 하고 있는지 묻고 있고, 앱을 써 보겠다고 남겨 주신 분들께 설문 내용을 반영한 뒤 사용 후기를 부탁드릴 예정입니다.</div></details>
         <details class="qa" id="go-qa-mma"><summary>왜 여러 종목에서 MMA로 좁혔나요?</summary><div>제가 알고 있는 스포츠 안에서는 MMA가 가장 배고프고 힘들며 몸이 상하는 운동이라고 생각했습니다. 벌이에 비해 훈련이 고되고, 운동 특성상 많이 다칩니다. 여기에 계체 전 감량과 계체 후 회복도 몸에 큰 무리를 줍니다. 국내에 정보가 적을 뿐 앱으로 충분히 도움을 줄 수 있겠다고 판단해 MMA로 정하고 바로 설문을 보냈습니다.</div></details>
-        <details class="qa" id="go-qa-ai"><summary>AI가 다 만든 것 아닌가요?</summary><div>제가 팀장이 되어 여러 AI에게 일을 맡기고, 올라온 결과를 검토하는 식으로 작업했습니다. 코드는 Claude가 썼지만, 어떤 기능을 넣고 뺄지, 어떤 기준으로 점검할지, 누구에게 물어볼지는 제가 정했고, 올라온 결과를 직접 써 보며 확인했습니다. AI 의견을 받아들인 것과 바꾼 것은 위의 표에 그대로 적었습니다.</div></details>
+        <details class="qa" id="go-qa-ai"><summary>AI가 다 만든 것 아닌가요?</summary><div>여러 AI에게 일을 맡기고, 올라온 결과를 제가 검토하는 식으로 작업했습니다. 코드는 Claude가 썼지만, 어떤 기능을 넣고 뺄지, 어떤 기준으로 점검할지, 누구에게 물어볼지는 제가 정했고, 올라온 결과를 직접 써 보며 확인했습니다. AI 의견을 받아들인 것과 바꾼 것은 위의 표에 그대로 적었습니다.</div></details>
         <details class="qa"><summary>설문 5명으로 무엇을 알 수 있나요?</summary><div>표본이 적어 아직 경향을 말할 정도는 아니지만, 제가 생각하지 못했던 것과 격투기 전용 앱을 써 본 사람이 없다는 것을 확인했습니다. 11월 12일 설문 마감 뒤 다시 정리할 예정입니다.</div></details>
         <details class="qa"><summary>비슷한 앱과 무엇이 다른가요?</summary><div>컨디션 기록, 증상, 영상, 감량 회복을 한곳에서 다루는 앱은 찾지 못했습니다. 감량은 Fighter Cut이 가장 가까웠지만 영어만 지원하는 유료 앱이었습니다. 이 앱은 계산 공식과 출처를 공개하고, 매일 신호의 이유를 줄마다 보여 주며, 한국어와 한국 음식 DB를 쓰고, 무료입니다.</div></details>
       </div>
@@ -1370,7 +1373,7 @@ body.print #skipStoryTouch { display: none; }
     ["'코치이면서 현역 선수'에게 코치·선수 질문 모두 받기", "me", "본인", "채택 · AI는 선수 질문만 받자고 했지만 둘 다 받게 했고, 겹치는 2문항은 제가 뺐습니다."],
     ["'잠들기 어려움' 항목", "me", "본인", "추가 · 선수 4명 중 3명이 골랐습니다."],
     ["MMA만 떼어 먼저 완성", "me", "본인", "채택 · 여러 종목 앱은 그대로 두고 새 저장소에 MMA 앱을 만들었습니다."],
-    ["식단 말로 넣기", "me", "본인", "채택 · 마이크로 말하면 칼로리를 찾아 주는 기능을 부탁했습니다. 다만 '라면 국물 없이 면만 먹었어'처럼 조건이 붙은 말은 비용 문제로 반영하지 못했습니다. 이런 말까지 알아들으려면 말한 문장을 AI 서버(Claude·Gemini 등)에 보내야 하는데, 쓸 때마다 요금이 들고 제 계정으로 내면 쓰는 사람이 늘수록 비용이 쌓이기 때문입니다. 지금은 인식이 좀 떨어지는데, 추후에는 Genspark Speakly와 유사한 기능을 하는 앱을 하나 개발해서 이어 붙일 생각입니다."],
+    ["식단 말로 넣기", "me", "본인", "채택 · 마이크로 말하면 칼로리를 찾아 주는 기능을 부탁했습니다. 다만 '라면 국물 없이 면만 먹었어'처럼 조건이 붙은 말은 비용 문제로 반영하지 못했습니다. 이런 말까지 알아들으려면 말한 문장을 AI 서버(Claude·Gemini 등)에 보내야 하는데, 쓸 때마다 요금이 들고 제 계정으로 내면 쓰는 사람이 늘수록 비용이 쌓이기 때문입니다."],
     ["저장 버튼의 남은 항목 이름", "ai", "AI", "다르게 · AI는 좁은 폰에서 남은 항목 이름이 '…'으로 잘린다고 찾아 왔는데요. 이름을 줄이는 대신 '몇 개 남았어요'만 보이게 했습니다."],
     ["처음 설정 건강 질문 하나로", "ai", "AI", "채택 · 예·아니요를 세 번 눌러야 하던 질문 3개를 '하나라도 해당되나요?' 하나로 합치자는 안을 받아들였습니다. '예'를 고르면 세부 질문 3개가 열립니다."]];
   let whoSel = "all";
@@ -1406,22 +1409,22 @@ body.print #skipStoryTouch { display: none; }
   $("flowT").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { fSel = b.dataset.k; flow(); } }); flow();
 
   /* 근거 */
-  const RULES = [["통증", "심함 → 빨강, 중간 → 노랑", "이 앱의 기준"],
-    ["컨디션 점수 (잠·피로·근육통·스트레스, 각 1~5)", "잠은 5가 좋음, 피로·근육통·스트레스는 1이 좋음(더할 때 좋은 쪽으로 맞춰 20점 만점) · 기록 7일 이상: 지난 28일 평균보다 z ≤ −1.5이면서 4점 이상 낮으면 빨강, z ≤ −1 노랑 (35세 이상 −0.75) · 7일 전: 8점 이하 빨강, 11점 이하 노랑", "Hooper & Mackinnon (1995) Sports Med 20(5); McLean 등 (2010)"],
-    ["잠잔 시간", "성인 6시간 미만, 청소년 7시간 미만이면 노랑", "미국수면의학회(AASM) 권고"],
-    ["훈련량", "시간(분) × 힘든 정도(1~10)", "Foster 등 (2001) J Strength Cond Res 15(1)"],
-    ["훈련량 급증 (참고 지표)", "최근 7일 ÷ 28일 주평균, 기록 21일 이상일 때만. 1.5배 초과 빨강, 1.3배 초과 노랑 (35세 이상 1.2배)", "Gabbett (2016) BJSM 50 · 비판 Impellizzeri 등 (2020) IJSPP 15(6)"],
-    ["몸무게", "지난 7일 평균보다 2% 이상 줄면 노랑", "이 앱의 기준"],
-    ["하루 열량", "기초대사량(Mifflin-St Jeor) × 활동계수 1.4~1.85", "Mifflin 등 (1990) Am J Clin Nutr 51(2)"],
-    ["탄수화물·단백질", "훈련 시간에 따라 탄수화물 3~8 g/kg, 단백질 유지 1.6·감량 2.0·증량 1.8 g/kg", "Thomas 등 (2016) ACSM 공동 입장문; Jäger 등 (2017) ISSN"],
-    ["감량 속도", "기한 없으면 주 0.5%, 주 1%를 넘으면 막음", "Helms 등 (2014) JISSN 11:20"],
-    ["계체 후 수분", "직후 600~900mL, 시간당 1~1.5L, 잃은 무게의 125~150%, 나트륨 1L당 50~90mmol", "ISSN 2025 입장문; GSSI (Reale)"],
-    ["계체 후 탄수화물", "2시간 뒤부터 시간당 약 1 g/kg (최대 60g), 감량 5% 이상이면 8~12 g/kg, 아니면 4~7 g/kg", "ISSN 2025; Lewis James 발표"],
-    ["급속 감량 범위 (경고용)", "계체 72시간 전 6.7%, 48시간 5.7%, 24시간 4.4% · 전날 계체 최대 8%, 당일 5% 미만", "ISSN 2025; GSSI"],
-    ["35세 이상 확인", "운동 중 가슴 불편감·숨참·어지럼, 준비·정리운동, 주 2일 근력 운동", "Riebe 등 (2015) MSSE 47(11); ACSM 지침 11판; WHO (2020)"],
-    ["음식 영양값", "식약처 식품영양성분 통합DB에서 1,015개", "식품의약품안전처 (공공데이터포털)"]];
+  const RULES = [["통증", "심함 → 빨강, 중간 → 노랑", "이 앱의 기준", "이 앱의 기준 (검토 전)"],
+    ["컨디션 점수 (잠·피로·근육통·스트레스, 각 1~5)", "잠은 5가 좋음, 피로·근육통·스트레스는 1이 좋음(더할 때 좋은 쪽으로 맞춰 20점 만점) · 기록 7일 이상: 지난 28일 평균보다 z ≤ −1.5이면서 4점 이상 낮으면 빨강, z ≤ −1 노랑 (35세 이상 −0.75) · 7일 전: 8점 이하 빨강, 11점 이하 노랑", "Hooper & Mackinnon (1995) Sports Med 20(5); McLean 등 (2010)", "논문 설문 + 이 앱의 기준 (검토 전)"],
+    ["잠잔 시간", "성인 6시간 미만, 청소년 7시간 미만이면 노랑", "미국수면의학회(AASM) 권고", "공식 기관 권고"],
+    ["훈련량", "시간(분) × 힘든 정도(1~10)", "Foster 등 (2001) J Strength Cond Res 15(1)", "논문"],
+    ["훈련량 급증 (참고 지표)", "최근 7일 ÷ 28일 주평균, 기록 21일 이상일 때만. 1.5배 초과 빨강, 1.3배 초과 노랑 (35세 이상 1.2배)", "Gabbett (2016) BJSM 50 · 비판 Impellizzeri 등 (2020) IJSPP 15(6)", "논문 (반론 있음, 참고만)"],
+    ["몸무게", "지난 7일 평균보다 2% 이상 줄면 노랑", "이 앱의 기준", "이 앱의 기준 (검토 전)"],
+    ["하루 열량", "기초대사량(Mifflin-St Jeor) × 활동계수 1.4~1.85", "Mifflin 등 (1990) Am J Clin Nutr 51(2)", "논문"],
+    ["탄수화물·단백질", "훈련 시간에 따라 탄수화물 3~8 g/kg, 단백질 유지 1.6·감량 2.0·증량 1.8 g/kg", "Thomas 등 (2016) ACSM 공동 입장문; Jäger 등 (2017) ISSN", "학회 입장문"],
+    ["감량 속도", "기한 없으면 주 0.5%, 주 1%를 넘으면 막음", "Helms 등 (2014) JISSN 11:20", "논문"],
+    ["계체 후 수분", "직후 600~900mL, 시간당 1~1.5L, 잃은 무게의 125~150%, 나트륨 1L당 50~90mmol", "ISSN 2025 입장문; GSSI (Reale)", "학회 입장문"],
+    ["계체 후 탄수화물", "2시간 뒤부터 시간당 약 1 g/kg (최대 60g), 감량 5% 이상이면 8~12 g/kg, 아니면 4~7 g/kg", "ISSN 2025; Lewis James 발표", "학회 입장문"],
+    ["급속 감량 범위 (경고용)", "계체 72시간 전 6.7%, 48시간 5.7%, 24시간 4.4% · 전날 계체 최대 8%, 당일 5% 미만 · 감량 계획을 세우는 데는 쓰지 않고, 이미 끝난 감량이 이 범위를 넘었을 때 경고만 합니다.", "ISSN 2025; GSSI", "학회 입장문 (경고용)"],
+    ["35세 이상 확인", "운동 중 가슴 불편감·숨참·어지럼, 준비·정리운동, 주 2일 근력 운동", "Riebe 등 (2015) MSSE 47(11); ACSM 지침 11판; WHO (2020)", "공식 지침 + 논문"],
+    ["음식 영양값", "식약처 식품영양성분 통합DB에서 1,015개", "식품의약품안전처 (공공데이터포털)", "공식 기관 자료"]];
   function rules() { const q = $("ruleQ").value.trim().toLowerCase();
-    $("ruleBody").innerHTML = RULES.filter(r => !q || r.join(" ").toLowerCase().includes(q)).map(([a, b, c]) => `<tr><td>${esc(a)}</td><td>${esc(b)}</td><td class="muted">${esc(c)}</td></tr>`).join("") || `<tr><td colspan="3" class="muted">찾는 내용이 없어요.</td></tr>`; }
+    $("ruleBody").innerHTML = RULES.filter(r => !q || r.join(" ").toLowerCase().includes(q)).map(([a, b, c, d]) => `<tr><td>${esc(a)}</td><td>${esc(b)}</td><td>${esc(d)}</td><td class="muted">${esc(c)}</td></tr>`).join("") || `<tr><td colspan="4" class="muted">찾는 내용이 없어요.</td></tr>`; }
   $("ruleQ").addEventListener("input", rules); rules();
 
   /* PDF용: 모든 미션을 예시 값으로 끝내고 이야기를 펼침 */
