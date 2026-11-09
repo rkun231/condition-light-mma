@@ -435,6 +435,7 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 .load-bars span, .load-bars b { font-size: 13px; }
 .story[data-s="5"] .sb { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
 .loopnote { font-size: 13px; color: #b3ada3; margin: -2px 0 6px; }
+.loopfix { margin: 4px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
 .fab { transition: opacity .25s, transform .25s; }
 .fab.at-p0 { display: none !important; }   /* 첫 화면(프롤로그)에서는 숨김: 계기 카드 모서리를 가리지 않게. 월요일부터 보임 */
 .fab.dim { opacity: .2; transform: scale(.85); pointer-events: none; }
@@ -829,7 +830,7 @@ body.print #skipStoryTouch { display: none; }
         <div class="sb">
           <div><span class="k">해결</span>증상은 목록에서 고르게 했습니다. 응급의료 안내 같은 공식 지침에 근거해 단계를 나눴고, 119·병원 단계를 기록하면 그날 신호가 빨간색이 됩니다.</div>
           <div><span class="k">AI 점검</span>앱 초기 버전을 만들고 나니 오류가 생각보다 많았는데요. 그래서 제가 테스트 기준을 만들어 AI에게 자동 검증을 맡겼습니다. 한 AI는 고치고, 다른 AI는 문제를 찾고, 또 다른 AI는 점수를 매기게 해서 세 번에 걸쳐 고쳤습니다. 고친 부분을 확인할 수 있게 체크리스트를 만들라고 했고, 그 체크리스트를 보며 제가 직접 다시 확인했습니다.</div>
-          <div class="full"><span class="k">제가 정한 기준으로 AI가 매긴 점수</span><div class="bars" id="loopBars"></div></div>
+          <div class="full"><span class="k">차례마다 고친 것</span><ul class="loopfix" id="loopBars"></ul></div>
         </div>
       </details>
     </div>
@@ -1254,8 +1255,8 @@ body.print #skipStoryTouch { display: none; }
     $("symOut").innerHTML = `<div class="triage l${lv}"><b>${LV[lv][0]}</b><span>${LV[lv][1]}</span><span class="src">고른 증상 중 가장 급한 단계로 안내해요. ${lv >= 1 ? "이 단계를 기록하면 오늘 신호가 빨강이 돼요." : ""} 진단이 아니에요.</span></div>`;
     complete(5); reveal($("symOut"));
   });
-  const LOOP = [["1차 검증", 78, "증상 저장 뒤 화면 이동, 폰 뒤로 가기 버튼 오류 등"], ["2차 검증", 84, "영상 크게 보기의 검은 화면, 회복 계산에 계체 전 몸무게가 들어가던 문제 등"], ["3차 검증", 90, "90점 통과, 남은 문제까지 마저 고침"]];
-  $("loopBars").innerHTML = LOOP.map(([l, s, t], i) => `<div class="brow"><span>${l}</span><div class="btrack"><i class="${i === 2 ? "hl" : ""}" style="width:${s}%"></i></div><span class="n">${s}점</span></div><p class="loopnote">${t}</p>`).join("");
+  const LOOP = [["1차 검증", 78, "증상 저장 뒤 화면 이동, 폰 뒤로 가기 버튼 오류 등"], ["2차 검증", 84, "영상 크게 보기의 검은 화면, 회복 계산에 계체 전 몸무게가 들어가던 문제 등"], ["3차 검증", 90, "남은 문제까지 마저 고침"]];
+  $("loopBars").innerHTML = LOOP.map(([l, , t]) => `<li><b>${l.replace(" 검증", "")}</b> ${t}</li>`).join("");
 
   /* MISSION 6: 계체 + 수분 잔 */
   $("weighGo").addEventListener("click", () => {
@@ -1389,7 +1390,7 @@ body.print #skipStoryTouch { display: none; }
     ["11월 2일", "3차 · 증상 체크, 투구 수, 계체 후 회복, 35세 이상", "v0.3.0", "build", "감량 '계획'은 보류하고 계체 '후' 회복만."],
     ["11월 2일", "4차 · 영상 비교", "v0.4.0", "build", "느리게, 한 프레임씩, 두 영상 같은 순간으로."],
     ["11월 3일", "발견 · 아이폰으로 써 본 피드백", "v0.4.1", "find", "'직접 입력' 위치 재조정, 커서가 숫자를 가림, 날짜가 멋대로 골라짐, 영상 ±1·5·10초 이동 버튼 추가."],
-    ["11월 3일", "자동 검증 3차례", "v0.4.3~0.4.5", "build", "AI가 고치고·찾고·채점. 78 → 84 → 90점."],
+    ["11월 3일", "자동 검증 3차례", "v0.4.3~0.4.5", "build", "AI가 고치고·찾고·채점."],
     ["11월 3~4일", "설정 정리, 평가 AI 안 일부 반영", "v0.4.6~0.4.9", "build", "뒤로 버튼은 하위 화면에만, 증상 체크·회복 계산기 버튼은 흰색으로."],
     ["11월 4일", "현장 설문 설계", "", "field", "입장에 따라 질문이 갈라지는 구글 폼. 로그인 없이."],
     ["11월 4~5일", "코치·관장, 선수, 기자에게 DM", "", "field", "설문을 돌리던 중 '잠들기 어려움' 추가."],
