@@ -639,6 +639,16 @@ body.print #skipStoryTouch { display: none; }
 }
 
 @media print { .hud, .fab { display: none; } }
+
+/* ── 개선 루프 11-07 v8 (첫 화면 오른쪽 빈 공간에 QR: 넓은 화면·인쇄본에서 보이고 폰 폭에서만 숨김) ── */
+@media (min-width: 641px) {
+  /* 첫 화면만 2칸 격자: 왼쪽에 머리말·제목·소개·버튼(1~4줄), 오른쪽에 QR. 나머지(목차·안내·선수 카드)는 전체 폭 그대로 */
+  .prolog .ch-in { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: clamp(28px, 3vw, 40px); row-gap: 16px; }
+  .prolog .ch-in > * { grid-column: 1 / -1; }
+  .prolog .ch-in > :is(.eyebrow, h1, .situ, .p0-btns) { grid-column: 1; }
+  .prolog .p0-qr { grid-column: 2; grid-row: 1 / span 4; align-self: center; justify-self: end; width: clamp(240px, 29vw, 300px); max-width: none; }
+}
+@media (max-width: 640px) { .p0-qr { display: none; } }
 </style>
 </head>
 <body>
@@ -664,6 +674,7 @@ body.print #skipStoryTouch { display: none; }
       <h1>이번 주, <em>계체를 앞둔 선수</em>가 되어 보세요</h1>
       <p class="situ">선수가 아침마다 몸 상태를 넣으면 오늘 훈련 강도를 초록·노랑·빨강 신호와 그 이유로 보여 주는 웹앱 '컨디션 신호등'을 만들었습니다. 설명을 읽는 대신 일주일을 직접 보내 보세요. 하루를 마칠 때마다 그 기능을 <b>왜, 어떻게 만들었는지</b>가 열립니다.</p>
       <div class="row-btns p0-btns"><a class="go-btn" href="#d1" style="text-decoration:none"><span>월요일 아침으로 →</span></a><a class="ghost-btn" href="#e5" style="text-decoration:none">결과부터 보기</a><a class="ghost-btn" href="https://rkun231.github.io/condition-light-mma/" target="_blank" rel="noopener" style="text-decoration:none">실제 앱 ↗</a></div>
+      <figure class="qr-card p0-qr"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARgAAAEYAQAAAACv9dQhAAAB3ElEQVR4nO1ay27EMAgcUP7/l6fyAI63rdqbY4k4UuIQDmiWx4DXiH+Xo68OCh8Suvjzi2+0xw/TuRIH09Ngeh33kIx9c/9h3dN/QrJ88Y32+GE6170laDTCAhh7xB4/Fx8opAZAAyy7E1F3fBhbqwwkcCTkdnv8MB3MKvXLFat1/rEZRooqCZR5eK7Ne+PLGHgo49gEasHJN9rjh+lg1HXVdnDU9uSHUdkRRf80m32jDlY8KHgCpcCN436azb5Vh5MKqnqF12hjSYLOs3lzfrYPwhMkUSIoEZ1ms2/UsQWVaLpqRYoe0ub80MJfhIa8Kap8YcXjbPb9/mMRS3Mr90E80b2/sJvujMYiIFObAblSc36IqGCCpTowNfOWCDWPLxMo8pQZUlXWOD50zz8WMZUNmKRzqIjm/gOuDUYCVPwZQaa9e3/Be6xag5/ZYLA3/7FJlivfZLAtTMgPs9kfqO+oJkOjw5RQr+iOD2Zboada1Njh7b9YSBVvnuyZRatP+039ofNT5D6Sc82ge9eva56STv+Z4cV3/oPP81NRn3Vghu71HR+059sHBm08zWZ/6HzZ8vg0qQ9H3/HWd9SIPnuwnBreJ2HoPj+EVpDlnGkw54nozp/t/f8Y/lpfVQYjrNuxU6QAAAAASUVORK5CYII=" alt="이 포트폴리오로 연결되는 QR 코드" width="200" height="200"><figcaption><b>휴대폰으로 열기</b></figcaption></figure>
       <div class="p0-map">
         <nav class="chiptoc" aria-label="장면 목차"><a href="#d1">월~일</a><i aria-hidden="true">→</i><a href="#e1">현장</a><i aria-hidden="true">→</i><a href="#e2">결정</a><i aria-hidden="true">→</i><a href="#e3">흐름</a><i aria-hidden="true">→</i><a href="#e4">근거</a><i aria-hidden="true">→</i><a href="#e5">회고</a></nav>
         <div class="p0-acts"><button type="button" class="ghost-btn" id="storyAll" aria-expanded="false">만든 이야기 모두 펼치기</button><a class="ghost-btn" href="#story1" id="skipStoryTouch" style="text-decoration:none">만든 이야기로 건너뛰기</a></div>
@@ -683,7 +694,7 @@ body.print #skipStoryTouch { display: none; }
         </div>
       </div>
       <p class="note navhint">어느 날짜든 위쪽에서 바로 갈 수 있어요. 미션을 하지 않아도 '만든 이야기'는 눌러서 펼칠 수 있어요. 월요일부터 오른쪽 아래에 나오는 <b>📱 실제 앱</b> 버튼은 진짜 앱을 그날 상황으로 띄웁니다.</p>
-      <p class="note printonly">직접 눌러 보기: rkun231.github.io/condition-light-mma/portfolio/ (QR 코드는 마지막 쪽에 있어요)</p>
+      <p class="note printonly">직접 눌러 보기: rkun231.github.io/condition-light-mma/portfolio/</p>
     </div>
   </section>
 
@@ -925,7 +936,7 @@ body.print #skipStoryTouch { display: none; }
       <span class="tag">실제로 만든 8일</span>
       <h2>11월 1일 첫 버전부터<br>11월 5일 MMA 분리, 이후 마지막 검증까지</h2>
       <div class="stats">
-        <div><span class="big-num">63<small>번</small></span><span class="cap">고칠 때마다 남긴 커밋 (여러 종목 18 + MMA 앱·포트폴리오 45)</span></div>
+        <div><span class="big-num">64<small>번</small></span><span class="cap">고칠 때마다 남긴 커밋 (여러 종목 18 + MMA 앱·포트폴리오 46)</span></div>
         <div><span class="big-num">78→90</span><span class="cap">자동 검증 3차례 평가 점수</span></div>
         <div><span class="big-num">1,015<small>개</small></span><span class="cap">식약처 DB에서 고른 음식</span></div>
         <div><span class="big-num">1<small>명</small></span><span class="cap">매일 쓰는 사용자 (만든 본인)</span></div>
