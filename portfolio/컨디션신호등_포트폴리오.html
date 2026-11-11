@@ -435,6 +435,8 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 .load-bars span, .load-bars b { font-size: 13px; }
 .story[data-s="5"] .sb { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
 .loopnote { font-size: 13px; color: #b3ada3; margin: -2px 0 6px; }
+.ailoop { margin: 12px 0; gap: 6px; } .ailoop p { margin: 0; font-size: 15px; } .ailoop .k { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; color: var(--gold); margin-top: 4px; }
+.survey-t { width: 100%; min-width: 0; border-collapse: collapse; font-size: 14px; margin: 6px 0 2px; } .survey-t tbody, .survey-t tr, .survey-t th, .survey-t td { display: block; width: auto; } .survey-t tr { border-top: 1px solid var(--line); padding: 6px 0; } .survey-t th, .survey-t td { text-align: left; padding: 0; border: 0; white-space: normal; } .survey-t th { font-size: 13px; font-weight: 700; color: var(--ink); } .survey-t caption { display: block; } .survey-t caption { text-align: left; font-size: 13px; color: var(--muted); padding-bottom: 4px; }
 .loopfix { margin: 4px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
 .fab { transition: opacity .25s, transform .25s; }
 .fab.at-p0 { display: none !important; }   /* 첫 화면(프롤로그)에서는 숨김: 계기 카드 모서리를 가리지 않게. 월요일부터 보임 */
@@ -676,7 +678,7 @@ body.print #skipStoryTouch { display: none; }
     <div class="ch-in">
       <span class="eyebrow">SK AIGEN 지원 포트폴리오 · 2지망 문화·예술·스포츠 · 유경군 · 컨디션 신호등</span>
       <h1>이번 주, <em>계체를 앞둔 선수</em>가 되어 보세요</h1>
-      <p class="situ">선수가 아침마다 몸 상태를 넣으면 오늘 훈련 강도를 초록·노랑·빨강 신호와 그 이유로 보여 주는 웹앱 '컨디션 신호등'을 만들었습니다. 설명을 읽는 대신 일주일을 직접 보내 보세요. 하루를 마칠 때마다 그 기능을 <b>왜, 어떻게 만들었는지</b>가 열립니다.</p>
+      <p class="situ">선수가 아침마다 몸 상태를 넣으면 오늘 훈련 강도를 초록·노랑·빨강 신호와 그 이유로 보여 주는 웹앱 '컨디션 신호등'을 만들었습니다. 이번 포트폴리오는 선수가 되어 앱을 체험해 보는 방식으로 만들었습니다. 앞서 만든 병원 택시와 같이 코드는 AI가 썼고, 무엇을 만들고 없앨지 기준은 제가 정했습니다. 하루를 마칠 때마다 그 기능을 <b>왜, 어떻게 만들었는지</b>가 열립니다.</p>
       <div class="row-btns p0-btns"><a class="go-btn" href="#d1" style="text-decoration:none"><span>월요일 아침으로 →</span></a><a class="ghost-btn" href="#e5" style="text-decoration:none">결과부터 보기</a><a class="ghost-btn" href="https://rkun231.github.io/condition-light-mma/" target="_blank" rel="noopener" style="text-decoration:none">실제 앱 ↗</a></div>
       <figure class="qr-card p0-qr"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARgAAAEYAQAAAACv9dQhAAAB3ElEQVR4nO1ay27EMAgcUP7/l6fyAI63rdqbY4k4UuIQDmiWx4DXiH+Xo68OCh8Suvjzi2+0xw/TuRIH09Ngeh33kIx9c/9h3dN/QrJ88Y32+GE6170laDTCAhh7xB4/Fx8opAZAAyy7E1F3fBhbqwwkcCTkdnv8MB3MKvXLFat1/rEZRooqCZR5eK7Ne+PLGHgo49gEasHJN9rjh+lg1HXVdnDU9uSHUdkRRf80m32jDlY8KHgCpcCN436azb5Vh5MKqnqF12hjSYLOs3lzfrYPwhMkUSIoEZ1ms2/UsQWVaLpqRYoe0ub80MJfhIa8Kap8YcXjbPb9/mMRS3Mr90E80b2/sJvujMYiIFObAblSc36IqGCCpTowNfOWCDWPLxMo8pQZUlXWOD50zz8WMZUNmKRzqIjm/gOuDUYCVPwZQaa9e3/Be6xag5/ZYLA3/7FJlivfZLAtTMgPs9kfqO+oJkOjw5RQr+iOD2Zboada1Njh7b9YSBVvnuyZRatP+039ofNT5D6Sc82ge9eva56STv+Z4cV3/oPP81NRn3Vghu71HR+059sHBm08zWZ/6HzZ8vg0qQ9H3/HWd9SIPnuwnBreJ2HoPj+EVpDlnGkw54nozp/t/f8Y/lpfVQYjrNuxU6QAAAAASUVORK5CYII=" alt="이 포트폴리오로 연결되는 QR 코드" width="200" height="200"><figcaption><b>휴대폰으로 열기</b></figcaption></figure>
       <div class="p0-map">
@@ -691,7 +693,8 @@ body.print #skipStoryTouch { display: none; }
         <div class="stack">
           <p class="muted">이 앱을 시작한 계기는 이것이었습니다.</p>
           <ul class="why">
-            <li class="l0 lead" style="color:var(--ink)">10년 넘게 MMA를 챙겨 보면서 계체 실패와 무리한 수분 감량 이야기를 계속 접했습니다.</li>
+            <li class="l0 lead" style="color:var(--ink)">10년 넘게 MMA를 챙겨 보면서, 경기 준비 과정을 담은 국내외 선수들의 영상에서 감량하다 병원에 실려 가거나, 감량에 실패하거나, 감량에 성공하고도 잠들지 못하거나, 기절하는 등 크고 작은 문제를 많이 지켜봤습니다.</li>
+            <li class="l0" style="color:var(--ink)">전역 전 휴가 때 두 달쯤, 그리고 전역한 뒤에도 운동을 다니며 선수들을 만났습니다. 그러면서 MMA라는 종목을 더 깊이 알게 됐고, 선수들의 고충도 알게 됐습니다.</li>
           </ul>
           <p class="note p0-field">만든 뒤 현장에 물어보니, 설문에 답한 선수 4명 중 3명이 계체 전 2~3일 동안 물로 3~5kg을 뺀다고 했습니다. 코치 겸 현역 선수 한 분은 가장 걱정되는 점으로 '선수 개인의 역치', 곧 사람마다 버틸 수 있는 한계가 다르다는 점을 꼽았습니다. 예시 선수는 직접 눌러 보도록 만든 체험용 인물이고, 실제로 들은 말은 '현장' 장면에 모았습니다.</p>
         </div>
@@ -826,11 +829,11 @@ body.print #skipStoryTouch { display: none; }
         </div>
         <div class="row-btns"><button class="ghost-btn" data-app="symptom">실제 앱 증상 체크 →</button></div>
       </div>
+      <div class="card stack ailoop"><b>앱 문제는 AI 셋에게 역할을 나눠 세 번 고쳤습니다</b><p>한 AI는 고치고, 다른 AI는 문제를 찾고, 또 다른 AI는 점수를 매기게 했습니다. 고친 부분을 확인할 수 있게 체크리스트를 만들라고 했고, 그 체크리스트를 보며 제가 직접 다시 확인했습니다.</p><span class="k">차례마다 고친 것</span><ul class="loopfix" id="loopBars"></ul></div>
       <details class="story" data-s="5"><summary><span class="lock">만든 이야기 5</span>증상은 공식 지침으로, 앱 문제는 AI 셋이 점검<span class="hint2"></span></summary>
         <div class="sb">
           <div><span class="k">해결</span>증상은 목록에서 고르게 했습니다. 응급의료 안내 같은 공식 지침에 근거해 단계를 나눴고, 119·병원 단계를 기록하면 그날 신호가 빨간색이 됩니다.</div>
-          <div><span class="k">AI 점검</span>앱 첫 버전을 만들고 나니 오류가 생각보다 많았는데요. 그래서 제가 점검 기준을 만들어 AI에게 자동 검증을 맡겼고, 그 뒤로는 AI에게 일을 맡기기 전에 점검 기준부터 정했습니다. 한 AI는 고치고, 다른 AI는 문제를 찾고, 또 다른 AI는 점수를 매기게 해서 세 번에 걸쳐 고쳤습니다. 고친 부분을 확인할 수 있게 체크리스트를 만들라고 했고, 그 체크리스트를 보며 제가 직접 다시 확인했습니다.</div>
-          <div class="full"><span class="k">차례마다 고친 것</span><ul class="loopfix" id="loopBars"></ul></div>
+          <div><span class="k">AI 점검</span>앱 첫 버전을 만들고 나니 오류가 생각보다 많았는데요. 그래서 제가 점검 기준을 만들어 AI에게 자동 검증을 맡겼고, 그 뒤로는 AI에게 일을 맡기기 전에 점검 기준부터 정했습니다. 역할을 나눠 고친 방법은 바로 위 상자에 적었습니다.</div>
         </div>
       </details>
     </div>
@@ -931,6 +934,7 @@ body.print #skipStoryTouch { display: none; }
         <ul>
           <li>감량 계획은 5명 모두 필요하다고 골랐습니다. 그래도 선수마다 한계가 달라 혼자 기준을 정하면 위험해서, 의료진 검토를 받기 전까지 만들지 않기로 한 결정을 그대로 둡니다.</li>
           <li>근거를 바탕으로 한 앱이라면 쓰겠다는 답을 보고, 의료진 검토를 받는 것을 다음 할 일로 정했습니다.</li>
+          <li>선수 4명이 모두 적은 회복 순서(전해질 음료 먼저 → 탄수화물)가 앱의 회복 계획(직후 전해질 음료 → 나눠 마시기 → 2시간 뒤부터 탄수화물)과 같은지 11월 11일에 맞춰 봤습니다. 같아서 앱은 그대로 뒀습니다.</li>
         </ul>
       </div>
     </div>
@@ -942,7 +946,7 @@ body.print #skipStoryTouch { display: none; }
       <h2>여러 종목 앱은 그대로 두고<br>MMA만 떼어 먼저 완성합니다</h2>
       <div class="toggles" id="verT"></div>
       <div class="split"><div class="mock" id="mock"></div><div class="stack" id="verNote"></div></div>
-      <h3 id="go-who" style="font-family:var(--display);font-weight:400;font-size:28px;margin-top:20px">코드는 AI가 쓰고, 무엇을 만들고 어떤 기준으로 볼지는 제가 정했습니다</h3>
+      <h3 id="go-who" style="font-family:var(--display);font-weight:400;font-size:28px;margin-top:20px">제가 맡은 일과 AI가 맡은 일</h3>
       <dl class="kv card">
         <dt>본인</dt><dd>문제 정하기, 넣고 뺄 기능, 디자인 시안 고르기, 아이폰으로 직접 써 보며 문제 찾기, 점검 기준 정하기, 설문 질문·대상, 코치·선수·기자에게 직접 연락, MMA 분리</dd>
         <dt>AI (Claude)</dt><dd>코드 작성, 근거 논문·공식 기준 찾기, 디자인 시안 제작, 자동 테스트, 문제 찾기·점수 매기기 역할, 설문 미리보기·DM 문구 초안</dd>
@@ -957,7 +961,7 @@ body.print #skipStoryTouch { display: none; }
       </div>
       <div class="toggles" id="whoT"></div>
       <div class="table-box"><table><thead><tr><th>무엇</th><th>낸 쪽</th><th>결과와 이유</th></tr></thead><tbody id="whoBody"></tbody></table></div>
-      <p class="note" style="margin-top:8px"><a href="https://rkun231.github.io/aigen-portfolio/decisions.html#c" target="_blank" rel="noopener">AI 제안과 제가 고른 결정 기록 전체 보기 ↗</a></p>
+      <p class="note" style="margin-top:8px">이 표는 포트폴리오에 담은 12건입니다. 앱 쪽 결정까지 합친 28건은 결정 기록에 모두 있습니다. <a href="https://rkun231.github.io/aigen-portfolio/decisions.html#c" target="_blank" rel="noopener">AI 제안과 제가 고른 결정 기록 전체 보기 ↗</a></p>
     </div>
   </section>
 
@@ -967,9 +971,9 @@ body.print #skipStoryTouch { display: none; }
       <h2>11월 1일 첫 버전부터<br>11월 5일 MMA 분리, 이후 마지막 검증까지</h2>
       <div class="stats">
         <div><span class="big-num">5<small>명</small></span><span class="cap">설문에 답한 선수·코치 (11월 12일 마감)</span></div>
-        <div><span class="big-num">1<small>개</small></span><span class="cap">설문을 돌리다 추가한 항목 (잠들기 어려움)</span></div>
+        <div><span class="big-num">1<small>개</small></span><span class="cap">첫 답이 오기 전에 제가 넣은 항목 (잠들기 어려움)</span></div>
         <div><span class="big-num">3<small>개</small></span><span class="cap">위험하거나 아직 이르다고 보류한 기능 (감량 계획, AI 자세 분석, 아이콘 색)</span></div>
-        <div><span class="big-num">1<small>명</small></span><span class="cap">매일 쓰는 사용자 (만든 본인)</span></div>
+        <div><span class="big-num">9<small>건</small></span><span class="cap">AI가 찾아 온 제안 16건 중 제가 골라 바꾼 것</span></div>
       </div>
       <div class="toggles" id="flowT"></div>
       <ol class="tl" id="tl"></ol>
@@ -981,7 +985,7 @@ body.print #skipStoryTouch { display: none; }
     <div class="ch-in">
       <span class="tag">판단 기준과 출처 · 기록 저장 방식</span>
       <h2>판단 기준과 출처를 적었습니다</h2>
-      <p class="note rules-head">의료진 검토 전이라, 아래 기준은 오늘 훈련 강도와 회복을 참고로 보여 주는 데만 씁니다. 진단에는 쓰지 않습니다. 한마디로, 컨디션 점수가 내 평소보다 크게 떨어지거나 통증이 심하면 빨강, 조금 떨어지거나 잠이 모자라면 노랑입니다.</p>
+      <p class="note rules-head">의료진 검토 전이라, 아래 기준은 오늘 훈련 강도와 회복을 참고로 보여 주는 데만 씁니다. 진단에는 쓰지 않습니다. 한마디로, 컨디션 점수가 내 평소보다 크게 떨어지거나 통증이 심하면 빨강, 조금 떨어지거나 잠이 모자라면 노랑입니다. 계체 뒤 회복은 짭짤한 음료로 물부터 채우고, 2시간쯤 지나 탄수화물을 먹는 순서입니다.</p>
       <input class="search" id="ruleQ" type="search" placeholder="찾기 (예: 잠, 감량, 학회)" aria-label="판단 기준 찾기">
       <div class="table-box"><table><thead><tr><th>무엇</th><th>기준</th><th>어떤 근거</th><th>출처</th></tr></thead><tbody id="ruleBody"></tbody></table></div>
       <dl class="kv card">
@@ -997,18 +1001,18 @@ body.print #skipStoryTouch { display: none; }
       <span class="tag">회고 · 2지망 문화·예술·스포츠</span>
       <h2>배운 것, 놓친 것, 이어갈 것</h2>
       <div class="retro">
-        <div class="r-g" id="go-learn"><b>배운 것</b><span>먼저 만들면서 배운 것입니다.</span><ul><li>직접 써 봐야 문제가 보였습니다. 아이폰에서 '쌀밥'을 치다 한글이 깨지는 버그를 찾았고, 영상 건너뛰기와 크게 보기도 써 보면서 넣었습니다. 말로 넣기도 아이폰으로 직접 말해 보고 나서야 마이크가 안 꺼지는 문제를 알았습니다.</li><li>첫 버전에서 오류를 겪은 뒤로는, AI에게 맡기기 전에 점검 기준(체크리스트)부터 정했습니다. 그래야 고친 결과를 믿고 확인할 수 있었습니다.</li><li>피로·근육통·스트레스 점수를 처음엔 '5가 좋음'으로 받았는데, 보통은 낮을수록 없다고 생각한다는 걸 알고 1이 좋은 쪽으로 뒤집었습니다.</li></ul><span>설문으로 현장에 물어보니 몰랐던 것들도 보였습니다.</span><ul><li>선수마다 평소 체중에서 빼는 폭이 꽤 달랐습니다(5~8%부터 10% 넘게까지). 감량법을 배운 곳으로는 선수 4명 중 3명이 유튜브·SNS를 골랐고, 영양사·의료진을 고른 분은 없었습니다.</li><li>반면 계체 후 경기 전까지 다시 채우는 방법(전해질 음료 → 탄수화물)은 대부분 비슷했습니다.</li><li>감량·회복 중에 어지럼이나 경기력 저하 같은 문제를 겪은 경우가 생각보다 많았고, 기록은 주로 휴대폰 메모로 하고 있었습니다.</li><li>격투기 전용 앱을 쓰는 분은 없었지만, 의학 논문과 전문가 자문을 바탕으로 한 앱이라면 쓰겠다는 답이 많았습니다.</li><li>한 선수는 제미나이로 칼로리를 계산하고 가이드를 받았는데, 가끔 틀린 정보를 가져와서 코치님 의견을 1순위, AI를 2순위로 두고 자기 생각을 말하며 조율했다고 적어 주셨습니다. 이 앱을 논문에 의거하거나 의료진의 검토가 있는 방향으로 발전시키면 선수들이 더 믿고 활용하겠구나 하는 생각을 했습니다.</li><li>필요한 기능을 고르게 하니 두 분은 7개를 모두, 나머지 분들도 3~4개씩 골라 생각보다 이런 앱이 필요하다는 걸 느꼈고, 자동화했으면 하는 일을 적어 준 분도 있었습니다.</li><li>5명 모두 필요한 기능으로 감량 계획과 식단 기록을 골랐습니다. 선수들이 필요로 하는 기능이구나 싶었습니다.</li><li>연락드린 선수분들이 좋게 반응해 주셨습니다. 한 선수는 설문을 마친 뒤 격투기 선수에게 좋은 앱을 만드는 것 같다며 응원 메시지까지 남겨 주셔서, 이런 앱을 바라는 사람이 있을 수 있겠다고 느꼈습니다.</li></ul></div>
-        <div class="r-y" id="go-miss"><b>놓친 것</b><span>실제 사용자는 아직 저 하나뿐이고 설문 응답도 아직은 5명이라 경향이라 말할 수는 없다는 점입니다. 또 계체 관련해서는 의료진의 검토도 받고 싶었는데, 논문을 더 찾아야 할지 직접 찾아뵙고 상담을 받아야 할지 오래 정하지 못해 아직 검토를 받지 못했습니다.</span><span class="note">이 앱은 혼자 AI와 만들어서, 사람과 의견이 갈려 고친 장면은 없습니다. 사람과 의견을 맞춘 이야기는 지원서 3번(풋살 코치)에 있습니다.</span></div>
+        <div class="r-g" id="go-learn"><b>배운 것</b><span>먼저 만들면서 배운 것입니다.</span><ul><li>직접 써 봐야 문제가 보였습니다. 아이폰에서 '쌀밥'을 치다 한글이 깨지는 버그를 찾았고, 영상 건너뛰기와 크게 보기도 써 보면서 넣었습니다. 말로 넣기도 아이폰으로 직접 말해 보고 나서야 마이크가 안 꺼지는 문제를 알았습니다.</li><li>첫 버전에서 오류를 겪은 뒤로는, AI에게 맡기기 전에 점검 기준(체크리스트)부터 정했습니다. 그래야 고친 결과를 믿고 확인할 수 있었습니다.</li><li>피로·근육통·스트레스 점수를 처음엔 '5가 좋음'으로 받았는데, 보통은 낮을수록 없다고 생각한다는 걸 알고 1이 좋은 쪽으로 뒤집었습니다.</li></ul><span>설문으로 현장에 물어보니 몰랐던 것들도 보였습니다.</span><ul><li>선수마다 평소 체중에서 빼는 폭이 꽤 달랐습니다(5~8%부터 10% 넘게까지). 감량법을 배운 곳으로는 선수 4명 중 3명이 유튜브·SNS를 골랐고, 영양사·의료진을 고른 분은 없었습니다.</li><li>반면 계체 후 경기 전까지 다시 채우는 방법(전해질 음료 → 탄수화물)은 선수 4명 모두 같았습니다.</li></ul><table class="survey-t"><caption>설문 결과 (11월 9일 기준 5명: 코치·관장 1, 프로 선수 3, 코치 겸 현역 선수 1)</caption><tbody><tr><th>근거 기반 앱을 쓸 생각 (5명, 5점 만점)</th><td>5점 3명 · 3점 2명</td></tr><tr><th>필요한 기능 (5명, 여러 개)</th><td>감량 계획 5 · 식단 기록 5 · 계체 후 회복 계획 4 · 컨디션에 따른 훈련 강도 3 · 코치와 기록 공유 3 · 부상·증상 체크 2 · 훈련 영상 비교 2</td></tr><tr><th>감량·회복 중 겪은 일 (선수 4명, 여러 개)</th><td>심한 어지럼 3 · 잠들기 어려움 3 · 경기력 저하 2 · 쥐·경련 1 · 계체 실패 1</td></tr><tr><th>기록하는 곳 (선수 4명, 여러 개)</th><td>휴대폰 메모·엑셀 3 · 코치에게 메신저 1 · 앱 1 · 따로 안 함 1</td></tr><tr><th>써 본 격투기 전용 앱</th><td>0명 (한 분은 제미나이를 칼로리 계산과 가이드로 씀)</td></tr></tbody></table><ul><li>한 선수는 제미나이로 칼로리를 계산하고 가이드를 받았는데, 가끔 틀린 정보를 가져와서 코치님 의견을 1순위, AI를 2순위로 두고 자기 생각을 말하며 조율했다고 적어 주셨습니다. 이 앱을 논문에 의거하거나 의료진의 검토가 있는 방향으로 발전시키면 선수들이 더 믿고 활용하겠구나 하는 생각을 했습니다.</li><li>연락드린 선수분들이 좋게 반응해 주셨습니다. 한 선수는 설문을 마친 뒤 격투기 선수에게 좋은 앱을 만드는 것 같다며 응원 메시지까지 남겨 주셔서, 이런 앱을 바라는 사람이 있을 수 있겠다고 느꼈습니다.</li></ul></div>
+        <div class="r-y" id="go-miss"><b>놓친 것</b><span>설문 응답이 아직은 5명이라 경향이라 말할 수는 없다는 점입니다. 또 계체 관련해서는 의료진의 검토도 받고 싶었는데, 논문을 더 찾아야 할지 직접 찾아뵙고 상담을 받아야 할지 오래 정하지 못해 아직 검토를 받지 못했습니다.</span></div>
         <div class="r-y" id="go-again"><b>다시 한다면</b><span>앱을 만들기 전에 설문부터 보내 현장에 먼저 물었을 겁니다. 이번에는 만들고 나서야 물어서, 들은 내용을 앱에 반영하는 일이 설문 마감(11월 12일) 뒤로 밀렸습니다.</span></div>
-        <div class="r-gold" id="go-next"><b>이어갈 것</b><span>11월 12일 설문이 마감되면 5명 중 4명이 필요하다고 고른 계체 후 회복 계획부터 선수들이 적은 순서(전해질 음료 먼저 → 탄수화물)에 맞춰 다듬고, 아이디를 남겨 주신 세 분께 직접 써 보시고 후기를 부탁드리겠습니다. 감량 계획처럼 혼자 정하면 위험한 부분은 아직 만들지 않고, 11월 말까지 스포츠의학 전문의께 회복 계산과 증상 단계 기준부터 검토를 부탁드리겠습니다. 감량 계획은 그 뒤 전문가와 함께 기준을 정하고 나서 만들겠습니다.</span><span>처음 여러 종목 앱을 만들 때는 풋살 팀에서 아쉬웠던 영상 짚어 주기와, 유소년 선수들이 훈련량과 몸을 스스로 관리하도록 돕는 일도 계기였습니다. 영상 비교는 이미 넣어 두었고(만든 이야기 7), 유소년 쪽은 MMA 앱을 완성한 뒤 이어서 풀어 보려고 합니다.</span><span>선수마다 다른 감량 기준을 어떻게 세울지는 혼자서 정하기 어렵습니다. AIGEN에서는 코치와 의사 선생님 같은 전문가를 만나 이 기준을 함께 세워 보고 싶습니다.</span><span>AIGEN 2년 동안 가장 무게를 두는 것은 1지망인 병원 택시이고, 이 일은 2지망인 문화·예술·스포츠 분야에서 이어 가려 합니다. 계체를 앞둔 선수와 코치에게 먼저 묻고, 의료진 검토를 거친 기준 위에서 AI로 만들어 바로 고치는 사람이 되고 싶습니다.</span></div>
+        <div class="r-gold" id="go-next"><b>이어갈 것</b><span>5명 중 4명이 필요하다고 고른 계체 후 회복 계획은 선수들이 적은 순서(전해질 음료 먼저 → 탄수화물)와 같다는 걸 맞춰 봤습니다. 11월 12일 설문이 마감되면 아이디를 남겨 주신 세 분께 직접 써 보시고 후기를 부탁드리겠습니다. 감량 계획처럼 혼자 정하면 위험한 부분은 아직 만들지 않고, 11월 말까지 스포츠의학 전문의께 회복 계산과 증상 단계 기준부터 검토를 부탁드리겠습니다. 감량 계획은 그 뒤 전문가와 함께 기준을 정하고 나서 만들겠습니다.</span><span>처음 여러 종목 앱을 만들 때는 풋살 팀에서 아쉬웠던 영상 짚어 주기와, 유소년 선수들이 훈련량과 몸을 스스로 관리하도록 돕는 일도 계기였습니다. 영상 비교는 이미 넣어 두었고(만든 이야기 7), 유소년 쪽은 MMA 앱을 완성한 뒤 이어서 풀어 보려고 합니다.</span><span>선수마다 다른 감량 기준을 어떻게 세울지는 혼자서 정하기 어렵습니다. AIGEN에서는 코치와 의사 선생님 같은 전문가를 만나 이 기준을 함께 세워 보고 싶습니다.</span><span>AIGEN 2년 동안 가장 무게를 두는 것은 1지망인 병원 택시이고, 이 일은 2지망인 문화·예술·스포츠 분야에서 이어 가려 합니다. 선수들이 본업인 스포츠에만 몰입할 수 있도록, 회복 과정과 몸 관리 과정을 의료진의 검증을 거쳐 전문적으로 돕는 앱이나 기구를 만들어 선수와 코치들을 돕고 싶습니다.</span></div>
       </div>
       <h3 id="go-qa" style="font-family:var(--display);font-weight:400;font-size:28px;margin-top:10px">나올 만한 질문과 답변</h3>
       <div class="row-btns qa-all"><button type="button" class="ghost-btn" id="qaAll" aria-controls="qa" aria-expanded="false">모두 펼치기</button></div>
       <div id="qa">
         <details class="qa"><summary>의학적으로 안전한가요?</summary><div>진단은 하지 않고, 오늘 훈련 강도를 신호로 참고만 하게 보여 줍니다. 참고용이지만 믿을 수 있도록 기준 숫자는 논문과 공식 입장문에서 가져와 출처를 화면에 적었습니다. 아직 의료진의 검토를 받지 못해서 감량 계획처럼 위험할 수 있는 기능은 만들지 않았고, 전문가와 함께 기준을 정한 뒤에 만들 생각입니다.</div></details>
-        <details class="qa"><summary>실제로 쓰는 사람이 있나요?</summary><div>아직은 저만 사용하고 있습니다. 대신 설문으로 코치·선수분들이 지금 어떻게 하고 있는지 묻고 있고, 앱을 써 보겠다고 남겨 주신 분들께 설문 내용을 반영한 뒤 사용 후기를 부탁드릴 예정입니다.</div></details>
+        <details class="qa"><summary>써 보겠다는 사람이 있나요?</summary><div>설문에 답한 분 가운데 세 분이 앱을 써 보겠다고 아이디를 남겨 주셨습니다. 설문으로 코치·선수분들이 지금 어떻게 하고 있는지 묻고 있고, 설문 내용을 반영한 뒤 그분들께 직접 써 보시고 후기를 부탁드릴 예정입니다.</div></details>
         <details class="qa" id="go-qa-mma"><summary>왜 여러 종목에서 MMA로 좁혔나요?</summary><div>제가 알고 있는 스포츠 안에서는 MMA가 가장 배고프고 힘들며 몸이 상하는 운동이라고 생각했습니다. 벌이에 비해 훈련이 고되고, 운동 특성상 많이 다칩니다. 여기에 계체 전 감량과 계체 후 회복도 몸에 큰 무리를 줍니다. 국내에 정보가 적을 뿐(만든 이야기 1의 앱 조사) 앱으로 충분히 도움을 줄 수 있겠다고 판단해 MMA로 정하고 바로 설문을 보냈습니다. 정한 뒤 받은 설문에서도 답한 선수 4명 중 3명이 계체 전 2~3일 동안 물로 3~5kg을 뺀다고 했습니다.</div></details>
-        <details class="qa" id="go-qa-ai"><summary>AI가 다 만든 것 아닌가요?</summary><div>여러 AI에게 일을 맡기고, 올라온 결과를 제가 검토하는 식으로 작업했습니다. 코드는 Claude가 썼지만, 어떤 기능을 넣고 뺄지, 어떤 기준으로 점검할지, 누구에게 물어볼지는 제가 정했고, 올라온 결과를 직접 써 보며 확인했습니다. AI 의견을 받아들인 것과 바꾼 것은 위의 표에 그대로 적었습니다.</div></details>
+        <details class="qa" id="go-qa-ai"><summary>AI가 다 만든 것 아닌가요?</summary><div>여러 AI에게 일을 맡기고, 올라온 결과를 제가 검토하는 식으로 작업했습니다. 어떤 기능을 넣고 뺄지, 어떤 기준으로 점검할지, 누구에게 물어볼지 정하고, 올라온 결과를 직접 써 보며 확인한 것이 제 몫이었습니다. AI 의견을 받아들인 것과 바꾼 것은 위의 표에 그대로 적었습니다.</div></details>
         <details class="qa"><summary>설문 5명으로 무엇을 알 수 있나요?</summary><div>표본이 적어 아직 경향을 말할 정도는 아니지만, 제가 생각하지 못했던 것과 격투기 전용 앱을 써 본 사람이 없다는 것을 확인했습니다. 11월 12일 설문 마감 뒤 다시 정리할 예정입니다.</div></details>
         <details class="qa"><summary>비슷한 앱과 무엇이 다른가요?</summary><div>한곳에서 다 다루는 앱이 없었다는 건 만든 이야기 1에 적었습니다. 그중 가장 다른 점은 계산 공식과 출처를 화면에 공개한 것입니다. 신호가 어떤 기준과 어떤 논문에서 나왔는지 앱의 '판단 기준 보기'에서 바로 볼 수 있습니다.</div></details>
       </div>
@@ -1301,8 +1305,9 @@ body.print #skipStoryTouch { display: none; }
     if (lost < 0.05) { $("recOut").innerHTML = `<ul class="why"><li class="l0" style="color:var(--ink)">감량이 없어요. 계체 체중이 평소 체중보다 낮을 때 회복 계산이 나와요.</li></ul>`; return; }
     $("recOut").innerHTML = `<div class="stats"><div><span class="big-num">${r1(lost)}<small>kg</small></span><span class="cap">감량 ${pct.toFixed(1)}%</span></div><div><span class="big-num">${r1(weigh * 1.1)}<small>kg</small></span><span class="cap">계체 뒤 최대 회복 범위 (계체 체중 +10%)</span></div></div>
       ${warn.map(w => `<ul class="why"><li class="l2">${esc(w)}</li></ul>`).join("")}
-      <ul class="why"><li class="l1"><b>직후 ~1시간</b> · 경구수액 600~900mL, 나트륨 1L당 50~90mmol</li><li class="l1"><b>1~2시간</b> · 시간당 1~1.5L씩, 총 ${r1(fl[0])}~${r1(fl[1])}L (잃은 무게의 125~150%)</li>
-      <li class="l1"><b>2시간 뒤부터</b> · 탄수화물 시간당 약 ${cph}g (1g/kg, 최대 60g)</li><li class="l1"><b>경기 전까지 합</b> · 탄수화물 ${carbTot[0]}~${carbTot[1]}g (${carb[0]}~${carb[1]}g/kg · ${big ? "감량 폭이 큰 편" : "작은 편"})</li></ul>
+      <ul class="why"><li class="l0" style="color:var(--ink)">한마디로, 계체 직후에는 짭짤한 전해질 음료로 물부터 나눠 채우고, 2시간쯤 지나 탄수화물을 먹기 시작해요.</li></ul>
+      <ul class="why"><li class="l1"><b>직후 ~1시간</b> · 짭짤한 전해질 음료(경구수액) 600~900mL · 나트륨 1L당 50~90mmol</li><li class="l1"><b>1~2시간</b> · 잃은 무게보다 조금 더 나눠 마시기 · 시간당 1~1.5L, 총 ${r1(fl[0])}~${r1(fl[1])}L (잃은 무게의 125~150%)</li>
+      <li class="l1"><b>2시간 뒤부터</b> · 탄수화물을 조금씩 · 시간당 약 ${cph}g (몸무게 1kg당 1g, 최대 60g)</li><li class="l1"><b>경기 전까지 합</b> · 탄수화물 ${carbTot[0]}~${carbTot[1]}g (몸무게 1kg당 ${carb[0]}~${carb[1]}g · ${big ? "감량 폭이 큰 편" : "작은 편"})</li></ul>
       <p class="src">앱의 회복 계산식과 같아요. 감량한 무게를 모두 수분으로 보고 계산한 값이에요. 대회 규정과 팀 의료진의 안내가 먼저예요.</p>`;
   }
   rec();
@@ -1355,7 +1360,7 @@ body.print #skipStoryTouch { display: none; }
     $("route").innerHTML = ROLES[roleSel][1].map((s, i) => `${i ? "<i>→</i>" : ""}<span class="${i && i < ROLES[roleSel][1].length - 1 ? "on" : ""}">${s}</span>`).join("") + (roleSel === 2 ? `<p class="note" style="width:100%;margin-top:6px">코치이면서 선수인 분은 둘 다 겪어서 양쪽 질문을 모두 받게 했습니다.</p>` : "");
   }
   $("roleT").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { roleSel = +b.dataset.i; roles(); } }); roles();
-  const QS = [["겪은 일", "감량·회복 중에 겪은 적이 있는 일 (선수 4명, 여러 개)", [["심한 어지럼", 3], ["잠들기 어려움", 3, 1], ["경기력이 떨어진 느낌", 2], ["쥐·경련", 1], ["계체 실패", 1], ["병원에 간 적", 0]], "'잠들기 어려움'은 수분 감량 중에 흔히 겪는다고 알고 있던 문제라 설문 중간에 추가한 항목인데, 선수 4명 중 3명이 골랐습니다.", 4],
+  const QS = [["겪은 일", "감량·회복 중에 겪은 적이 있는 일 (선수 4명, 여러 개)", [["심한 어지럼", 3], ["잠들기 어려움", 3, 1], ["경기력이 떨어진 느낌", 2], ["쥐·경련", 1], ["계체 실패", 1], ["병원에 간 적", 0]], "'잠들기 어려움'은 수분 감량 중에 흔히 겪는다고 알고 있던 문제라 첫 답이 오기 전에 제가 넣은 항목인데, 선수 4명 중 3명이 골랐습니다.", 4],
     ["물로 빼는 양", "계체 전 2~3일 동안 물로 빼는 양 (선수 4명)", [["1kg 미만", 0], ["1~3kg", 1], ["3~5kg", 3], ["5kg 이상", 0], ["하지 않음", 0]], "4명 모두 계체 후에는 전해질 음료부터 마시고 그다음 탄수화물을 먹는다고 적었습니다.", 4],
     ["필요한 기능", "근거 기반 앱에서 필요한 것 (5명, 여러 개)", [["감량 계획", 5], ["식단 기록", 5], ["계체 후 회복 계획", 4], ["컨디션에 따른 훈련 강도", 3], ["코치와 기록 공유", 3], ["부상·증상 체크", 2], ["훈련 영상 비교", 2]], "격투기 전용 앱을 써 본 사람은 없었고, 한 분은 제미나이를 칼로리 계산과 가이드로 썼다고 적었습니다. 쓸 생각은 5점 만점에 5·5·5·3·3점.", 5]];
   let qSel = 0;
@@ -1405,7 +1410,7 @@ body.print #skipStoryTouch { display: none; }
     ["11월 3일", "자동 검증 3차례", "", "build", "AI가 고치고·찾고·채점."],
     ["11월 3~4일", "설정 정리, 평가 AI 안 일부 반영", "", "build", "뒤로 버튼은 하위 화면에만, 증상 체크·회복 계산기 버튼은 흰색으로."],
     ["11월 4일", "현장 설문 설계", "", "field", "입장에 따라 질문이 갈라지는 구글 폼. 로그인 없이."],
-    ["11월 4~5일", "코치·관장, 선수, 기자에게 DM", "", "field", "설문을 돌리던 중 '잠들기 어려움' 추가."],
+    ["11월 4~5일", "코치·관장, 선수, 기자에게 DM", "", "field", "첫 답이 오기 전에 '잠들기 어려움' 추가."],
     ["11월 5일", "응답 3명", "", "field", "잠들기 어려움 2명, 격투기 관련 앱 써 본 사람 0명."],
     ["11월 5일", "MMA만 떼어 새 앱으로", "", "build", "종목을 MMA로 고정, 저장 공간 분리. 여러 종목 앱은 그대로."],
     ["11월 6일", "검증·평가 8번, 사용성 원칙 점검", "", "test", "피로·근육통·스트레스는 1이 좋음으로 번호를 뒤집고, 빨강은 평소보다 4점 이상 낮을 때만 켜지게 바꿨습니다. 이유에 '평소보다 나빠진 것'을 보여 주고, 사용성 원칙 10가지로 다시 점검했습니다."],
@@ -1431,8 +1436,8 @@ body.print #skipStoryTouch { display: none; }
     ["하루 열량", "기초대사량 × 활동 정도 1.4~1.85배", "Mifflin 등 (1990)", "논문"],
     ["탄수화물·단백질", "훈련 시간에 따라 탄수화물 3~8 g/kg, 단백질 유지 1.6·감량 2.0·증량 1.8 g/kg", "미국스포츠의학회 (2016); 국제스포츠영양학회 (2017)", "학회 입장문"],
     ["감량 속도", "기한 없으면 주 0.5%, 주 1%를 넘으면 막음", "Helms 등 (2014)", "논문"],
-    ["계체 후 수분", "직후 600~900mL, 시간당 1~1.5L, 잃은 무게의 125~150%, 나트륨 1L당 50~90mmol", "국제스포츠영양학회 (2025); 게토레이 스포츠과학연구소", "학회 입장문"],
-    ["계체 후 탄수화물", "2시간 뒤부터 시간당 약 1 g/kg (최대 60g), 감량 5% 이상이면 8~12 g/kg, 아니면 4~7 g/kg", "국제스포츠영양학회 (2025); Lewis James 발표", "학회 입장문"],
+    ["계체 후 수분", "잃은 무게보다 조금 더, 짭짤한 음료로 나눠 마시기 · 직후 600~900mL, 시간당 1~1.5L, 잃은 무게의 125~150%, 나트륨 1L당 50~90mmol", "국제스포츠영양학회 (2025); 게토레이 스포츠과학연구소", "학회 입장문"],
+    ["계체 후 탄수화물", "2시간쯤 지나 조금씩 먹기 시작 · 시간당 몸무게 1kg당 약 1g (최대 60g), 경기 전까지 합은 감량 5% 이상이면 1kg당 8~12g, 아니면 4~7g", "국제스포츠영양학회 (2025); Lewis James 발표", "학회 입장문"],
     ["급속 감량 범위 (경고용)", "계체 72시간 전 6.7%, 48시간 5.7%, 24시간 4.4% · 전날 계체 최대 8%, 당일 5% 미만 · 감량 계획을 세우는 데는 쓰지 않고, 이미 끝난 감량이 이 범위를 넘었을 때 경고만 합니다.", "국제스포츠영양학회 (2025); 게토레이 스포츠과학연구소", "학회 입장문 (경고용)"],
     ["35세 이상 확인", "운동 중 가슴 불편감·숨참·어지럼, 준비·정리운동, 주 2일 근력 운동", "Riebe 등 (2015); 미국스포츠의학회 지침 11판; 세계보건기구 (2020)", "공식 지침 + 논문"],
     ["음식 영양값", "식약처 식품영양성분 통합DB에서 1,015개", "식품의약품안전처 (공공데이터포털)", "공식 기관 자료"]];
