@@ -12,6 +12,7 @@
 <script>
 /* 0.1.21 화면 밝기: 자동(폰 설정) / 밝게 / 어둡게 — 기록 데이터와 따로, 작은 키에만 */
 /* 0.1.23 포트폴리오 시연(임베드)은 window.__THEME_LOCK 으로 고정 — 폰 설정·저장값 무시 */
+/* 0.1.24 회복 계산 원문 기준: 회복 목표 = 평소 체중(+10% 상한 없앰), 탄수화물 합은 '계체 주간에 탄수화물을 크게 줄였나요?' 답으로 (ISSN 2025 핵심 14) */
 (function(){ var m="auto", L=window.__THEME_LOCK; try{ var v=localStorage.getItem("condition-mma-theme"); if(v==="light"||v==="dark") m=v; }catch(e){}
   if(L==="light"||L==="dark") m=L;
   var d=m!=="auto"?m:(window.matchMedia&&matchMedia("(prefers-color-scheme: light)").matches?"light":"dark");
@@ -560,7 +561,7 @@ function cleanData(d){
   d.recent=Array.isArray(d.recent)?d.recent.filter(x=>typeof x==="string").map(str).slice(0,20):[];
   const DTL=/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
   if(obj(d.cut)){ const c=d.cut; d.cut={usualKg:numOr(c.usualKg,20,250)??"", weighKg:numOr(c.weighKg,20,250)??"", weighAt:DTL.test(c.weighAt)?c.weighAt:"", fightAt:DTL.test(c.fightAt)?c.fightAt:"",
-    checks:Array.isArray(c.checks)?c.checks.filter(x=>Array.isArray(x)&&DTL.test(x[0])&&numOr(x[1],20,250)!=null).map(x=>[x[0],+x[1]]):[]}; } else delete d.cut;
+    checks:Array.isArray(c.checks)?c.checks.filter(x=>Array.isArray(x)&&DTL.test(x[0])&&numOr(x[1],20,250)!=null).map(x=>[x[0],+x[1]]):[], carbCut:(c.carbCut==="예"||c.carbCut==="아니요")?c.carbCut:""}; } else delete d.cut;
   d.vnotes=(Array.isArray(d.vnotes)?d.vnotes:[]).filter(n=>obj(n)&&DT.test(n.date)).map(n=>({date:n.date, names:(Array.isArray(n.names)?n.names:[]).map(str),
     memo:String(n.memo??"").slice(0,2000), marks:(Array.isArray(n.marks)?n.marks:[]).filter(obj).map(m=>({k:m.k==="B"?"B":"A", t:num(m.t), txt:String(m.txt??"").slice(0,200)}))}));
   const out={}; for(const k of ["profile","logs","lastBackup","created","meals","goal","myFoods","recent","cut","vnotes"]) if(k in d) out[k]=d[k];
@@ -580,7 +581,7 @@ function band(p){ const a=ageOf(p);
   return {id:"m50",name:"성인 · 50세 이상",youth:false}; }
 
 /* ───────── 종목 ───────── */
-const APP_VER = "0.1.23";
+const APP_VER = "0.1.24";
 // subs 값: null = 포지션 없음 / [[묶음 이름, [포지션…]], …]
 const SPORTS = {
   "투기": { subs:{ "MMA":null }, weightClass:true }
@@ -1241,16 +1242,17 @@ function recoveryPlan(c){
   const gap=hoursBetween(c.weighAt,c.fightAt), lost=c.usualKg-c.weighKg, pct=lost/c.usualKg*100;
   const fl=[lost*1.25, lost*1.5];                       // 잃은 수분의 125~150% (ISSN 2025)
   const cph=Math.min(60, Math.round(c.weighKg));        // 시간당 약 1g/kg, 최대 60g
-  const big=pct>=5;                                     // 앱 기준: 5% 이상을 큰 감량으로 봄
-  const carb=big?[8,12]:[4,7];                          // g/kg (ISSN 2025)
-  const carbTot=carb.map(x=>Math.round(x*c.weighKg));
+  const cc=c.carbCut;                                   // 계체 주간에 탄수화물을 크게 줄였나요? 예/아니요 (ISSN 2025 핵심 14)
+  const big=cc==="예";
+  const carb=cc==="예"?[8,12]:cc==="아니요"?[4,7]:null; // g/kg (ISSN 2025)
+  const carbTot=carb?carb.map(x=>Math.round(x*c.weighKg)):null;
   const carbFit=Math.max(0,Math.floor(gap-2))*60;       // 2시간 뒤부터 시간당 최대 60g
   const warn=[];
   if(gap<12 && pct>=5) warn.push(`계체와 경기가 같은 날이면 감량은 5% 미만이 권장돼요. 지금 ${pct.toFixed(1)}%예요. (GSSI)`);
   if(gap>=12 && pct>8) warn.push(`전날 계체여도 감량은 최대 8%까지가 권장돼요. 지금 ${pct.toFixed(1)}%예요. (GSSI)`);
   if(fl[0]>Math.max(0,gap)*1.5) warn.push(`경기 전까지 시간이 짧아 잃은 수분을 다 채우기 어려워요. 무리해서 한 번에 많이 마시지 마세요.`);
-  if(carbFit<carbTot[0]) warn.push(`경기 전까지 시간당 60g씩 먹어도 탄수화물 목표(${carbTot[0]}g)를 다 채우기 어려워요. 가능한 만큼만 나눠 드세요.`);
-  return {gap,lost,pct,fl,cph,big,carb,carbTot,warn,target:Math.min(c.usualKg,c.weighKg*1.10)};
+  if(carbTot&&carbFit<carbTot[0]) warn.push(`경기 전까지 시간당 60g씩 먹어도 탄수화물 목표(${carbTot[0]}g)를 다 채우기 어려워요. 가능한 만큼만 나눠 드세요.`);
+  return {gap,lost,pct,fl,cph,big,carb,carbTot,warn,target:c.usualKg};
 }
 function renderRecovery(){
   const p=S.profile; if(!S.cut){ S.cut={weighKg:"",usualKg:curWeight(),weighAt:"",fightAt:"",checks:[]}; } const c=S.cut;
@@ -1260,7 +1262,8 @@ function renderRecovery(){
   <div class="card"><label class="f">평소 체중</label>${picker("ru",c.usualKg,...wRange(c.usualKg||curWeight()),1,"kg")}
   <label class="f">계체 체중 <span class="mut">(공식 계체 숫자 그대로, 소수점까지)</span></label>${picker("rw",c.weighKg,...wRange(p.classLimit||c.usualKg||curWeight()),1,"kg",p.classLimit?`예: ${p.classLimit}`:"예: 70.3")}<small class="src">소수점이 있으면 목록에서 '직접 입력'을 골라 주세요.</small>
   <label class="f">계체 시각</label><input id="rwa" type="datetime-local" value="${esc(c.weighAt)}">
-  <label class="f">경기 시각</label><input id="rfa" type="datetime-local" value="${esc(c.fightAt)}"></div>
+  <label class="f">경기 시각</label><input id="rfa" type="datetime-local" value="${esc(c.fightAt)}">
+  <label class="f">계체 주간에 탄수화물을 크게 줄였나요?</label><div class="yn" id="rcc">${["예","아니요"].map(v=>`<button class="chip ${c.carbCut===v?"on":""}" data-v="${v}" aria-pressed="${c.carbCut===v}">${v}</button>`).join("")}</div></div>
   <div id="rres"></div>
   <h2>참고: 급속 감량 범위</h2><div class="card" style="font-size:15px">
   <ul class="why"><li class="lo">계체 72시간 전부터 6.7% · 48시간 5.7% · 24시간 4.4% 이내</li>
@@ -1270,9 +1273,11 @@ function renderRecovery(){
   <button class="btn danger" id="rclr">계산기 비우기</button>`;
   const num=(id,k)=>{ const el=$("#"+id); const f=()=>{ const v=parseFloat(el.value), nv=v>=20&&v<=250?v:""; if(nv===c[k]) return; c[k]=nv; save(); drawRecovery(); }; el.oninput=f; el.onchange=f; };
   num("ru","usualKg"); num("rw","weighKg");
+  $("#rcc").querySelectorAll("button").forEach(b=>b.onclick=()=>{ c.carbCut=c.carbCut===b.dataset.v?"":b.dataset.v; save();
+    $("#rcc").querySelectorAll("button").forEach(x=>{ const on=x.dataset.v===c.carbCut; x.classList.toggle("on",on); x.setAttribute("aria-pressed",String(on)); }); drawRecovery(); });
   // 날짜·시각은 값만 저장하고 화면은 그대로 둠
   ["rwa","rfa"].forEach((id,i)=>{ const el=$("#"+id); const f=()=>{ const key=i?"fightAt":"weighAt"; if(el.value===c[key]) return; c[key]=el.value; save(); drawRecovery(); }; el.onchange=f; el.onblur=f; });
-  $("#rclr").onclick=()=>ask("계체 후 회복 계산기 내용을 비울까요?","비우기",()=>{ S.cut={weighKg:"",usualKg:"",weighAt:"",fightAt:"",checks:[]}; save(); renderRecovery(); });
+  $("#rclr").onclick=()=>ask("계체 후 회복 계산기 내용을 비울까요?","비우기",()=>{ S.cut={weighKg:"",usualKg:"",weighAt:"",fightAt:"",checks:[],carbCut:""}; save(); renderRecovery(); });
   drawRecovery();
 }
 const sgn=x=>(x>=0?"+":"")+r1(x);
@@ -1286,15 +1291,15 @@ function drawRecovery(){
   const gain=last?last[1]-c.weighKg:0, goal=P.target-c.weighKg, prog=last?Math.max(0,Math.min(100,gain/goal*100)):0;
   box.innerHTML=`<div class="stats"><div><b>${r1(P.lost)}<small>kg</small></b><span class="cap">감량 (${P.pct.toFixed(1)}%)</span></div>
   <div><b>${r1(P.gap)}<small>h</small></b><span class="cap">경기까지</span></div>
-  <div><b>${r1(P.target)}<small>kg</small></b><span class="cap">회복 목표</span></div></div><small class="src" style="display:block;margin-top:-4px">회복 목표 = 평소 체중 (계체 체중 +10%를 넘지 않게)</small>
+  <div><b>${r1(P.target)}<small>kg</small></b><span class="cap">회복 목표</span></div></div><small class="src" style="display:block;margin-top:-4px">회복 목표 = 평소 체중</small>
   ${P.warn.map(w=>`<div class="banner bad">${w}</div>`).join("")}
   <h2>시간대별 계획</h2><div class="card">
   <ul class="why">
    <li class="hi"><span><b>계체 직후 ~1시간</b> · 경구수액(이온음료보다 짠 것) <b>600~900mL</b>. 나트륨 1L당 50~90mmol.</span></li>
    <li class="hi"><span><b>1~2시간</b> · 시간당 <b>1~1.5L</b>씩 나눠 마시기. 총 <b>${r1(P.fl[0])}~${r1(P.fl[1])}L</b>까지 (잃은 무게의 125~150%).</span></li>
    <li class="hi"><span><b>2시간 뒤부터</b> · 탄수화물 시간당 약 <b>${P.cph}g</b> (1g/kg, 최대 60g). 소화 잘 되는 저섬유 음식으로.</span></li>
-   <li class="hi"><span><b>경기 전까지 탄수화물 합</b> · <b>${P.carbTot[0]}~${P.carbTot[1]}g</b> (${P.carb[0]}~${P.carb[1]}g/kg, ${P.big?"감량 폭이 큰 편":"감량 폭이 작은 편"})</span></li>
-  </ul><small class="src">감량한 무게를 모두 수분으로 보고 계산한 값이에요. 이 앱은 5% 이상을 '감량 폭이 큰 편'으로 봐요.</small></div>
+   <li class="hi"><span><b>경기 전까지 탄수화물 합</b> · ${P.carb?`<b>${P.carbTot[0]}~${P.carbTot[1]}g</b> (${P.carb[0]}~${P.carb[1]}g/kg, ${P.big?"계체 주간에 탄수화물을 크게 줄인 경우":"탄수화물을 조금 줄인 경우"})`:"위의 '계체 주간에 탄수화물을 크게 줄였나요?'에 답하면 나와요."}</span></li>
+  </ul><small class="src">감량한 무게를 모두 수분으로 보고 계산한 값이에요. 탄수화물 합은 국제스포츠영양학회 입장문처럼 계체 주간에 탄수화물을 크게 줄였는지로 나눠요.</small></div>
   <h2>회복 확인</h2><div class="card">
   <p class="mut">중간중간 몸무게를 재서 넣으면 회복 목표(${r1(P.target)}kg) 대비 얼마나 올라왔는지 보여 줘요.</p>
   ${last?`<div class="mlab"><span>지금 ${last[1]}kg · ${sgn(gain)}kg</span><span>${Math.round(prog)}%</span></div><div class="track"><i style="width:${prog}%;background:var(--acc)"></i></div>
@@ -1492,7 +1497,7 @@ function renderSettings(){
   <details class="fold"><summary>체급표</summary><div>MMA 통합 규정(Unified Rules) 체급이에요. 대회마다 체급 한계가 다르면 처음 설정에서 직접 고쳐 쓰세요.</div></details>
   <details class="fold"><summary>증상 체크</summary><div>고른 증상 중 가장 급한 단계(119 / 오늘 병원 / 쉬면서 관찰)로 안내하고, 119·병원 단계를 기록하면 그날 신호가 빨강이 돼요.<small class="src">${Object.values(SYM_SRC).join(" / ")}</small></div></details>
   
-  <details class="fold"><summary>계체 후 회복</summary><div>잃은 무게의 125~150%를 수분으로, 처음 600~900mL, 시간당 1~1.5L, 나트륨 50~90mmol/L. 2시간 뒤부터 탄수화물 시간당 약 1g/kg(최대 60g), 합계 4~7g/kg(감량 5% 이상이면 8~12g/kg).<small class="src">ISSN 2025 입장문; GSSI (Reale) 자료; Lewis James 발표</small></div></details>
+  <details class="fold"><summary>계체 후 회복</summary><div>잃은 무게의 125~150%를 수분으로, 처음 600~900mL, 시간당 1~1.5L, 나트륨 50~90mmol/L. 2시간 뒤부터 탄수화물 시간당 약 1g/kg(최대 60g), 합계는 계체 주간에 탄수화물을 크게 줄였으면 8~12g/kg, 조금 줄였으면 4~7g/kg. 회복 목표는 평소 체중.<small class="src">ISSN 2025 입장문; GSSI (Reale) 자료; Lewis James 발표</small></div></details>
   <details class="fold"><summary>식단 목표</summary><div><p>하루 열량은 기초대사량(Mifflin-St Jeor 공식) × 주간 훈련 횟수 활동계수에서 시작해요. 단백질은 체중 1kg당 1.6g(감량 2.0g, 증량 1.8g, 청소년 1.5g), 탄수화물은 그날 훈련 시간에 따라 1kg당 3~8g이에요. 감량은 주 1%, 증량은 주 0.5%를 넘지 않게 막아요.<small class="src">Thomas 등 (2016) Med Sci Sports Exerc 48(3); Jäger 등 (2017) JISSN 14:20; Helms 등 (2014) JISSN 11:20; Mifflin 등 (1990) Am J Clin Nutr 51(2)</small></p><p>음식 영양값은 식품의약품안전처 식품영양성분 통합DB(공공데이터포털, 2026-09-29 기준)에서 가져왔어요.</p></div></details>
   <p class="mut">이 앱은 의학적 진단·치료를 하지 않아요. 몸에 이상이 있으면 의료진과 상담하세요.</p></div>
   <p class="mut" style="text-align:center">컨디션 신호등 MMA v${APP_VER}</p>`;
@@ -1688,7 +1693,7 @@ function whyPlan(T){
   <p>기초대사량 ${T.bmr.toLocaleString()}kcal × 활동계수(주 ${esc(S.profile.weeklySessions)}회) = 유지 열량 ${T.tdee.toLocaleString()}kcal${T.adj?` → 목표 조정 ${T.adj>0?"+":""}${T.adj}kcal`:""}</p>
   <p>단백질: 체중 ${r1(T.w)}kg × ${T.pk}g = ${T.p}g<br>탄수화물: 오늘 훈련 ${T.min}분 → 1kg당 ${T.ck}g = ${T.c}g<br>지방: 남은 열량 = ${T.f}g</p>
   ${T.notes.map(x=>`<p class="mut">${x}</p>`).join("")}
-  <small class="src">기초대사량: Mifflin 등 (1990) Am J Clin Nutr 51(2)<br>탄수화물 1kg당 3~10g, 단백질 1.2~2.0g: Thomas 등 (2016) ACSM·영양사협회·캐나다영양사 공동 입장문, Med Sci Sports Exerc 48(3)<br>단백질 1.4~2.0g, 감량 중 더 높게: Jäger 등 (2017) ISSN 입장문, JISSN 14:20<br>감량 속도 주 0.5~1%: Helms 등 (2014) JISSN 11:20<br>최소 섭취량 1,500/1,200kcal: 일반 임상 기준(저열량 식단 하한)<br>음식 영양값: 식품의약품안전처 식품영양성분 통합DB</small>
+  <small class="src">기초대사량: Mifflin 등 (1990) Am J Clin Nutr 51(2)<br>탄수화물 1kg당 3~8g(훈련 시간에 따라 이 앱이 고른 값), 단백질 1.2~2.0g: Thomas 등 (2016) ACSM·영양사협회·캐나다영양사 공동 입장문, Med Sci Sports Exerc 48(3)<br>단백질 1.4~2.0g, 감량 중 더 높게: Jäger 등 (2017) ISSN 입장문, JISSN 14:20<br>감량 속도 주 0.5~1%: Helms 등 (2014) JISSN 11:20<br>최소 섭취량 1,500/1,200kcal: 일반 임상 기준(저열량 식단 하한)<br>음식 영양값: 식품의약품안전처 식품영양성분 통합DB</small>
   <button class="btn ghost neutral" id="cl">닫기</button>`); $("#cl").onclick=closeSheet;
 }
 function goalSheet(){
