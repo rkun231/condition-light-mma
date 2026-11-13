@@ -968,7 +968,7 @@ body.print #skipStoryTouch { display: none; }
     if (z <= -1.5 && m - w >= 4) up(2, `컨디션 점수(${w}/20)가 평소(${m.toFixed(1)})보다 많이 낮아요.`, dropItems(o)); else if (z <= -1) up(1, `컨디션 점수(${w}/20)가 평소(${m.toFixed(1)})보다 낮아요.`, dropItems(o));
     if (o.H < 6) up(1, `잠잔 시간 ${fmtSleep(o.H)} · 권장 7시간 이상보다 적어요.`);
     if (o.W != null && o.W <= -2) up(1, `몸무게가 평소보다 ${Math.abs(o.W).toFixed(1)}% 줄었어요. 덜 먹었거나 물이 부족할 수 있어요.`);
-    // 앱 v0.1.24 signal()과 같은 초록 이유 (잠·점수 요약 + 컨디션 점수 + 안 좋은 항목 + 평소 비교). 예시 선수는 지난 27일 기록이 있음
+    // 앱 v0.1.25 signal()과 같은 초록 이유 (잠·점수 요약 + 컨디션 점수 + 안 좋은 항목 + 평소 비교). 예시 선수는 지난 27일 기록이 있음
     // 정해진 글자와 숫자로만 만든 줄이라 <br>·<b>를 그대로 씀 (4번째 값 true = HTML)
     if (!why.some(a => a[0])) {
       const sTxt = k => { const d = shownN(k, o[k]); return `${d}(${ENDW[k][d - 1]})`; };
@@ -1009,7 +1009,7 @@ body.print #skipStoryTouch { display: none; }
       `<div class="now ${ratio > 1.5 ? "bad" : ratio > 1.3 ? "warn" : ""} ${done.has(2) ? "" : "pending"}"><b>${proj}</b><div class="pl">${av}<i style="height:${proj / max * H}px"></i></div><span>이번 주*</span></div>`;
     $("lbLegend").textContent = `평소 주평균 ${Math.round(avg)}`;
     if (done.has(2)) { dayResult.d2 = ratio > 1.5 ? 2 : ratio > 1.3 ? 1 : 0; setHudSignal(dayResult.d2); }
-    $("loadOut").innerHTML = `오늘 훈련량 <b>${m * r}</b> · 이번 주 예상 <b>${proj}</b> = 평소 주평균(${Math.round(avg)})의 <b class="${ratio > 1.5 ? "no" : ratio > 1.3 ? "mid" : "yes"}">${ratio.toFixed(2)}배</b>. ${ratio > 1.5 ? "앱은 '급하게 늘었어요'로 빨강 이유를 붙여요." : ratio > 1.3 ? "앱은 '늘었어요'로 노랑 이유를 붙여요." : "평소 범위예요."}<br><span class="src">* 남은 사흘은 월요일과 같은 90분 × 6으로 가정. 기록 21일 이상일 때만 계산하는 참고 지표예요.</span>`;
+    $("loadOut").innerHTML = `오늘 훈련량 <b>${m * r}</b> · 이번 주 예상 <b>${proj}</b> = 평소 주평균(${Math.round(avg)})의 <b class="${ratio > 1.5 ? "no" : ratio > 1.3 ? "mid" : "yes"}">${ratio.toFixed(2)}배</b>. ${ratio > 1.5 ? "앱은 '급격히 늘었어요'로 빨강 이유를 붙여요." : ratio > 1.3 ? "앱은 '늘었어요'로 노랑 이유를 붙여요." : "평소 범위예요."}<br><span class="src">* 남은 사흘은 월요일과 같은 90분 × 6으로 가정. 기록 21일 이상일 때만 계산하는 참고 지표예요.</span>`;
   }
   ["tMin", "tRpe"].forEach(id => $(id).addEventListener("input", load2)); load2();
   $("t2go").addEventListener("click", () => { complete(2); load2(); $("t2go").firstElementChild.textContent = "기록했어요 ✓"; });
